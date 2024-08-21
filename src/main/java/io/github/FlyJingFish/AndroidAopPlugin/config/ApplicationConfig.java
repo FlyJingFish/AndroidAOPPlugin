@@ -74,6 +74,6 @@ public class ApplicationConfig {
     }
 
     public String getFileType() {
-        return codeStyle == CodeStyle.KotlinCode ? FileTypeExtension.Kotlin.getValue():FileTypeExtension.JAVA.getValue();
+        return codeStyle == CodeStyle.KotlinCode ? FileTypeExtension.KOTLIN.getValue():FileTypeExtension.JAVA.getValue();
     }
 }

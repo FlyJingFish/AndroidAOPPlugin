@@ -28,13 +28,13 @@ import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension;
 /**
  * Bytecode view.
  */
-public class BytecodeOutline extends ACodeView {
+public class ReplaceViewKt extends ACodeView {
 
-	public BytecodeOutline(final Project project, KeymapManager keymapManager, final ToolWindowManager toolWindowManager) {
-		super(toolWindowManager, keymapManager, project, FileTypeExtension.JAVA.getValue());
+	public ReplaceViewKt(final Project project, KeymapManager keymapManager, final ToolWindowManager toolWindowManager) {
+		super(toolWindowManager, keymapManager, project, FileTypeExtension.KOTLIN.getValue());
 	}
 
-	public static BytecodeOutline getInstance(Project project) {
-		return ServiceManager.getService(project, BytecodeOutline.class);
+	public static ReplaceViewKt getInstance(Project project) {
+		return ServiceManager.getService(project, ReplaceViewKt.class);
 	}
 }

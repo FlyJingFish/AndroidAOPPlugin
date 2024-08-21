@@ -31,7 +31,8 @@ import io.github.FlyJingFish.AndroidAopPlugin.config.ASMPluginComponent;
 public class MatchView extends ACodeView {
 
 	public MatchView(final Project project, KeymapManager keymapManager, final ToolWindowManager toolWindowManager) {
-		super(toolWindowManager, keymapManager, project, ASMPluginComponent.getApplicationConfig().getFileType());
+//		super(toolWindowManager, keymapManager, project, ASMPluginComponent.getApplicationConfig().getFileType());
+		super(toolWindowManager, keymapManager, project, FileTypeExtension.JAVA.getValue());
 	}
 
 	public static MatchView getInstance(Project project) {

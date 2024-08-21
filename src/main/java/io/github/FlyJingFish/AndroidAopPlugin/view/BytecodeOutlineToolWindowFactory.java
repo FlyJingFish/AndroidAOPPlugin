@@ -30,6 +30,7 @@ public class BytecodeOutlineToolWindowFactory implements ToolWindowFactory {
 
     public void createToolWindowContent(final Project project, final ToolWindow toolWindow) {
         toolWindow.getContentManager().addContent(ContentFactory.SERVICE.getInstance().createContent(ReplaceView.getInstance(project), "Replace", false));
+        toolWindow.getContentManager().addContent(ContentFactory.SERVICE.getInstance().createContent(ReplaceViewKt.getInstance(project), "Replace(Kt)", false));
         toolWindow.getContentManager().addContent(ContentFactory.SERVICE.getInstance().createContent(MatchView.getInstance(project), "Match", false));
     }
 

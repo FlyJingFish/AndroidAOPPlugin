@@ -44,9 +44,11 @@ import io.github.FlyJingFish.AndroidAopPlugin.common.Constants;
 import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension;
 import io.github.FlyJingFish.AndroidAopPlugin.config.ASMPluginComponent;
 import io.github.FlyJingFish.AndroidAopPlugin.config.ApplicationConfig;
+import io.github.FlyJingFish.AndroidAopPlugin.config.CodeStyle;
 import io.github.FlyJingFish.AndroidAopPlugin.util.AndroidAOPCode;
 import io.github.FlyJingFish.AndroidAopPlugin.view.ReplaceView;
 import io.github.FlyJingFish.AndroidAopPlugin.view.MatchView;
+import io.github.FlyJingFish.AndroidAopPlugin.view.ReplaceViewKt;
 import org.objectweb.asm.ClassReader;
 
 
@@ -192,12 +194,14 @@ public class ShowBytecodeViewerAction extends AnAction {
         ApplicationManager.getApplication().runWriteAction(() -> {
             ReplaceView replaceView = ReplaceView.getInstance(project);
             MatchView matchView = MatchView.getInstance(project);
+            ReplaceViewKt replaceViewKt = ReplaceViewKt.getInstance(project);
             ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
 
 
             if (file == null) {
                 replaceView.setCode(file, Constants.NO_CLASS_FOUND);
                 matchView.setCode(file, Constants.NO_CLASS_FOUND);
+                replaceViewKt.setCode(file, Constants.NO_CLASS_FOUND);
                 toolWindowManager.getToolWindow(Constants.PLUGIN_WINDOW_NAME).activate(null);
                 return;
             } else {
@@ -217,14 +221,24 @@ public class ShowBytecodeViewerAction extends AnAction {
 
 //            reader.accept(new TraceClassVisitor(new PrintWriter(stringWriter)), flags);
 
-            StringWriter stringWriter = new StringWriter();
-            stringWriter.getBuffer().setLength(0);
-            stringWriter.append(AndroidAOPCode.getReplaceContent(reader,applicationConfig.getCodeStyle()).toString());
-            PsiFile psiFile = PsiFileFactory.getInstance(project).createFileFromText(Constants.FILE_NAME, FileTypeManager.getInstance().getFileTypeByExtension(FileTypeExtension.JAVA.getValue()), stringWriter.toString());
+            AndroidAOPCode androidAOPCode = new AndroidAOPCode(reader);
+
+
+            StringWriter replaceJavaCode = androidAOPCode.getReplaceContent(CodeStyle.JavaCode);
+            PsiFile psiFile = PsiFileFactory.getInstance(project).createFileFromText(Constants.FILE_NAME, FileTypeManager.getInstance().getFileTypeByExtension(FileTypeExtension.JAVA.getValue()), replaceJavaCode.toString());
             CodeStyleManager.getInstance(project).reformat(psiFile);
             replaceView.setCode(file, psiFile.getText(),applicationConfig.getFileType());
 
-            matchView.setCode(file, stringWriter.toString(),applicationConfig.getFileType());
+
+            StringWriter replaceKotlinCode = androidAOPCode.getReplaceContent(CodeStyle.KotlinCode);
+            PsiFile psiFileKt = PsiFileFactory.getInstance(project).createFileFromText(Constants.FILE_NAME, FileTypeManager.getInstance().getFileTypeByExtension(FileTypeExtension.KOTLIN.getValue()), replaceKotlinCode.toString());
+            CodeStyleManager.getInstance(project).reformat(psiFileKt);
+            replaceViewKt.setCode(file, psiFileKt.getText(),applicationConfig.getFileType());
+
+            StringWriter matchJavaCode = androidAOPCode.getMatchContent();
+            PsiFile matchPsiFile = PsiFileFactory.getInstance(project).createFileFromText(Constants.FILE_NAME, FileTypeManager.getInstance().getFileTypeByExtension(FileTypeExtension.JAVA.getValue()), matchJavaCode.toString());
+            CodeStyleManager.getInstance(project).reformat(matchPsiFile);
+            matchView.setCode(file, matchPsiFile.getText(),applicationConfig.getFileType());
 
 
             toolWindowManager.getToolWindow(Constants.PLUGIN_WINDOW_NAME).activate(null);

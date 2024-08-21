@@ -32,7 +32,8 @@ import io.github.FlyJingFish.AndroidAopPlugin.config.ASMPluginComponent;
 public class ReplaceView extends ACodeView {
 
 	public ReplaceView(final ToolWindowManager toolWindowManager, KeymapManager keymapManager, final Project project) {
-		super(toolWindowManager, keymapManager, project, ASMPluginComponent.getApplicationConfig().getFileType());
+//		super(toolWindowManager, keymapManager, project, ASMPluginComponent.getApplicationConfig().getFileType());
+		super(toolWindowManager, keymapManager, project, FileTypeExtension.JAVA.getValue());
 	}
 
 	public static ReplaceView getInstance(Project project) {

@@ -1,6 +1,7 @@
 package io.github.FlyJingFish.AndroidAopPlugin.util;
 
-import org.objectweb.asm.ClassReader;
+
+import org.objectweb.asm.*;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -12,9 +13,9 @@ public class MethodParamNamesScanner {
     private final ClassNode cn = new ClassNode();
     private int initCount;
 
-    public MethodParamNamesScanner(byte[] inputStreamBytes){
-        ClassReader cr = new ClassReader(inputStreamBytes);
-        cr.accept(cn, ClassReader.EXPAND_FRAMES);
+    public MethodParamNamesScanner(ClassReader cr){
+        ClassWriter cw = new ClassWriter(cr, 0);
+        cr.accept(cn, 0);
         this.methods = cn.methods;
     }
 
@@ -40,7 +41,7 @@ public class MethodParamNamesScanner {
      */
     public List<String> getParamNames(
             String name,
-            String  desc ,
+            String desc ,
             int size
     ) {
         List<String> list = new ArrayList<>();
@@ -66,6 +67,11 @@ public class MethodParamNamesScanner {
                     list.add(tmpArr.get(j).name);
                 }
                 break;
+            }
+        }
+        if (size > 0 && list.isEmpty()){
+            for (int i = 0; i < size; i++) {
+                list.add("var"+i);
             }
         }
         return list;

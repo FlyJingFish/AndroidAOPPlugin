@@ -45,11 +45,11 @@
         <applicationConfigurable groupId="tools" instance="io.github.FlyJingFish.AndroidAopPlugin.config.PluginConfig" />
         <toolWindow anchor="right" factoryClass="io.github.FlyJingFish.AndroidAopPlugin.view.BytecodeOutlineToolWindowFactory" icon="/images/asm.gif"
                     id="AndroidAOPPlugin" />
-        <projectService serviceImplementation="io.github.FlyJingFish.AndroidAopPlugin.view.BytecodeOutline"
-            serviceInterface="io.github.FlyJingFish.AndroidAopPlugin.view.BytecodeOutline" />
-        <projectService serviceImplementation="io.github.FlyJingFish.AndroidAopPlugin.view.JavaView"
-            serviceInterface="io.github.FlyJingFish.AndroidAopPlugin.view.JavaView" />
-        <projectService serviceImplementation="io.github.FlyJingFish.AndroidAopPlugin.view.KotlinView"
-            serviceInterface="io.github.FlyJingFish.AndroidAopPlugin.view.KotlinView" />
+<!--        <projectService serviceImplementation="io.github.FlyJingFish.AndroidAopPlugin.view.BytecodeOutline"-->
+<!--            serviceInterface="io.github.FlyJingFish.AndroidAopPlugin.view.BytecodeOutline" />-->
+        <projectService serviceImplementation="io.github.FlyJingFish.AndroidAopPlugin.view.ReplaceView"
+            serviceInterface="io.github.FlyJingFish.AndroidAopPlugin.view.ReplaceView" />
+        <projectService serviceImplementation="io.github.FlyJingFish.AndroidAopPlugin.view.MatchView"
+            serviceInterface="io.github.FlyJingFish.AndroidAopPlugin.view.MatchView" />
     </extensions>
 </idea-plugin>

@@ -49,20 +49,21 @@ public class ACodeView extends SimpleToolWindowPanel implements Disposable {
 
     protected final ToolWindowManager toolWindowManager;
     protected final KeymapManager keymapManager;
-    private final String extension;
     protected Editor editor;
     private ShowASMDiffAction showASMDiffAction;
+    private String fileExtension;
+    private DefaultActionGroup group;
 
     public ACodeView(final ToolWindowManager toolWindowManager, KeymapManager keymapManager, final Project project, final String fileExtension) {
         super(true, true);
         this.toolWindowManager = toolWindowManager;
         this.keymapManager = keymapManager;
         this.project = project;
-        this.extension = fileExtension;
-        setupUI();
+        this.fileExtension = fileExtension;
+        setupUI(fileExtension);
     }
 
-    private void setupUI() {
+    private void setupUI(String extension) {
         final EditorFactory editorFactory = EditorFactory.getInstance();
         Document document = editorFactory.createDocument("");
         editor = editorFactory.createEditor(document, project, FileTypeManager.getInstance().getFileTypeByExtension(extension), true);
@@ -70,7 +71,7 @@ public class ACodeView extends SimpleToolWindowPanel implements Disposable {
 
         final JComponent editorComponent = editor.getComponent();
         add(editorComponent);
-        DefaultActionGroup group = new DefaultActionGroup();
+        group = new DefaultActionGroup();
         group.add(showASMDiffAction);
         group.add(new ShowASMSettingsAction());
 
@@ -83,6 +84,19 @@ public class ACodeView extends SimpleToolWindowPanel implements Disposable {
     }
 
     public void setCode(final VirtualFile file, final String code) {
+        setCode(file,code,fileExtension);
+    }
+    public void setCode(final VirtualFile file, final String code,final String extension) {
+        if (!fileExtension.equals(extension)){
+//            final EditorFactory editorFactory = EditorFactory.getInstance();
+//            Document document = editorFactory.createDocument("");
+//            editor = editorFactory.createEditor(document, project, FileTypeManager.getInstance().getFileTypeByExtension(extension), true);
+//            showASMDiffAction.setExtension(extension);
+//            final ActionManager actionManager = ActionManager.getInstance();
+//            PopupHandler.installPopupHandler(editor.getContentComponent(), group, Constants.PLUGIN_WINDOW_NAME, actionManager);
+
+            fileExtension = extension;
+        }
         final String text = showASMDiffAction.getDocument().getText();
         if (showASMDiffAction.getPreviousFile() == null || file == null || showASMDiffAction.getPreviousFile().getPath().equals(file.getPath()) && !Constants.NO_CLASS_FOUND.equals(text)) {
             if (file != null) showASMDiffAction.setPreviousCode(text);

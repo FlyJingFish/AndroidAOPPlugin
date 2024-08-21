@@ -46,7 +46,7 @@ public class ASMPluginConfiguration {
         skipFramesCheckBox.setSelected(applicationConfig.isProtected());
         skipCodeCheckBox.setSelected(applicationConfig.isPackage());
         expandFramesCheckBox.setSelected(applicationConfig.isPrivate());
-        groovyCodeStyleComboBox.setSelectedItem(applicationConfig.getGroovyCodeStyle());
+        groovyCodeStyleComboBox.setSelectedItem(applicationConfig.getCodeStyle());
     }
 
     public void getData(ApplicationConfig applicationConfig) {
@@ -54,7 +54,7 @@ public class ASMPluginConfiguration {
         applicationConfig.setProtected(skipFramesCheckBox.isSelected());
         applicationConfig.setPackage(skipCodeCheckBox.isSelected());
         applicationConfig.setPrivate(expandFramesCheckBox.isSelected());
-        applicationConfig.setGroovyCodeStyle((CodeStyle) groovyCodeStyleComboBox.getSelectedItem());
+        applicationConfig.setCodeStyle((CodeStyle) groovyCodeStyleComboBox.getSelectedItem());
     }
 
     public boolean isModified(ApplicationConfig applicationConfig) {
@@ -62,7 +62,7 @@ public class ASMPluginConfiguration {
         if (skipFramesCheckBox.isSelected() != applicationConfig.isProtected()) return true;
         if (skipCodeCheckBox.isSelected() != applicationConfig.isPackage()) return true;
         if (expandFramesCheckBox.isSelected() != applicationConfig.isPrivate()) return true;
-        return !Objects.equals(groovyCodeStyleComboBox.getSelectedItem(), applicationConfig.getGroovyCodeStyle());
+        return !Objects.equals(groovyCodeStyleComboBox.getSelectedItem(), applicationConfig.getCodeStyle());
     }
 
     private void createUIComponents() {

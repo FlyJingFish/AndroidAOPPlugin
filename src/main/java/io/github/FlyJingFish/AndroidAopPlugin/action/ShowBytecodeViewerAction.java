@@ -45,9 +45,8 @@ import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension;
 import io.github.FlyJingFish.AndroidAopPlugin.config.ASMPluginComponent;
 import io.github.FlyJingFish.AndroidAopPlugin.config.ApplicationConfig;
 import io.github.FlyJingFish.AndroidAopPlugin.util.AndroidAOPCode;
-import io.github.FlyJingFish.AndroidAopPlugin.view.JavaView;
-import io.github.FlyJingFish.AndroidAopPlugin.view.BytecodeOutline;
-import io.github.FlyJingFish.AndroidAopPlugin.view.KotlinView;
+import io.github.FlyJingFish.AndroidAopPlugin.view.ReplaceView;
+import io.github.FlyJingFish.AndroidAopPlugin.view.MatchView;
 import org.objectweb.asm.ClassReader;
 
 
@@ -191,23 +190,21 @@ public class ShowBytecodeViewerAction extends AnAction {
      */
     private void updateToolWindowContents(final Project project, final VirtualFile file) {
         ApplicationManager.getApplication().runWriteAction(() -> {
-            BytecodeOutline bytecodeOutline = BytecodeOutline.getInstance(project);
-            JavaView asmifiedView = JavaView.getInstance(project);
-            KotlinView groovifiedView = KotlinView.getInstance(project);
+            ReplaceView replaceView = ReplaceView.getInstance(project);
+            MatchView matchView = MatchView.getInstance(project);
             ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
 
 
             if (file == null) {
-                bytecodeOutline.setCode(file, Constants.NO_CLASS_FOUND);
-                asmifiedView.setCode(file, Constants.NO_CLASS_FOUND);
-                groovifiedView.setCode(file, Constants.NO_CLASS_FOUND);
+                replaceView.setCode(file, Constants.NO_CLASS_FOUND);
+                matchView.setCode(file, Constants.NO_CLASS_FOUND);
                 toolWindowManager.getToolWindow(Constants.PLUGIN_WINDOW_NAME).activate(null);
                 return;
             } else {
                 Logger.getInstance(ShowBytecodeViewerAction.class).warn("file " + file.toString());
             }
 
-            StringWriter stringWriter = new StringWriter();
+
             ClassReader reader = null;
             try {
                 file.refresh(false, false);
@@ -215,21 +212,20 @@ public class ShowBytecodeViewerAction extends AnAction {
             } catch (IOException e) {
                 return;
             }
+            ApplicationConfig applicationConfig = ASMPluginComponent.getApplicationConfig();
+
+
 //            reader.accept(new TraceClassVisitor(new PrintWriter(stringWriter)), flags);
 
-
+            StringWriter stringWriter = new StringWriter();
             stringWriter.getBuffer().setLength(0);
-            stringWriter.append(AndroidAOPCode.getStringWriter(reader).toString());
+            stringWriter.append(AndroidAOPCode.getReplaceContent(reader,applicationConfig.getCodeStyle()).toString());
             PsiFile psiFile = PsiFileFactory.getInstance(project).createFileFromText(Constants.FILE_NAME, FileTypeManager.getInstance().getFileTypeByExtension(FileTypeExtension.JAVA.getValue()), stringWriter.toString());
             CodeStyleManager.getInstance(project).reformat(psiFile);
-            asmifiedView.setCode(file, psiFile.getText());
+            replaceView.setCode(file, psiFile.getText(),applicationConfig.getFileType());
 
-//            stringWriter.getBuffer().setLength(0);
-//            reader.accept(new TraceClassVisitor(null, new GroovifiedTextifier(applicationConfig.getGroovyCodeStyle()), new PrintWriter(stringWriter)), ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG);
-//            System.out.println("androidAOP--code="+stringWriter.toString());
-            groovifiedView.setCode(file, stringWriter.toString());
+            matchView.setCode(file, stringWriter.toString(),applicationConfig.getFileType());
 
-            bytecodeOutline.setCode(file, stringWriter.toString());
 
             toolWindowManager.getToolWindow(Constants.PLUGIN_WINDOW_NAME).activate(null);
         });

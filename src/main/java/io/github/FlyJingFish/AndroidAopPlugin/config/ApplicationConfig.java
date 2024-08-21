@@ -19,6 +19,8 @@
 package io.github.FlyJingFish.AndroidAopPlugin.config;
 
 
+import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension;
+
 /**
  * @author Kamiel Ahmadpour - 2017
  */
@@ -63,11 +65,15 @@ public class ApplicationConfig {
         this.isPrivate = aPrivate;
     }
 
-    public CodeStyle getGroovyCodeStyle() {
+    public CodeStyle getCodeStyle() {
         return codeStyle;
     }
 
-    public void setGroovyCodeStyle(CodeStyle codeStyle) {
+    public void setCodeStyle(CodeStyle codeStyle) {
         this.codeStyle = codeStyle;
+    }
+
+    public String getFileType() {
+        return codeStyle == CodeStyle.KotlinCode ? FileTypeExtension.Kotlin.getValue():FileTypeExtension.JAVA.getValue();
     }
 }

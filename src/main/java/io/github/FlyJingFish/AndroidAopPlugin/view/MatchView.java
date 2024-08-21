@@ -23,18 +23,18 @@ import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindowManager;
 import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension;
-
+import io.github.FlyJingFish.AndroidAopPlugin.config.ASMPluginComponent;
 
 /**
- * ASMified code view.
+ * The groovified view displays @groovyx.ast.bytecode.Bytecode code for methods.
  */
-public class JavaView extends ACodeView {
+public class MatchView extends ACodeView {
 
-	public JavaView(final ToolWindowManager toolWindowManager, KeymapManager keymapManager, final Project project) {
-		super(toolWindowManager, keymapManager, project, FileTypeExtension.JAVA.getValue());
+	public MatchView(final Project project, KeymapManager keymapManager, final ToolWindowManager toolWindowManager) {
+		super(toolWindowManager, keymapManager, project, ASMPluginComponent.getApplicationConfig().getFileType());
 	}
 
-	public static JavaView getInstance(Project project) {
-		return ServiceManager.getService(project, JavaView.class);
+	public static MatchView getInstance(Project project) {
+		return ServiceManager.getService(project, MatchView.class);
 	}
 }

@@ -1,7 +1,7 @@
 package io.github.FlyJingFish.AndroidAopPlugin.util;
 
+import io.github.FlyJingFish.AndroidAopPlugin.config.CodeStyle;
 import org.objectweb.asm.*;
-import org.objectweb.asm.commons.Method;
 import org.objectweb.asm.tree.MethodNode;
 
 import java.io.StringWriter;
@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static org.objectweb.asm.Opcodes.ACC_STATIC;
 
 
 public class AndroidAOPCode {
@@ -48,7 +46,7 @@ public class AndroidAOPCode {
         javaKotlinMap.put("Object","Any");
     }
 
-    public static StringWriter getStringWriter(ClassReader cr) {
+    public static StringWriter getReplaceContent(ClassReader cr, CodeStyle codeStyle) {
         ClassWriter cw = new ClassWriter(cr, 0);
         cr.accept(new ClassVisitor(Opcodes.ASM9, cw) {}, 0);
         MethodParamNamesScanner scanner = new MethodParamNamesScanner(cw.toByteArray());
@@ -82,8 +80,10 @@ public class AndroidAOPCode {
 
         for (MethodNode method : scanner.getMethods()) {
             boolean isSuspendMethod = method.desc.endsWith("Lkotlin/coroutines/Continuation;)Ljava/lang/Object;");
-            if (isSuspendMethod){
-                getReplaceKotlinMethod(method.access,method.name,method.desc,method.signature,stringWriter,scanner);
+            if (codeStyle == CodeStyle.JavaCode){
+                if (!isSuspendMethod){
+                    getReplaceJavaMethod(method.access,method.name,method.desc,stringWriter,scanner);
+                }
             }else {
                 getReplaceKotlinMethod(method.access,method.name,method.desc,method.signature,stringWriter,scanner);
             }

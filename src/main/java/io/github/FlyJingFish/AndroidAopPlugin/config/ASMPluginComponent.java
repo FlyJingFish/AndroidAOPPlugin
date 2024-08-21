@@ -54,7 +54,7 @@ public class ASMPluginComponent implements PersistentStateComponent<Element> {
         asmNode.setAttribute("isPrivate", String.valueOf(applicationConfig.isPrivate()));
         root.addContent(asmNode);
         Element groovyNode = new Element("code");
-        groovyNode.setAttribute("codeStyle", applicationConfig.getGroovyCodeStyle().toString());
+        groovyNode.setAttribute("codeStyle", applicationConfig.getCodeStyle().toString());
         root.addContent(groovyNode);
         return root;
     }
@@ -75,7 +75,7 @@ public class ASMPluginComponent implements PersistentStateComponent<Element> {
         Element groovyNode = state.getChild("code");
         if (groovyNode != null) {
             String codeStyleStr = groovyNode.getAttributeValue("codeStyle");
-            if (codeStyleStr != null) applicationConfig.setGroovyCodeStyle(CodeStyle.valueOf(codeStyleStr));
+            if (codeStyleStr != null) applicationConfig.setCodeStyle(CodeStyle.valueOf(codeStyleStr));
         }
     }
 

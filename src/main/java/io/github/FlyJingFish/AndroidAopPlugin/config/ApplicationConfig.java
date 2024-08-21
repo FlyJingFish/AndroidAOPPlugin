@@ -24,50 +24,50 @@ package io.github.FlyJingFish.AndroidAopPlugin.config;
  */
 public class ApplicationConfig {
     static final String APPLICATION_NAME = "AndroidAOP Code Viewer";
-    private boolean skipFrames = true;
-    private boolean skipDebug = true;
-    private boolean skipCode = false;
-    private boolean expandFrames = false;
-    private GroovyCodeStyle groovyCodeStyle = GroovyCodeStyle.LEGACY;
+    private boolean isPublic = true;
+    private boolean isProtected = true;
+    private boolean isPackage = true;
+    private boolean isPrivate = true;
+    private CodeStyle codeStyle = CodeStyle.JavaCode;
 
 
-    public boolean isSkipFrames() {
-        return skipFrames;
+    public boolean isProtected() {
+        return isProtected;
     }
 
-    public void setSkipFrames(boolean skipFrames) {
-        this.skipFrames = skipFrames;
+    public void setProtected(boolean aProtected) {
+        this.isProtected = aProtected;
     }
 
-    public boolean isSkipDebug() {
-        return skipDebug;
+    public boolean isPublic() {
+        return isPublic;
     }
 
-    public void setSkipDebug(boolean skipDebug) {
-        this.skipDebug = skipDebug;
+    public void setPublic(boolean aPublic) {
+        this.isPublic = aPublic;
     }
 
-    public boolean isSkipCode() {
-        return skipCode;
+    public boolean isPackage() {
+        return isPackage;
     }
 
-    public void setSkipCode(boolean skipCode) {
-        this.skipCode = skipCode;
+    public void setPackage(boolean aPackage) {
+        this.isPackage = aPackage;
     }
 
-    public boolean isExpandFrames() {
-        return expandFrames;
+    public boolean isPrivate() {
+        return isPrivate;
     }
 
-    public void setExpandFrames(boolean expandFrames) {
-        this.expandFrames = expandFrames;
+    public void setPrivate(boolean aPrivate) {
+        this.isPrivate = aPrivate;
     }
 
-    public GroovyCodeStyle getGroovyCodeStyle() {
-        return groovyCodeStyle;
+    public CodeStyle getGroovyCodeStyle() {
+        return codeStyle;
     }
 
-    public void setGroovyCodeStyle(GroovyCodeStyle groovyCodeStyle) {
-        this.groovyCodeStyle = groovyCodeStyle;
+    public void setGroovyCodeStyle(CodeStyle codeStyle) {
+        this.codeStyle = codeStyle;
     }
 }

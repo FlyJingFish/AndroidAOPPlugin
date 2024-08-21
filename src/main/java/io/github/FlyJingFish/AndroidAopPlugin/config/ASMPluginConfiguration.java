@@ -32,7 +32,7 @@ public class ASMPluginConfiguration {
     private JCheckBox skipFramesCheckBox;
     private JCheckBox skipCodeCheckBox;
     private JCheckBox expandFramesCheckBox;
-    private JComboBox<GroovyCodeStyle> groovyCodeStyleComboBox;
+    private JComboBox<CodeStyle> groovyCodeStyleComboBox;
 
     public ASMPluginConfiguration() {
     }
@@ -42,41 +42,41 @@ public class ASMPluginConfiguration {
     }
 
     public void setData(ApplicationConfig applicationConfig) {
-        skipDebugCheckBox.setSelected(applicationConfig.isSkipDebug());
-        skipFramesCheckBox.setSelected(applicationConfig.isSkipFrames());
-        skipCodeCheckBox.setSelected(applicationConfig.isSkipCode());
-        expandFramesCheckBox.setSelected(applicationConfig.isExpandFrames());
+        skipDebugCheckBox.setSelected(applicationConfig.isPublic());
+        skipFramesCheckBox.setSelected(applicationConfig.isProtected());
+        skipCodeCheckBox.setSelected(applicationConfig.isPackage());
+        expandFramesCheckBox.setSelected(applicationConfig.isPrivate());
         groovyCodeStyleComboBox.setSelectedItem(applicationConfig.getGroovyCodeStyle());
     }
 
     public void getData(ApplicationConfig applicationConfig) {
-        applicationConfig.setSkipDebug(skipDebugCheckBox.isSelected());
-        applicationConfig.setSkipFrames(skipFramesCheckBox.isSelected());
-        applicationConfig.setSkipCode(skipCodeCheckBox.isSelected());
-        applicationConfig.setExpandFrames(expandFramesCheckBox.isSelected());
-        applicationConfig.setGroovyCodeStyle((GroovyCodeStyle) groovyCodeStyleComboBox.getSelectedItem());
+        applicationConfig.setPublic(skipDebugCheckBox.isSelected());
+        applicationConfig.setProtected(skipFramesCheckBox.isSelected());
+        applicationConfig.setPackage(skipCodeCheckBox.isSelected());
+        applicationConfig.setPrivate(expandFramesCheckBox.isSelected());
+        applicationConfig.setGroovyCodeStyle((CodeStyle) groovyCodeStyleComboBox.getSelectedItem());
     }
 
     public boolean isModified(ApplicationConfig applicationConfig) {
-        if (skipDebugCheckBox.isSelected() != applicationConfig.isSkipDebug()) return true;
-        if (skipFramesCheckBox.isSelected() != applicationConfig.isSkipFrames()) return true;
-        if (skipCodeCheckBox.isSelected() != applicationConfig.isSkipCode()) return true;
-        if (expandFramesCheckBox.isSelected() != applicationConfig.isExpandFrames()) return true;
+        if (skipDebugCheckBox.isSelected() != applicationConfig.isPublic()) return true;
+        if (skipFramesCheckBox.isSelected() != applicationConfig.isProtected()) return true;
+        if (skipCodeCheckBox.isSelected() != applicationConfig.isPackage()) return true;
+        if (expandFramesCheckBox.isSelected() != applicationConfig.isPrivate()) return true;
         return !Objects.equals(groovyCodeStyleComboBox.getSelectedItem(), applicationConfig.getGroovyCodeStyle());
     }
 
     private void createUIComponents() {
-        ComboBoxModel<GroovyCodeStyle> model = new EnumComboBoxModel<>(GroovyCodeStyle.class);
+        ComboBoxModel<CodeStyle> model = new EnumComboBoxModel<>(CodeStyle.class);
         groovyCodeStyleComboBox = new ComboBox<>(model);
         groovyCodeStyleComboBox.setRenderer(new GroovyCodeStyleCellRenderer<>());
     }
 
     private static class GroovyCodeStyleCellRenderer<T> implements ListCellRenderer<T> {
-        private EnumMap<GroovyCodeStyle, JLabel> labels;
+        private EnumMap<CodeStyle, JLabel> labels;
 
         private GroovyCodeStyleCellRenderer() {
-            labels = new EnumMap<>(GroovyCodeStyle.class);
-            for (GroovyCodeStyle codeStyle : GroovyCodeStyle.values()) {
+            labels = new EnumMap<>(CodeStyle.class);
+            for (CodeStyle codeStyle : CodeStyle.values()) {
                 labels.put(codeStyle, new JLabel(codeStyle.label));
             }
         }

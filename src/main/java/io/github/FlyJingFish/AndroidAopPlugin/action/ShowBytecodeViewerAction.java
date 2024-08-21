@@ -215,13 +215,6 @@ public class ShowBytecodeViewerAction extends AnAction {
             } catch (IOException e) {
                 return;
             }
-            int flags = 0;
-            ApplicationConfig applicationConfig = ASMPluginComponent.getApplicationConfig();
-            if (applicationConfig.isSkipDebug()) flags = flags | ClassReader.SKIP_DEBUG;
-            if (applicationConfig.isSkipFrames()) flags = flags | ClassReader.SKIP_FRAMES;
-            if (applicationConfig.isExpandFrames()) flags = flags | ClassReader.EXPAND_FRAMES;
-            if (applicationConfig.isSkipCode()) flags = flags | ClassReader.SKIP_CODE;
-
 //            reader.accept(new TraceClassVisitor(new PrintWriter(stringWriter)), flags);
 
 

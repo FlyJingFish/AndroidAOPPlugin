@@ -28,13 +28,13 @@ package io.github.FlyJingFish.AndroidAopPlugin.config;
 /**
  * Enumeration of Groovy code styles
  */
-public enum GroovyCodeStyle {
-    LEGACY("Legacy Bytecode"),
-    GROOVIFIER_0_2_0("Groovified Bytecode");
+public enum CodeStyle {
+    JavaCode("Java Code"),
+    KotlinCode("Kotlin Code");
 
     String label;
 
-    GroovyCodeStyle(final String label) {
+    CodeStyle(final String label) {
         this.label = label;
     }
 }

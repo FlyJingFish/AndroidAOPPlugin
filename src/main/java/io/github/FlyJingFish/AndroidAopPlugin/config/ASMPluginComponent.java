@@ -48,12 +48,12 @@ public class ASMPluginComponent implements PersistentStateComponent<Element> {
     public Element getState() {
         Element root = new Element("state");
         Element asmNode = new Element("asm");
-        asmNode.setAttribute("skipDebug", String.valueOf(applicationConfig.isSkipDebug()));
-        asmNode.setAttribute("skipFrames", String.valueOf(applicationConfig.isSkipFrames()));
-        asmNode.setAttribute("skipCode", String.valueOf(applicationConfig.isSkipCode()));
-        asmNode.setAttribute("expandFrames", String.valueOf(applicationConfig.isExpandFrames()));
+        asmNode.setAttribute("isPublic", String.valueOf(applicationConfig.isPublic()));
+        asmNode.setAttribute("isProtected", String.valueOf(applicationConfig.isProtected()));
+        asmNode.setAttribute("isPackage", String.valueOf(applicationConfig.isPackage()));
+        asmNode.setAttribute("isPrivate", String.valueOf(applicationConfig.isPrivate()));
         root.addContent(asmNode);
-        Element groovyNode = new Element("groovy");
+        Element groovyNode = new Element("code");
         groovyNode.setAttribute("codeStyle", applicationConfig.getGroovyCodeStyle().toString());
         root.addContent(groovyNode);
         return root;
@@ -63,19 +63,19 @@ public class ASMPluginComponent implements PersistentStateComponent<Element> {
     public void loadState(final Element state) {
         Element asmNode = state.getChild("asm");
         if (asmNode != null) {
-            final String skipDebugStr = asmNode.getAttributeValue("skipDebug");
-            if (skipDebugStr != null) applicationConfig.setSkipDebug(Boolean.valueOf(skipDebugStr));
-            final String skipFramesStr = asmNode.getAttributeValue("skipFrames");
-            if (skipFramesStr != null) applicationConfig.setSkipFrames(Boolean.valueOf(skipFramesStr));
-            final String skipCodeStr = asmNode.getAttributeValue("skipCode");
-            if (skipCodeStr != null) applicationConfig.setSkipCode(Boolean.valueOf(skipCodeStr));
-            final String expandFramesStr = asmNode.getAttributeValue("expandFrames");
-            if (expandFramesStr != null) applicationConfig.setExpandFrames(Boolean.valueOf(expandFramesStr));
+            final String skipDebugStr = asmNode.getAttributeValue("isPublic");
+            if (skipDebugStr != null) applicationConfig.setPublic(Boolean.valueOf(skipDebugStr));
+            final String skipFramesStr = asmNode.getAttributeValue("isProtected");
+            if (skipFramesStr != null) applicationConfig.setProtected(Boolean.valueOf(skipFramesStr));
+            final String skipCodeStr = asmNode.getAttributeValue("isPackage");
+            if (skipCodeStr != null) applicationConfig.setPackage(Boolean.valueOf(skipCodeStr));
+            final String expandFramesStr = asmNode.getAttributeValue("isPrivate");
+            if (expandFramesStr != null) applicationConfig.setPrivate(Boolean.valueOf(expandFramesStr));
         }
-        Element groovyNode = state.getChild("groovy");
+        Element groovyNode = state.getChild("code");
         if (groovyNode != null) {
             String codeStyleStr = groovyNode.getAttributeValue("codeStyle");
-            if (codeStyleStr != null) applicationConfig.setGroovyCodeStyle(GroovyCodeStyle.valueOf(codeStyleStr));
+            if (codeStyleStr != null) applicationConfig.setGroovyCodeStyle(CodeStyle.valueOf(codeStyleStr));
         }
     }
 

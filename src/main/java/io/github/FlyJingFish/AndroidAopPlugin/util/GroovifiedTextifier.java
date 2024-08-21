@@ -25,7 +25,7 @@ package io.github.FlyJingFish.AndroidAopPlugin.util;
  * Updated by: Kamiel
  */
 
-import io.github.FlyJingFish.AndroidAopPlugin.config.GroovyCodeStyle;
+import io.github.FlyJingFish.AndroidAopPlugin.config.CodeStyle;
 import reloc.org.objectweb.asm.Label;
 import reloc.org.objectweb.asm.Opcodes;
 import reloc.org.objectweb.asm.Type;
@@ -68,9 +68,9 @@ public class GroovifiedTextifier extends Textifier {
         }
     }
 
-    private final GroovyCodeStyle codeStyle;
+    private final CodeStyle codeStyle;
 
-    public GroovifiedTextifier(final GroovyCodeStyle codeStyle) {
+    public GroovifiedTextifier(final CodeStyle codeStyle) {
         super(Opcodes.ASM5);
         this.codeStyle = codeStyle;
     }
@@ -177,7 +177,7 @@ public class GroovifiedTextifier extends Textifier {
 
     protected static class GroovifiedMethodTextifier extends Textifier {
 
-        private final GroovyCodeStyle codeStyle;
+        private final CodeStyle codeStyle;
         private static final Textifier EMPTY_TEXTIFIER = new Textifier(Opcodes.ASM5) {
             @Override
             public List<Object> getText() {
@@ -185,13 +185,13 @@ public class GroovifiedTextifier extends Textifier {
             }
         };
 
-        public GroovifiedMethodTextifier(final GroovyCodeStyle codeStyle) {
+        public GroovifiedMethodTextifier(final CodeStyle codeStyle) {
             super(Opcodes.ASM5);
             this.codeStyle = codeStyle;
         }
 
         private boolean isLegacy() {
-            return codeStyle == GroovyCodeStyle.LEGACY;
+            return codeStyle == CodeStyle.JavaCode;
         }
 
         @Override
@@ -363,7 +363,7 @@ public class GroovifiedTextifier extends Textifier {
             this.stringBuilder.setLength(0);
             this.stringBuilder.append(ltab);
             appendLabel(label);
-            if (codeStyle == GroovyCodeStyle.GROOVIFIER_0_2_0) this.stringBuilder.append(':');
+            if (codeStyle == CodeStyle.KotlinCode) this.stringBuilder.append(':');
             this.stringBuilder.append('\n');
             text.add(this.stringBuilder.toString());
         }

@@ -1,0 +1,55 @@
+<idea-plugin version="2">
+    <name>AndroidAOP Code Viewer</name>
+    <description>
+        <![CDATA[
+        <h3>Displays bytecode for Java or Kotlin classes and ASMified code which will help you in your class generation.</h3>
+        <b>Usage: </b>
+        <p>- Open ASM Bytecode Viewer from NavBar > code > ASM Bytecode Viewer</p>]]>
+    </description>
+    <version>1.1.0</version>
+    <vendor>Raven</vendor>
+    <idea-version since-build="2022.2.5" />
+    <depends>com.intellij.modules.java</depends>
+    
+    <change-notes><![CDATA[
+        <b>Version 1.1.0</b>
+        <ul>
+            <li>bug fix</li>
+        </ul>
+        <b>Version 1.0.0</b>
+        <ul>
+            <li>support kotlin</li>
+        </ul>
+    ]]></change-notes>
+
+    <application-components>
+
+    </application-components>
+
+    <project-components>
+        <component>
+            <implementation-class>io.github.FlyJingFish.AndroidAopPlugin.config.ASMPluginComponent</implementation-class>
+        </component>
+    </project-components>
+
+    <actions>
+        <action class="io.github.FlyJingFish.AndroidAopPlugin.action.ShowBytecodeViewerAction" description="Shows the bytecode viewer and ASMified code from the current class" id="showBytecodeViewer"
+                text="AndroidAOPCode">
+            <add-to-group anchor="last" group-id="EditorPopupMenu" />
+            <add-to-group anchor="last" group-id="ProjectViewPopupMenu" />
+            <add-to-group anchor="last" group-id="CodeMenu" />
+        </action>
+    </actions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable groupId="tools" instance="io.github.FlyJingFish.AndroidAopPlugin.config.PluginConfig" />
+        <toolWindow anchor="right" factoryClass="io.github.FlyJingFish.AndroidAopPlugin.view.BytecodeOutlineToolWindowFactory" icon="/images/asm.gif"
+                    id="AndroidAOPPlugin" />
+        <projectService serviceImplementation="io.github.FlyJingFish.AndroidAopPlugin.view.BytecodeOutline"
+            serviceInterface="io.github.FlyJingFish.AndroidAopPlugin.view.BytecodeOutline" />
+        <projectService serviceImplementation="io.github.FlyJingFish.AndroidAopPlugin.view.JavaView"
+            serviceInterface="io.github.FlyJingFish.AndroidAopPlugin.view.JavaView" />
+        <projectService serviceImplementation="io.github.FlyJingFish.AndroidAopPlugin.view.KotlinView"
+            serviceInterface="io.github.FlyJingFish.AndroidAopPlugin.view.KotlinView" />
+    </extensions>
+</idea-plugin>

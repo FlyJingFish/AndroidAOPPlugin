@@ -1,0 +1,39 @@
+plugins {
+    id "org.jetbrains.intellij" version "1.13.0" apply true
+    id 'java' apply true
+    id 'idea' apply true
+}
+
+repositories {
+    maven {
+        url 'https://cache-redirector.jetbrains.com/plugins.gradle.org'
+    }
+    gradlePluginPortal()
+    mavenCentral()
+}
+
+group 'io.github.FlyJingFish.AndroidAopPlugin.action'
+version '1.1'
+
+sourceCompatibility = "1.8"
+idea {
+    project {
+        languageLevel = '1.8'
+    }
+}
+
+intellij {
+    version = "2022.2.5"
+    type = "IC"
+    plugins = ["com.jetbrains.php:222.4554.10","java","Kotlin"]
+
+}
+
+dependencies {
+    implementation fileTree('lib/reloc-asm-7.1.jar')
+    implementation fileTree('lib/reloc-asm-commons-7.1.jar')
+    implementation fileTree('lib/reloc-asm-tree-7.1.jar')
+    implementation fileTree('lib/reloc-asm-util-7.1.jar')
+
+}
+targetCompatibility = JavaVersion.VERSION_11

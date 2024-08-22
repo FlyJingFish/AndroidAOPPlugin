@@ -1,6 +1,8 @@
 package io.github.FlyJingFish.AndroidAopPlugin.util;
 
 
+import io.github.FlyJingFish.AndroidAopPlugin.config.ASMPluginComponent;
+import io.github.FlyJingFish.AndroidAopPlugin.config.ApplicationConfig;
 import org.objectweb.asm.*;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.LocalVariableNode;
@@ -9,14 +11,43 @@ import org.objectweb.asm.tree.MethodNode;
 import java.util.*;
 
 public class MethodParamNamesScanner {
-    private final List<MethodNode> methods;
+    private final List<MethodNode> methods = new ArrayList<>();
     private final ClassNode cn = new ClassNode();
     private int initCount;
 
     public MethodParamNamesScanner(ClassReader cr){
-        ClassWriter cw = new ClassWriter(cr, 0);
+        ApplicationConfig applicationConfig = ASMPluginComponent.getApplicationConfig();
         cr.accept(cn, 0);
-        this.methods = cn.methods;
+        this.methods.addAll(cn.methods);
+        Iterator<MethodNode> iterator = methods.iterator();
+
+        while (iterator.hasNext()){
+            MethodNode methodNode = iterator.next();
+            int access = methodNode.access;
+            boolean isPublic =  (access & Opcodes.ACC_PUBLIC) != 0;
+            boolean isProtected =  (access & Opcodes.ACC_PROTECTED) != 0;
+            boolean isPrivate =  (access & Opcodes.ACC_PRIVATE) != 0;
+            boolean isPackage;
+            if (!isPublic && !isProtected && !isPrivate){
+                isPackage = true;
+            }else {
+                isPackage = false;
+            }
+
+            if (applicationConfig.isPublic() && isPublic){
+                continue;
+            }
+            if (applicationConfig.isProtected() && isProtected){
+                continue;
+            }
+            if (applicationConfig.isPrivate() && isPrivate){
+                continue;
+            }
+            if (applicationConfig.isPackage() && isPackage){
+                continue;
+            }
+            iterator.remove();
+        }
     }
 
     public String getClassName(){

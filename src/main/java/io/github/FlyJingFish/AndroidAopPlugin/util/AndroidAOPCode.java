@@ -1,6 +1,9 @@
 package io.github.FlyJingFish.AndroidAopPlugin.util;
 
 import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension;
+import io.github.FlyJingFish.AndroidAopPlugin.config.ASMPluginComponent;
+import io.github.FlyJingFish.AndroidAopPlugin.config.ApplicationConfig;
+import io.github.FlyJingFish.AndroidAopPlugin.config.ReplaceProxy;
 import org.objectweb.asm.*;
 import org.objectweb.asm.tree.MethodNode;
 
@@ -14,7 +17,8 @@ import java.util.regex.Pattern;
 
 
 public class AndroidAOPCode {
-    private MethodParamNamesScanner scanner;
+    private final MethodParamNamesScanner scanner;
+    private final boolean useProxyMethod;
 //    public static void main(String[] args) throws Exception {
 //        ClassReader cr = new ClassReader("com.testdemo1.Demo");
 //        AndroidAOPCode androidAOPCode = new AndroidAOPCode(cr);
@@ -28,6 +32,8 @@ public class AndroidAOPCode {
 
     public AndroidAOPCode(ClassReader cr) {
         scanner = new MethodParamNamesScanner(cr);
+        ApplicationConfig applicationConfig = ASMPluginComponent.getApplicationConfig();
+        useProxyMethod = applicationConfig.getReplaceProxy() == ReplaceProxy.Proxy;
     }
 
     private static final Map<String,String> javaKotlinMap = new HashMap<>();
@@ -174,7 +180,7 @@ public class AndroidAOPCode {
     }
 
 
-    public static void getReplaceKotlinMethod(int methodAccess, String methodName, String methodDescriptor,String signature,
+    public void getReplaceKotlinMethod(int methodAccess, String methodName, String methodDescriptor,String signature,
                                               StringWriter stringWriter, MethodParamNamesScanner scanner) {
         if (!"<clinit>".equals(methodName)){
 
@@ -198,6 +204,13 @@ public class AndroidAOPCode {
             boolean isStatic = (methodAccess & Opcodes.ACC_STATIC) != 0;
 
             stringWriter.append("@JvmStatic\n");
+            if (useProxyMethod){
+                stringWriter.append("@ProxyMethod(proxyClass = ")
+                        .append(getShowMethodClassName(scanner.getClassName()))
+                        .append("::class,type = ")
+                        .append(isStatic?"ProxyType.STATIC_METHOD":(isInit?"ProxyType.INIT":"ProxyType.METHOD"))
+                        .append(")\n");
+            }
             stringWriter.append("@AndroidAopReplaceMethod(\"");
             if (isSuspendMethod){
                 stringWriter.append("suspend").append(" ");
@@ -302,7 +315,7 @@ public class AndroidAOPCode {
         }
     }
 
-    public static void getReplaceJavaMethod(int methodAccess, String methodName, String methodDescriptor,
+    public void getReplaceJavaMethod(int methodAccess, String methodName, String methodDescriptor,
                                             StringWriter stringWriter, MethodParamNamesScanner scanner) {
         if (!"<clinit>".equals(methodName)){
             boolean isInit = "<init>".equals(methodName);
@@ -316,7 +329,13 @@ public class AndroidAOPCode {
 
             boolean isStatic = (methodAccess & Opcodes.ACC_STATIC) != 0;
             boolean isSuspendMethod = methodDescriptor.endsWith("Lkotlin/coroutines/Continuation;)Ljava/lang/Object;");
-
+            if (useProxyMethod){
+                stringWriter.append("@ProxyMethod(proxyClass = ")
+                        .append(getShowMethodClassName(scanner.getClassName()))
+                        .append(".class,type = ")
+                        .append(isStatic?"ProxyType.STATIC_METHOD":(isInit?"ProxyType.INIT":"ProxyType.METHOD"))
+                        .append(")\n");
+            }
             stringWriter.append("@AndroidAopReplaceMethod(\"");
             if (isSuspendMethod){
                 stringWriter.append("suspend").append(" ");

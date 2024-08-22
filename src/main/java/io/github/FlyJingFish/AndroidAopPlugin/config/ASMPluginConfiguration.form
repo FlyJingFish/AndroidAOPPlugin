@@ -16,7 +16,7 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="908f9" class="javax.swing.JCheckBox" binding="skipDebugCheckBox" default-binding="true">
+          <component id="908f9" class="javax.swing.JCheckBox" binding="publicCheckBox" default-binding="true">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -25,7 +25,7 @@
               <text value="public"/>
             </properties>
           </component>
-          <component id="76b4c" class="javax.swing.JCheckBox" binding="skipFramesCheckBox" default-binding="true">
+          <component id="76b4c" class="javax.swing.JCheckBox" binding="protectedCheckBox" default-binding="true">
             <constraints>
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -34,7 +34,7 @@
               <text value="protected"/>
             </properties>
           </component>
-          <component id="8887b" class="javax.swing.JCheckBox" binding="skipCodeCheckBox" default-binding="true">
+          <component id="8887b" class="javax.swing.JCheckBox" binding="packageCheckBox" default-binding="true">
             <constraints>
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -43,7 +43,7 @@
               <text value="package"/>
             </properties>
           </component>
-          <component id="72fde" class="javax.swing.JCheckBox" binding="expandFramesCheckBox" default-binding="true">
+          <component id="72fde" class="javax.swing.JCheckBox" binding="privateCheckBox" default-binding="true">
             <constraints>
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -68,7 +68,7 @@
                   <text value="ProxyMethod"/>
                 </properties>
               </component>
-              <component id="afc8c" class="javax.swing.JComboBox" binding="groovyCodeStyleComboBox" custom-create="true">
+              <component id="afc8c" class="javax.swing.JComboBox" binding="replaceProxyComboBox" custom-create="true">
                 <constraints>
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>

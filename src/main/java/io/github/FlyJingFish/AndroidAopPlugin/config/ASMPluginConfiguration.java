@@ -28,11 +28,11 @@ import java.util.Objects;
 
 public class ASMPluginConfiguration {
     private JPanel contentPane;
-    private JCheckBox skipDebugCheckBox;
-    private JCheckBox skipFramesCheckBox;
-    private JCheckBox skipCodeCheckBox;
-    private JCheckBox expandFramesCheckBox;
-    private JComboBox<ReplaceProxy> groovyCodeStyleComboBox;
+    private JCheckBox publicCheckBox;
+    private JCheckBox protectedCheckBox;
+    private JCheckBox packageCheckBox;
+    private JCheckBox privateCheckBox;
+    private JComboBox<ReplaceProxy> replaceProxyComboBox;
 
     public ASMPluginConfiguration() {
     }
@@ -42,38 +42,38 @@ public class ASMPluginConfiguration {
     }
 
     public void setData(ApplicationConfig applicationConfig) {
-        skipDebugCheckBox.setSelected(applicationConfig.isPublic());
-        skipFramesCheckBox.setSelected(applicationConfig.isProtected());
-        skipCodeCheckBox.setSelected(applicationConfig.isPackage());
-        expandFramesCheckBox.setSelected(applicationConfig.isPrivate());
-        groovyCodeStyleComboBox.setSelectedItem(applicationConfig.getReplaceProxy());
+        publicCheckBox.setSelected(applicationConfig.isPublic());
+        protectedCheckBox.setSelected(applicationConfig.isProtected());
+        packageCheckBox.setSelected(applicationConfig.isPackage());
+        privateCheckBox.setSelected(applicationConfig.isPrivate());
+        replaceProxyComboBox.setSelectedItem(applicationConfig.getReplaceProxy());
     }
 
     public void getData(ApplicationConfig applicationConfig) {
-        applicationConfig.setPublic(skipDebugCheckBox.isSelected());
-        applicationConfig.setProtected(skipFramesCheckBox.isSelected());
-        applicationConfig.setPackage(skipCodeCheckBox.isSelected());
-        applicationConfig.setPrivate(expandFramesCheckBox.isSelected());
-        applicationConfig.setReplaceProxy((ReplaceProxy) groovyCodeStyleComboBox.getSelectedItem());
+        applicationConfig.setPublic(publicCheckBox.isSelected());
+        applicationConfig.setProtected(protectedCheckBox.isSelected());
+        applicationConfig.setPackage(packageCheckBox.isSelected());
+        applicationConfig.setPrivate(privateCheckBox.isSelected());
+        applicationConfig.setReplaceProxy((ReplaceProxy) replaceProxyComboBox.getSelectedItem());
     }
 
     public boolean isModified(ApplicationConfig applicationConfig) {
-        if (skipDebugCheckBox == null || skipFramesCheckBox == null
-                || skipCodeCheckBox == null || expandFramesCheckBox == null
-                || groovyCodeStyleComboBox == null){
+        if (publicCheckBox == null || protectedCheckBox == null
+                || packageCheckBox == null || privateCheckBox == null
+                || replaceProxyComboBox == null){
             return false;
         }
-        if (skipDebugCheckBox.isSelected() != applicationConfig.isPublic()) return true;
-        if (skipFramesCheckBox.isSelected() != applicationConfig.isProtected()) return true;
-        if (skipCodeCheckBox.isSelected() != applicationConfig.isPackage()) return true;
-        if (expandFramesCheckBox.isSelected() != applicationConfig.isPrivate()) return true;
-        return !Objects.equals(groovyCodeStyleComboBox.getSelectedItem(), applicationConfig.getReplaceProxy());
+        if (publicCheckBox.isSelected() != applicationConfig.isPublic()) return true;
+        if (protectedCheckBox.isSelected() != applicationConfig.isProtected()) return true;
+        if (packageCheckBox.isSelected() != applicationConfig.isPackage()) return true;
+        if (privateCheckBox.isSelected() != applicationConfig.isPrivate()) return true;
+        return !Objects.equals(replaceProxyComboBox.getSelectedItem(), applicationConfig.getReplaceProxy());
     }
 
     private void createUIComponents() {
         ComboBoxModel<ReplaceProxy> model = new EnumComboBoxModel<>(ReplaceProxy.class);
-        groovyCodeStyleComboBox = new ComboBox<>(model);
-        groovyCodeStyleComboBox.setRenderer(new GroovyCodeStyleCellRenderer<>());
+        replaceProxyComboBox = new ComboBox<>(model);
+        replaceProxyComboBox.setRenderer(new GroovyCodeStyleCellRenderer<>());
     }
 
     private static class GroovyCodeStyleCellRenderer<T> implements ListCellRenderer<T> {

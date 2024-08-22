@@ -1,6 +1,6 @@
 package io.github.FlyJingFish.AndroidAopPlugin.util;
 
-import io.github.FlyJingFish.AndroidAopPlugin.config.CodeStyle;
+import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension;
 import org.objectweb.asm.*;
 import org.objectweb.asm.tree.MethodNode;
 
@@ -31,17 +31,29 @@ public class AndroidAOPCode {
     }
 
     private static final Map<String,String> javaKotlinMap = new HashMap<>();
+    private static final Map<String,String> basejavaKotlinMap = new HashMap<>();
+    private static final Map<String,String> basejavaKotlinArrayMap = new HashMap<>();
 
     static {
-        javaKotlinMap.put("int","Int");
-        javaKotlinMap.put("short","Short");
-        javaKotlinMap.put("byte","Byte");
-        javaKotlinMap.put("char","Char");
-        javaKotlinMap.put("long","Long");
-        javaKotlinMap.put("float","Float");
-        javaKotlinMap.put("double","Double");
-        javaKotlinMap.put("boolean","Boolean");
+        basejavaKotlinArrayMap.put("int","IntArray");
+        basejavaKotlinArrayMap.put("short","ShortArray");
+        basejavaKotlinArrayMap.put("byte","ByteArray");
+        basejavaKotlinArrayMap.put("char","CharArray");
+        basejavaKotlinArrayMap.put("long","LongArray");
+        basejavaKotlinArrayMap.put("float","FloatArray");
+        basejavaKotlinArrayMap.put("double","DoubleArray");
+        basejavaKotlinArrayMap.put("boolean","BooleanArray");
 
+        basejavaKotlinMap.put("int","Int");
+        basejavaKotlinMap.put("short","Short");
+        basejavaKotlinMap.put("byte","Byte");
+        basejavaKotlinMap.put("char","Char");
+        basejavaKotlinMap.put("long","Long");
+        basejavaKotlinMap.put("float","Float");
+        basejavaKotlinMap.put("double","Double");
+        basejavaKotlinMap.put("boolean","Boolean");
+
+        javaKotlinMap.putAll(basejavaKotlinMap);
         javaKotlinMap.put("Integer","Int?");
         javaKotlinMap.put("Short","Short?");
         javaKotlinMap.put("Byte","Byte?");
@@ -77,6 +89,9 @@ public class AndroidAOPCode {
             stringWriter.append(methodName.get(i));
             if (i != methodName.size() -1){
                 stringWriter.append(",");
+            }
+            if (i % 3 == 0){
+                stringWriter.append("\n");
             }
         }
         stringWriter.append("}\n)\n");
@@ -126,19 +141,25 @@ public class AndroidAOPCode {
         }
     }
 
-    public StringWriter getReplaceContent(CodeStyle codeStyle) {
+    public StringWriter getReplaceContent(FileTypeExtension codeStyle) {
 
         StringWriter stringWriter = new StringWriter();
         stringWriter.append("@AndroidAopReplaceClass(\"")
                 .append(scanner.getClassName())
                 .append("\")\n");
-        stringWriter.append("public class Replace")
-                .append(getShowMethodClassName(scanner.getClassName()))
-                .append("{\n\n");
+        if (codeStyle == FileTypeExtension.JAVA){
+            stringWriter.append("public class Replace")
+                    .append(getShowMethodClassName(scanner.getClassName()))
+                    .append("{\n\n");
+        }else {
+            stringWriter.append("object Replace")
+                    .append(getShowMethodClassName(scanner.getClassName()))
+                    .append("{\n\n");
+        }
 
         for (MethodNode method : scanner.getMethods()) {
             boolean isSuspendMethod = method.desc.endsWith("Lkotlin/coroutines/Continuation;)Ljava/lang/Object;");
-            if (codeStyle == CodeStyle.JavaCode){
+            if (codeStyle == FileTypeExtension.JAVA){
                 if (!isSuspendMethod){
                     getReplaceJavaMethod(method.access,method.name,method.desc,stringWriter,scanner);
                 }
@@ -158,13 +179,15 @@ public class AndroidAOPCode {
         if (!"<clinit>".equals(methodName)){
 
             boolean isSuspendMethod = methodDescriptor.endsWith("Lkotlin/coroutines/Continuation;)Ljava/lang/Object;");
-
+            boolean isInit = "<init>".equals(methodName);
             String returnTypeClassName = Type.getReturnType(methodDescriptor).getClassName();
             if (isSuspendMethod){
                 returnTypeClassName = getSuspendMethodType(signature);
+            }else if (isInit){
+                returnTypeClassName = scanner.getClassName();
             }
 
-            boolean isInit = "<init>".equals(methodName);
+
             Type[] types= Type.getArgumentTypes(methodDescriptor);
             List<String> argNameList = scanner.getParamNames(
                     methodName,
@@ -188,7 +211,7 @@ public class AndroidAOPCode {
                 if (i == types.length - 1 && isSuspendMethod){
                     break;
                 }
-                stringWriter.append(type.getClassName());
+                stringWriter.append(type.getClassName().replaceAll("\\$","."));
                 if ((isSuspendMethod && i < types.length - 2) || (!isSuspendMethod && i != types.length -1)){
                     stringWriter.append(",");
                 }
@@ -304,7 +327,7 @@ public class AndroidAOPCode {
 
             for (int i = 0; i < types.length; i++) {
                 Type type = types[i];
-                stringWriter.append(type.getClassName());
+                stringWriter.append(type.getClassName().replaceAll("\\$","."));
                 if (i != types.length -1){
                     stringWriter.append(",");
                 }
@@ -314,7 +337,11 @@ public class AndroidAOPCode {
             stringWriter.append("\")");
 
             stringWriter.append("\npublic static ");
-            stringWriter.append(getShowMethodClassName(returnType.getClassName()));
+            if (isInit){
+                stringWriter.append(getShowMethodClassName(scanner.getClassName()));
+            }else {
+                stringWriter.append(getShowMethodClassName(returnType.getClassName()));
+            }
             stringWriter.append(" ");
             if (isInit){
                 stringWriter.append("get").append(getShowMethodClassName(scanner.getClassName())).append(scanner.getInitCount()+"");
@@ -377,7 +404,7 @@ public class AndroidAOPCode {
 
     private static String getShowMethodClassName(String className){
         if (className.contains(".")){
-            return className.substring(className.lastIndexOf(".")+1);
+            return className.replaceAll("\\$",".").substring(className.lastIndexOf(".")+1);
         }else {
             return className;
         }
@@ -387,7 +414,44 @@ public class AndroidAOPCode {
         String showName = getShowMethodClassName(className);
         String kotlinName = javaKotlinMap.get(showName);
         if (kotlinName == null){
-            return showName;
+            if (showName.contains("[]")){
+                String type = showName.replaceAll("\\[]","");
+                boolean isBaseType = basejavaKotlinMap.containsKey(type);
+                String subStr = "[]";
+                int count = 0;
+                int index = 0;
+                while ((index = showName.indexOf(subStr, index)) != -1) {
+                    index += subStr.length();
+                    count++;
+                }
+                if (isBaseType){
+                    if (count == 1){
+                        return basejavaKotlinArrayMap.get(type);
+                    }else {
+                        StringBuilder stringBuffer = new StringBuilder();
+                        for (int i = 0; i < count - 1; i++) {
+                            stringBuffer.append("Array<");
+                        }
+                        stringBuffer.append(basejavaKotlinArrayMap.get(type));
+                        for (int i = 0; i < count - 1; i++) {
+                            stringBuffer.append(">");
+                        }
+                        return stringBuffer.toString();
+                    }
+                }else {
+                    StringBuilder stringBuffer = new StringBuilder();
+                    for (int i = 0; i < count; i++) {
+                        stringBuffer.append("Array<");
+                    }
+                    stringBuffer.append(type);
+                    for (int i = 0; i < count; i++) {
+                        stringBuffer.append(">");
+                    }
+                    return stringBuffer.toString();
+                }
+            }else {
+                return showName;
+            }
         }else {
             return kotlinName;
         }

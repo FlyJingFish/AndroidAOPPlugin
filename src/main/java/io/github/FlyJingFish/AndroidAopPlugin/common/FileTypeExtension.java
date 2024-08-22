@@ -23,7 +23,6 @@ package io.github.FlyJingFish.AndroidAopPlugin.common;
  */
 public enum FileTypeExtension {
     JAVA("java"),
-    GROOVY("groovy"),
     KOTLIN("kt");
 
     FileTypeExtension(String value) {

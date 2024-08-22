@@ -2,9 +2,9 @@
 <svg version="1.1"
      xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink"
-     width="100" height="100">
-    <circle cx="50" cy="50" r="50" stroke="black" stroke-width="0" fill="#BB86FC"/>
-    <text font-size="16" x="6" y="54">
-        <tspan fill="white">AndroidAOP</tspan>
+     width="13px" height="13px">
+    <circle cx="6.5px" cy="6.5px" r="6.5px" stroke="black" stroke-width="0" fill="#BB86FC"/>
+    <text font-size="5px" x="1.5px" y="8">
+        <tspan fill="white">AOP</tspan>
     </text>
 </svg>

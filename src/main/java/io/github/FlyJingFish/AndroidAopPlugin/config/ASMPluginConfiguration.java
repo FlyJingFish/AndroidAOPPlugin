@@ -56,18 +56,15 @@ public class ASMPluginConfiguration {
         applicationConfig.setPrivate(privateCheckBox.isSelected());
         applicationConfig.setReplaceProxy((ReplaceProxy) replaceProxyComboBox.getSelectedItem());
     }
-
+    public boolean isModified = true;
     public boolean isModified(ApplicationConfig applicationConfig) {
-        if (publicCheckBox == null || protectedCheckBox == null
-                || packageCheckBox == null || privateCheckBox == null
-                || replaceProxyComboBox == null){
-            return true;
-        }
-        if (publicCheckBox.isSelected() != applicationConfig.isPublic()) return true;
-        if (protectedCheckBox.isSelected() != applicationConfig.isProtected()) return true;
-        if (packageCheckBox.isSelected() != applicationConfig.isPackage()) return true;
-        if (privateCheckBox.isSelected() != applicationConfig.isPrivate()) return true;
-        return !Objects.equals(replaceProxyComboBox.getSelectedItem(), applicationConfig.getReplaceProxy());
+        isModified = !isModified;
+        return isModified;
+//        if (publicCheckBox.isSelected() != applicationConfig.isPublic()) return true;
+//        if (protectedCheckBox.isSelected() != applicationConfig.isProtected()) return true;
+//        if (packageCheckBox.isSelected() != applicationConfig.isPackage()) return true;
+//        if (privateCheckBox.isSelected() != applicationConfig.isPrivate()) return true;
+//        return !Objects.equals(replaceProxyComboBox.getSelectedItem(), applicationConfig.getReplaceProxy());
     }
 
     private void createUIComponents() {

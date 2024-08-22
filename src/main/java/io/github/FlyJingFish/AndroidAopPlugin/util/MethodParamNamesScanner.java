@@ -4,16 +4,22 @@ package io.github.FlyJingFish.AndroidAopPlugin.util;
 import io.github.FlyJingFish.AndroidAopPlugin.config.ASMPluginComponent;
 import io.github.FlyJingFish.AndroidAopPlugin.config.ApplicationConfig;
 import org.objectweb.asm.*;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.LocalVariableNode;
-import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.*;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MethodParamNamesScanner {
     private final List<MethodNode> methods = new ArrayList<>();
     private final ClassNode cn = new ClassNode();
     private int initCount;
+    private static final Pattern pattern1 = Pattern.compile("^lambda\\$.*?\\$.+");
+    private static final Pattern pattern2 = Pattern.compile("^access\\$\\d+");
+    public static boolean isRemoveMethod(String methodName) {
+        return pattern1.matcher(methodName).find()
+                || pattern2.matcher(methodName).find();
+    }
 
     public MethodParamNamesScanner(ClassReader cr){
         ApplicationConfig applicationConfig = ASMPluginComponent.getApplicationConfig();
@@ -23,16 +29,17 @@ public class MethodParamNamesScanner {
 
         while (iterator.hasNext()){
             MethodNode methodNode = iterator.next();
+            if (isRemoveMethod(methodNode.name)){
+                iterator.remove();
+                continue;
+            }
+
             int access = methodNode.access;
             boolean isPublic =  (access & Opcodes.ACC_PUBLIC) != 0;
             boolean isProtected =  (access & Opcodes.ACC_PROTECTED) != 0;
             boolean isPrivate =  (access & Opcodes.ACC_PRIVATE) != 0;
             boolean isPackage;
-            if (!isPublic && !isProtected && !isPrivate){
-                isPackage = true;
-            }else {
-                isPackage = false;
-            }
+            isPackage = !isPublic && !isProtected && !isPrivate;
 
             if (applicationConfig.isPublic() && isPublic){
                 continue;

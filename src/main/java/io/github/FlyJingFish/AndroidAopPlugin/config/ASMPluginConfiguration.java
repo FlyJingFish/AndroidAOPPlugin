@@ -32,7 +32,7 @@ public class ASMPluginConfiguration {
     private JCheckBox skipFramesCheckBox;
     private JCheckBox skipCodeCheckBox;
     private JCheckBox expandFramesCheckBox;
-    private JComboBox<CodeStyle> groovyCodeStyleComboBox;
+    private JComboBox<ReplaceProxy> groovyCodeStyleComboBox;
 
     public ASMPluginConfiguration() {
     }
@@ -46,7 +46,7 @@ public class ASMPluginConfiguration {
         skipFramesCheckBox.setSelected(applicationConfig.isProtected());
         skipCodeCheckBox.setSelected(applicationConfig.isPackage());
         expandFramesCheckBox.setSelected(applicationConfig.isPrivate());
-        groovyCodeStyleComboBox.setSelectedItem(applicationConfig.getCodeStyle());
+        groovyCodeStyleComboBox.setSelectedItem(applicationConfig.getReplaceProxy());
     }
 
     public void getData(ApplicationConfig applicationConfig) {
@@ -54,7 +54,7 @@ public class ASMPluginConfiguration {
         applicationConfig.setProtected(skipFramesCheckBox.isSelected());
         applicationConfig.setPackage(skipCodeCheckBox.isSelected());
         applicationConfig.setPrivate(expandFramesCheckBox.isSelected());
-        applicationConfig.setCodeStyle((CodeStyle) groovyCodeStyleComboBox.getSelectedItem());
+        applicationConfig.setReplaceProxy((ReplaceProxy) groovyCodeStyleComboBox.getSelectedItem());
     }
 
     public boolean isModified(ApplicationConfig applicationConfig) {
@@ -62,22 +62,22 @@ public class ASMPluginConfiguration {
         if (skipFramesCheckBox.isSelected() != applicationConfig.isProtected()) return true;
         if (skipCodeCheckBox.isSelected() != applicationConfig.isPackage()) return true;
         if (expandFramesCheckBox.isSelected() != applicationConfig.isPrivate()) return true;
-        return !Objects.equals(groovyCodeStyleComboBox.getSelectedItem(), applicationConfig.getCodeStyle());
+        return !Objects.equals(groovyCodeStyleComboBox.getSelectedItem(), applicationConfig.getReplaceProxy());
     }
 
     private void createUIComponents() {
-        ComboBoxModel<CodeStyle> model = new EnumComboBoxModel<>(CodeStyle.class);
+        ComboBoxModel<ReplaceProxy> model = new EnumComboBoxModel<>(ReplaceProxy.class);
         groovyCodeStyleComboBox = new ComboBox<>(model);
         groovyCodeStyleComboBox.setRenderer(new GroovyCodeStyleCellRenderer<>());
     }
 
     private static class GroovyCodeStyleCellRenderer<T> implements ListCellRenderer<T> {
-        private EnumMap<CodeStyle, JLabel> labels;
+        private EnumMap<ReplaceProxy, JLabel> labels;
 
         private GroovyCodeStyleCellRenderer() {
-            labels = new EnumMap<>(CodeStyle.class);
-            for (CodeStyle codeStyle : CodeStyle.values()) {
-                labels.put(codeStyle, new JLabel(codeStyle.label));
+            labels = new EnumMap<>(ReplaceProxy.class);
+            for (ReplaceProxy replaceProxy : ReplaceProxy.values()) {
+                labels.put(replaceProxy, new JLabel(replaceProxy.label));
             }
         }
 

@@ -19,8 +19,6 @@
 package io.github.FlyJingFish.AndroidAopPlugin.config;
 
 
-import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension;
-
 /**
  * @author Kamiel Ahmadpour - 2017
  */
@@ -30,7 +28,7 @@ public class ApplicationConfig {
     private boolean isProtected = true;
     private boolean isPackage = true;
     private boolean isPrivate = true;
-    private CodeStyle codeStyle = CodeStyle.JavaCode;
+    private ReplaceProxy replaceProxy = ReplaceProxy.NoneProxy;
 
 
     public boolean isProtected() {
@@ -65,15 +63,12 @@ public class ApplicationConfig {
         this.isPrivate = aPrivate;
     }
 
-    public CodeStyle getCodeStyle() {
-        return codeStyle;
+    public ReplaceProxy getReplaceProxy() {
+        return replaceProxy;
     }
 
-    public void setCodeStyle(CodeStyle codeStyle) {
-        this.codeStyle = codeStyle;
+    public void setReplaceProxy(ReplaceProxy replaceProxy) {
+        this.replaceProxy = replaceProxy;
     }
 
-    public String getFileType() {
-        return codeStyle == CodeStyle.KotlinCode ? FileTypeExtension.KOTLIN.getValue():FileTypeExtension.JAVA.getValue();
-    }
 }

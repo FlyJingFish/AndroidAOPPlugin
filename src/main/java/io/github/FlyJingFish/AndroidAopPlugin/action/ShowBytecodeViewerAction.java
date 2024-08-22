@@ -44,7 +44,6 @@ import io.github.FlyJingFish.AndroidAopPlugin.common.Constants;
 import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension;
 import io.github.FlyJingFish.AndroidAopPlugin.config.ASMPluginComponent;
 import io.github.FlyJingFish.AndroidAopPlugin.config.ApplicationConfig;
-import io.github.FlyJingFish.AndroidAopPlugin.config.CodeStyle;
 import io.github.FlyJingFish.AndroidAopPlugin.util.AndroidAOPCode;
 import io.github.FlyJingFish.AndroidAopPlugin.view.ReplaceView;
 import io.github.FlyJingFish.AndroidAopPlugin.view.MatchView;
@@ -227,18 +226,18 @@ public class ShowBytecodeViewerAction extends AnAction {
             StringWriter replaceJavaCode = androidAOPCode.getReplaceContent(FileTypeExtension.JAVA);
             PsiFile psiFile = PsiFileFactory.getInstance(project).createFileFromText(Constants.FILE_NAME, FileTypeManager.getInstance().getFileTypeByExtension(FileTypeExtension.JAVA.getValue()), replaceJavaCode.toString());
             CodeStyleManager.getInstance(project).reformat(psiFile);
-            replaceView.setCode(file, psiFile.getText(),applicationConfig.getFileType());
+            replaceView.setCode(file, psiFile.getText());
 
 
             StringWriter replaceKotlinCode = androidAOPCode.getReplaceContent(FileTypeExtension.KOTLIN);
             PsiFile psiFileKt = PsiFileFactory.getInstance(project).createFileFromText(Constants.FILE_NAME, FileTypeManager.getInstance().getFileTypeByExtension(FileTypeExtension.KOTLIN.getValue()), replaceKotlinCode.toString());
             CodeStyleManager.getInstance(project).reformat(psiFileKt);
-            replaceViewKt.setCode(file, psiFileKt.getText(),applicationConfig.getFileType());
+            replaceViewKt.setCode(file, psiFileKt.getText());
 
             StringWriter matchJavaCode = androidAOPCode.getMatchContent();
             PsiFile matchPsiFile = PsiFileFactory.getInstance(project).createFileFromText(Constants.FILE_NAME, FileTypeManager.getInstance().getFileTypeByExtension(FileTypeExtension.JAVA.getValue()), matchJavaCode.toString());
             CodeStyleManager.getInstance(project).reformat(matchPsiFile);
-            matchView.setCode(file, matchPsiFile.getText(),applicationConfig.getFileType());
+            matchView.setCode(file, matchPsiFile.getText());
 
 
             toolWindowManager.getToolWindow(Constants.PLUGIN_WINDOW_NAME).activate(null);

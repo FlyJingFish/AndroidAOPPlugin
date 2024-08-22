@@ -28,13 +28,13 @@ package io.github.FlyJingFish.AndroidAopPlugin.config;
 /**
  * Enumeration of Groovy code styles
  */
-public enum CodeStyle {
-    JavaCode("Java Code"),
-    KotlinCode("Kotlin Code");
+public enum ReplaceProxy {
+    NoneProxy("Not Use @ProxyMethod"),
+    Proxy("Use @ProxyMethod");
 
     String label;
 
-    CodeStyle(final String label) {
+    ReplaceProxy(final String label) {
         this.label = label;
     }
 }

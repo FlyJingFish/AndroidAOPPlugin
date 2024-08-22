@@ -47,35 +47,35 @@ public class ASMPluginComponent implements PersistentStateComponent<Element> {
     @Override
     public Element getState() {
         Element root = new Element("state");
-        Element asmNode = new Element("asm");
-        asmNode.setAttribute("isPublic", String.valueOf(applicationConfig.isPublic()));
-        asmNode.setAttribute("isProtected", String.valueOf(applicationConfig.isProtected()));
-        asmNode.setAttribute("isPackage", String.valueOf(applicationConfig.isPackage()));
-        asmNode.setAttribute("isPrivate", String.valueOf(applicationConfig.isPrivate()));
-        root.addContent(asmNode);
-        Element groovyNode = new Element("code");
-        groovyNode.setAttribute("codeStyle", applicationConfig.getCodeStyle().toString());
-        root.addContent(groovyNode);
+        Element modifiersType = new Element("modifiers");
+        modifiersType.setAttribute("isPublic", String.valueOf(applicationConfig.isPublic()));
+        modifiersType.setAttribute("isProtected", String.valueOf(applicationConfig.isProtected()));
+        modifiersType.setAttribute("isPackage", String.valueOf(applicationConfig.isPackage()));
+        modifiersType.setAttribute("isPrivate", String.valueOf(applicationConfig.isPrivate()));
+        root.addContent(modifiersType);
+        Element proxy = new Element("proxy");
+        proxy.setAttribute("proxyType", applicationConfig.getReplaceProxy().toString());
+        root.addContent(proxy);
         return root;
     }
 
     @Override
     public void loadState(final Element state) {
-        Element asmNode = state.getChild("asm");
-        if (asmNode != null) {
-            final String skipDebugStr = asmNode.getAttributeValue("isPublic");
+        Element modifiersType = state.getChild("modifiers");
+        if (modifiersType != null) {
+            final String skipDebugStr = modifiersType.getAttributeValue("isPublic");
             if (skipDebugStr != null) applicationConfig.setPublic(Boolean.valueOf(skipDebugStr));
-            final String skipFramesStr = asmNode.getAttributeValue("isProtected");
+            final String skipFramesStr = modifiersType.getAttributeValue("isProtected");
             if (skipFramesStr != null) applicationConfig.setProtected(Boolean.valueOf(skipFramesStr));
-            final String skipCodeStr = asmNode.getAttributeValue("isPackage");
+            final String skipCodeStr = modifiersType.getAttributeValue("isPackage");
             if (skipCodeStr != null) applicationConfig.setPackage(Boolean.valueOf(skipCodeStr));
-            final String expandFramesStr = asmNode.getAttributeValue("isPrivate");
+            final String expandFramesStr = modifiersType.getAttributeValue("isPrivate");
             if (expandFramesStr != null) applicationConfig.setPrivate(Boolean.valueOf(expandFramesStr));
         }
-        Element groovyNode = state.getChild("code");
-        if (groovyNode != null) {
-            String codeStyleStr = groovyNode.getAttributeValue("codeStyle");
-            if (codeStyleStr != null) applicationConfig.setCodeStyle(CodeStyle.valueOf(codeStyleStr));
+        Element proxy = state.getChild("proxy");
+        if (proxy != null) {
+            String codeStyleStr = proxy.getAttributeValue("proxyType");
+            if (codeStyleStr != null) applicationConfig.setReplaceProxy(ReplaceProxy.valueOf(codeStyleStr));
         }
     }
 

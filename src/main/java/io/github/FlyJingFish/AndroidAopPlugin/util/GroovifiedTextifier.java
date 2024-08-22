@@ -25,7 +25,7 @@ package io.github.FlyJingFish.AndroidAopPlugin.util;
  * Updated by: Kamiel
  */
 
-import io.github.FlyJingFish.AndroidAopPlugin.config.CodeStyle;
+import io.github.FlyJingFish.AndroidAopPlugin.config.ReplaceProxy;
 import reloc.org.objectweb.asm.Label;
 import reloc.org.objectweb.asm.Opcodes;
 import reloc.org.objectweb.asm.Type;
@@ -68,16 +68,16 @@ public class GroovifiedTextifier extends Textifier {
         }
     }
 
-    private final CodeStyle codeStyle;
+    private final ReplaceProxy replaceProxy;
 
-    public GroovifiedTextifier(final CodeStyle codeStyle) {
+    public GroovifiedTextifier(final ReplaceProxy replaceProxy) {
         super(Opcodes.ASM5);
-        this.codeStyle = codeStyle;
+        this.replaceProxy = replaceProxy;
     }
 
     @Override
     protected Textifier createTextifier() {
-        return new GroovifiedMethodTextifier(codeStyle);
+        return new GroovifiedMethodTextifier(replaceProxy);
     }
 
     @Override
@@ -177,7 +177,7 @@ public class GroovifiedTextifier extends Textifier {
 
     protected static class GroovifiedMethodTextifier extends Textifier {
 
-        private final CodeStyle codeStyle;
+        private final ReplaceProxy replaceProxy;
         private static final Textifier EMPTY_TEXTIFIER = new Textifier(Opcodes.ASM5) {
             @Override
             public List<Object> getText() {
@@ -185,13 +185,13 @@ public class GroovifiedTextifier extends Textifier {
             }
         };
 
-        public GroovifiedMethodTextifier(final CodeStyle codeStyle) {
+        public GroovifiedMethodTextifier(final ReplaceProxy replaceProxy) {
             super(Opcodes.ASM5);
-            this.codeStyle = codeStyle;
+            this.replaceProxy = replaceProxy;
         }
 
         private boolean isLegacy() {
-            return codeStyle == CodeStyle.JavaCode;
+            return replaceProxy == ReplaceProxy.NoneProxy;
         }
 
         @Override
@@ -363,7 +363,7 @@ public class GroovifiedTextifier extends Textifier {
             this.stringBuilder.setLength(0);
             this.stringBuilder.append(ltab);
             appendLabel(label);
-            if (codeStyle == CodeStyle.KotlinCode) this.stringBuilder.append(':');
+            if (replaceProxy == ReplaceProxy.Proxy) this.stringBuilder.append(':');
             this.stringBuilder.append('\n');
             text.add(this.stringBuilder.toString());
         }

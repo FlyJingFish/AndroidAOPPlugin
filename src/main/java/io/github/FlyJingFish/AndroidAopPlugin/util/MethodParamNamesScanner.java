@@ -16,9 +16,11 @@ public class MethodParamNamesScanner {
     private int initCount;
     private static final Pattern pattern1 = Pattern.compile("^lambda\\$.*?\\$.+");
     private static final Pattern pattern2 = Pattern.compile("^access\\$\\d+");
+    private static final Pattern pattern3 = Pattern.compile("\\$\\$.{32}\\$\\$AndroidAOP$");
     public static boolean isRemoveMethod(String methodName) {
         return pattern1.matcher(methodName).find()
-                || pattern2.matcher(methodName).find();
+                || pattern2.matcher(methodName).find()
+                || pattern3.matcher(methodName).find();
     }
 
     public MethodParamNamesScanner(ClassReader cr){

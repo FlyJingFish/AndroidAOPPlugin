@@ -35,6 +35,11 @@ public class MatchView extends ACodeView {
 		super(toolWindowManager, keymapManager, project, FileTypeExtension.JAVA.getValue());
 	}
 
+
+	public MatchView(Project project) {
+		super(project,  FileTypeExtension.JAVA.getValue());
+	}
+
 	public static MatchView getInstance(Project project) {
 		return project.getService(MatchView.class);
 	}

@@ -22,12 +22,15 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.util.IconLoader;
+import io.github.FlyJingFish.AndroidAopPlugin.MyPluginClass;
 import io.github.FlyJingFish.AndroidAopPlugin.config.PluginConfig;
+
+import javax.swing.*;
 
 public class ShowASMSettingsAction extends AnAction {
 
     public ShowASMSettingsAction() {
-        super("Settings", "Show settings for AndroidAOP plugin", IconLoader.getIcon("/general/projectSettings.png"));
+        super("Settings", "Show settings for AndroidAOP plugin", IconLoader.getIcon("/icons/setting.svg", MyPluginClass.class));
     }
 
     @Override

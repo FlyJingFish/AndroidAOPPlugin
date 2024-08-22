@@ -34,6 +34,11 @@ public class ReplaceViewKt extends ACodeView {
 		super(toolWindowManager, keymapManager, project, FileTypeExtension.KOTLIN.getValue());
 	}
 
+	public ReplaceViewKt(Project project) {
+		super(project,  FileTypeExtension.KOTLIN.getValue());
+	}
+
+
 	public static ReplaceViewKt getInstance(Project project) {
 		return project.getService(ReplaceViewKt.class);
 	}

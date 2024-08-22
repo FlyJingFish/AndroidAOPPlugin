@@ -54,6 +54,15 @@ public class ACodeView extends SimpleToolWindowPanel implements Disposable {
     private String fileExtension;
     private DefaultActionGroup group;
 
+    public ACodeView( final Project project, final String fileExtension) {
+        super(true, true);
+        this.toolWindowManager = null;
+        this.keymapManager = null;
+        this.project = project;
+        this.fileExtension = fileExtension;
+        setupUI(fileExtension);
+    }
+
     public ACodeView(final ToolWindowManager toolWindowManager, KeymapManager keymapManager, final Project project, final String fileExtension) {
         super(true, true);
         this.toolWindowManager = toolWindowManager;

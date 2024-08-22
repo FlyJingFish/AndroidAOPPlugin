@@ -34,6 +34,11 @@ public class MatchViewKt extends ACodeView {
 		super(toolWindowManager, keymapManager, project, FileTypeExtension.KOTLIN.getValue());
 	}
 
+	public MatchViewKt(Project project) {
+		super(project,  FileTypeExtension.KOTLIN.getValue());
+	}
+
+
 	public static MatchViewKt getInstance(Project project) {
 		return project.getService(MatchViewKt.class);
 	}

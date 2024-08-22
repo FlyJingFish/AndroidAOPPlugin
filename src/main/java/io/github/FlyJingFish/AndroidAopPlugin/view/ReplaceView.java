@@ -36,6 +36,10 @@ public class ReplaceView extends ACodeView {
 		super(toolWindowManager, keymapManager, project, FileTypeExtension.JAVA.getValue());
 	}
 
+	public ReplaceView(Project project) {
+		super(project,  FileTypeExtension.JAVA.getValue());
+	}
+
 	public static ReplaceView getInstance(Project project) {
 		return project.getService(ReplaceView.class);
 	}

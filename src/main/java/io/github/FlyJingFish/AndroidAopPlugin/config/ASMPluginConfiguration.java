@@ -58,6 +58,11 @@ public class ASMPluginConfiguration {
     }
 
     public boolean isModified(ApplicationConfig applicationConfig) {
+        if (skipDebugCheckBox == null || skipFramesCheckBox == null
+                || skipCodeCheckBox == null || expandFramesCheckBox == null
+                || groovyCodeStyleComboBox == null){
+            return false;
+        }
         if (skipDebugCheckBox.isSelected() != applicationConfig.isPublic()) return true;
         if (skipFramesCheckBox.isSelected() != applicationConfig.isProtected()) return true;
         if (skipCodeCheckBox.isSelected() != applicationConfig.isPackage()) return true;

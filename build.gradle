@@ -25,15 +25,17 @@ idea {
 intellij {
     version = "2022.2.5"
     type = "IC"
-    plugins = ["com.jetbrains.php:222.4554.10","java","Kotlin"]
-
+    plugins = ["java","Kotlin"]
+    updateSinceUntilBuild = false
 }
 
 dependencies {
-    implementation fileTree('lib/reloc-asm-7.1.jar')
-    implementation fileTree('lib/reloc-asm-commons-7.1.jar')
-    implementation fileTree('lib/reloc-asm-tree-7.1.jar')
-    implementation fileTree('lib/reloc-asm-util-7.1.jar')
+    implementation "org.ow2.asm:asm:9.6"
+    implementation "org.ow2.asm:asm-commons:9.6"
+
+//    implementation fileTree('lib/asm-9.6.jar')
+//    implementation fileTree('lib/asm-commons-9.6.jar')
+//    implementation fileTree('lib/asm-tree-9.6.jar')
 
 }
 targetCompatibility = JavaVersion.VERSION_11

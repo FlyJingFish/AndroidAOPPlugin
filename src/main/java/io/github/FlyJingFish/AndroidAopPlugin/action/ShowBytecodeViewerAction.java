@@ -45,6 +45,7 @@ import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension;
 import io.github.FlyJingFish.AndroidAopPlugin.config.ASMPluginComponent;
 import io.github.FlyJingFish.AndroidAopPlugin.config.ApplicationConfig;
 import io.github.FlyJingFish.AndroidAopPlugin.util.AndroidAOPCode;
+import io.github.FlyJingFish.AndroidAopPlugin.view.MatchViewKt;
 import io.github.FlyJingFish.AndroidAopPlugin.view.ReplaceView;
 import io.github.FlyJingFish.AndroidAopPlugin.view.MatchView;
 import io.github.FlyJingFish.AndroidAopPlugin.view.ReplaceViewKt;
@@ -192,15 +193,17 @@ public class ShowBytecodeViewerAction extends AnAction {
     private void updateToolWindowContents(final Project project, final VirtualFile file) {
         ApplicationManager.getApplication().runWriteAction(() -> {
             ReplaceView replaceView = ReplaceView.getInstance(project);
-            MatchView matchView = MatchView.getInstance(project);
             ReplaceViewKt replaceViewKt = ReplaceViewKt.getInstance(project);
+            MatchView matchView = MatchView.getInstance(project);
+            MatchViewKt matchViewKt = MatchViewKt.getInstance(project);
             ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
 
 
             if (file == null) {
                 replaceView.setCode(file, Constants.NO_CLASS_FOUND);
-                matchView.setCode(file, Constants.NO_CLASS_FOUND);
                 replaceViewKt.setCode(file, Constants.NO_CLASS_FOUND);
+                matchView.setCode(file, Constants.NO_CLASS_FOUND);
+                matchViewKt.setCode(file, Constants.NO_CLASS_FOUND);
                 toolWindowManager.getToolWindow(Constants.PLUGIN_WINDOW_NAME).activate(null);
                 return;
             } else {
@@ -234,10 +237,15 @@ public class ShowBytecodeViewerAction extends AnAction {
             CodeStyleManager.getInstance(project).reformat(psiFileKt);
             replaceViewKt.setCode(file, psiFileKt.getText());
 
-            StringWriter matchJavaCode = androidAOPCode.getMatchContent();
+            StringWriter matchJavaCode = androidAOPCode.getMatchContent(FileTypeExtension.JAVA,false,false);
             PsiFile matchPsiFile = PsiFileFactory.getInstance(project).createFileFromText(Constants.FILE_NAME, FileTypeManager.getInstance().getFileTypeByExtension(FileTypeExtension.JAVA.getValue()), matchJavaCode.toString());
             CodeStyleManager.getInstance(project).reformat(matchPsiFile);
             matchView.setCode(file, matchPsiFile.getText());
+
+            StringWriter matchKotlinCode = androidAOPCode.getMatchContent(FileTypeExtension.KOTLIN,false,false);
+            PsiFile matchPsiFileKt = PsiFileFactory.getInstance(project).createFileFromText(Constants.FILE_NAME, FileTypeManager.getInstance().getFileTypeByExtension(FileTypeExtension.KOTLIN.getValue()), matchKotlinCode.toString());
+            CodeStyleManager.getInstance(project).reformat(matchPsiFileKt);
+            matchViewKt.setCode(file, matchPsiFileKt.getText());
 
 
             toolWindowManager.getToolWindow(Constants.PLUGIN_WINDOW_NAME).activate(null);

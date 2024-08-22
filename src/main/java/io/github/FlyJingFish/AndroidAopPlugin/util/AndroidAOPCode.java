@@ -74,37 +74,55 @@ public class AndroidAOPCode {
         javaKotlinMap.put("Object","Any");
     }
 
-    public StringWriter getMatchContent() {
+    public StringWriter getMatchContent(FileTypeExtension codeStyle,boolean allMethod,boolean useProxyMethod) {
 
         StringWriter stringWriter = new StringWriter();
         stringWriter.append("@AndroidAopMatchClassMethod(\n")
                 .append("   targetClassName = \"").append(scanner.getClassName()).append("\",\n")
-                .append("   type = MatchType.SELF,\n")
-                .append("   methodName = {");
+                .append("   type = MatchType.SELF,\n");
+        if (codeStyle == FileTypeExtension.KOTLIN){
+            stringWriter.append("   methodName = [");
+        }else {
+            stringWriter.append("   methodName = {");
+        }
 
+        if (allMethod){
+            stringWriter.append("\"*\"");
+        }else {
+            List<String> methodName = new ArrayList<>();
+            for (MethodNode method : scanner.getMethods()) {
+                String name = getMatchJavaMethod(method.access,method.name,method.desc,method.signature,scanner);
+                if (name != null){
+                    methodName.add(name);
+                }
+            }
 
-        List<String> methodName = new ArrayList<>();
-        for (MethodNode method : scanner.getMethods()) {
-            String name = getMatchJavaMethod(method.access,method.name,method.desc,method.signature,scanner);
-            if (name != null){
-                methodName.add(name);
+            for (int i = 0; i < methodName.size(); i++) {
+                stringWriter.append(methodName.get(i));
+                if (i != methodName.size() -1){
+                    stringWriter.append(",");
+                }
+                if (i % 3 == 0){
+                    stringWriter.append("\n");
+                }
             }
         }
 
-        for (int i = 0; i < methodName.size(); i++) {
-            stringWriter.append(methodName.get(i));
-            if (i != methodName.size() -1){
-                stringWriter.append(",");
-            }
-            if (i % 3 == 0){
-                stringWriter.append("\n");
-            }
-        }
-        stringWriter.append("}\n)\n");
 
-        stringWriter.append("public class Match")
-                .append(getShowMethodClassName(scanner.getClassName()))
-                .append(" implements MatchClassMethod{\n\n");
+
+        if (codeStyle == FileTypeExtension.KOTLIN){
+            stringWriter.append("]\n)\n");
+            stringWriter.append("class Match")
+                    .append(getShowMethodClassName(scanner.getClassName()))
+                    .append(" : ").append(useProxyMethod?"MatchClassMethodProxy()":"MatchClassMethod").append("{\n\n");
+        }else {
+            stringWriter.append("}\n)\n");
+            stringWriter.append("public class Match")
+                    .append(getShowMethodClassName(scanner.getClassName()))
+                    .append(useProxyMethod?" extends MatchClassMethodProxy":" implements MatchClassMethod").append("{\n\n");
+        }
+
+
 
         stringWriter.append("}");
 
@@ -150,6 +168,12 @@ public class AndroidAOPCode {
     public StringWriter getReplaceContent(FileTypeExtension codeStyle) {
 
         StringWriter stringWriter = new StringWriter();
+
+        if (useProxyMethod){
+            StringWriter matchContent = getMatchContent(codeStyle,true,true);
+            stringWriter.append(matchContent.toString()).append("\n");
+        }
+
         stringWriter.append("@AndroidAopReplaceClass(\"")
                 .append(scanner.getClassName())
                 .append("\")\n");

@@ -37,6 +37,6 @@ public class ReplaceView extends ACodeView {
 	}
 
 	public static ReplaceView getInstance(Project project) {
-		return ServiceManager.getService(project, ReplaceView.class);
+		return project.getService(ReplaceView.class);
 	}
 }

@@ -61,7 +61,7 @@ public class ASMPluginConfiguration {
         if (publicCheckBox == null || protectedCheckBox == null
                 || packageCheckBox == null || privateCheckBox == null
                 || replaceProxyComboBox == null){
-            return false;
+            return true;
         }
         if (publicCheckBox.isSelected() != applicationConfig.isPublic()) return true;
         if (protectedCheckBox.isSelected() != applicationConfig.isProtected()) return true;

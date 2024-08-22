@@ -36,6 +36,6 @@ public class MatchView extends ACodeView {
 	}
 
 	public static MatchView getInstance(Project project) {
-		return ServiceManager.getService(project, MatchView.class);
+		return project.getService(MatchView.class);
 	}
 }

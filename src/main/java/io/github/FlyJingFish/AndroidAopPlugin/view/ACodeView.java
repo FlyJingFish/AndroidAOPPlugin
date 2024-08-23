@@ -39,11 +39,10 @@ import io.github.FlyJingFish.AndroidAopPlugin.action.ShowASMSettingsAction;
 import io.github.FlyJingFish.AndroidAopPlugin.common.Constants;
 
 import javax.swing.*;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import java.awt.*;
 
-/**
- * Base class for editors which displays bytecode or ASMified code.
- */
 public class ACodeView extends SimpleToolWindowPanel implements Disposable {
     protected final Project project;
 
@@ -88,7 +87,23 @@ public class ACodeView extends SimpleToolWindowPanel implements Disposable {
         final ActionToolbar actionToolBar = actionManager.createActionToolbar(Constants.PLUGIN_WINDOW_NAME, group, true);
         final JPanel buttonsPanel = new JPanel(new BorderLayout());
         buttonsPanel.add(actionToolBar.getComponent(), BorderLayout.CENTER);
-        PopupHandler.installPopupHandler(editor.getContentComponent(), group, Constants.PLUGIN_WINDOW_NAME, actionManager);
+//        PopupHandler.installPopupHandler(editor.getContentComponent(), group, Constants.PLUGIN_WINDOW_NAME, actionManager);
+        PopupHandler.installPopupMenu(editor.getContentComponent(), group, Constants.PLUGIN_WINDOW_NAME, new PopupMenuListener() {
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+
+            }
+
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
+
+            }
+        });
         setToolbar(buttonsPanel);
     }
 

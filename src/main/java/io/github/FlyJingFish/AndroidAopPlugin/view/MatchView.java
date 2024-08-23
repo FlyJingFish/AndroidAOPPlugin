@@ -18,12 +18,10 @@
 
 package io.github.FlyJingFish.AndroidAopPlugin.view;
 
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindowManager;
 import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension;
-import io.github.FlyJingFish.AndroidAopPlugin.config.ASMPluginComponent;
 
 /**
  * The groovified view displays @groovyx.ast.bytecode.Bytecode code for methods.

@@ -26,7 +26,7 @@ import java.awt.*;
 import java.util.EnumMap;
 import java.util.Objects;
 
-public class ASMPluginConfiguration {
+public class AOPPluginConfiguration {
     private JPanel contentPane;
     private JCheckBox publicCheckBox;
     private JCheckBox protectedCheckBox;
@@ -34,7 +34,7 @@ public class ASMPluginConfiguration {
     private JCheckBox privateCheckBox;
     private JComboBox<ReplaceProxy> replaceProxyComboBox;
 
-    public ASMPluginConfiguration() {
+    public AOPPluginConfiguration() {
     }
 
     public JComponent getRootPane() {

@@ -9,7 +9,7 @@ import javax.swing.*;
 public class PluginConfig implements Configurable {
 
     private ApplicationConfig applicationConfig;
-    private ASMPluginConfiguration configDialog;
+    private AOPPluginConfiguration configDialog;
 
     public PluginConfig() {
         this.applicationConfig = AOPPluginComponent.getApplicationConfig();
@@ -29,7 +29,7 @@ public class PluginConfig implements Configurable {
 
     @Override
     public JComponent createComponent() {
-        if (configDialog == null) configDialog = new ASMPluginConfiguration();
+        if (configDialog == null) configDialog = new AOPPluginConfiguration();
         return configDialog.getRootPane();
     }
 

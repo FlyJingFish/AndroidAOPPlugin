@@ -12,7 +12,7 @@ public class PluginConfig implements Configurable {
     private ASMPluginConfiguration configDialog;
 
     public PluginConfig() {
-        this.applicationConfig = ASMPluginComponent.getApplicationConfig();
+        this.applicationConfig = AOPPluginComponent.getApplicationConfig();
 
     }
 

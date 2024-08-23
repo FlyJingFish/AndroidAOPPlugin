@@ -13,7 +13,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import io.github.FlyJingFish.AndroidAopPlugin.common.Constants;
 
-public class ShowASMDiffAction extends AnAction {
+public class ShowAOPDiffAction extends AnAction {
     private static final String DIFF_WINDOW_TITLE = "Show differences from previous class contents";
     private static final String[] DIFF_TITLES = {"Previous version", "Current version"};
     private String previousCode;
@@ -22,7 +22,7 @@ public class ShowASMDiffAction extends AnAction {
     private String extension;
 
 
-    public ShowASMDiffAction(String previousCode, VirtualFile previousFile, Document document, String extension) {
+    public ShowAOPDiffAction(String previousCode, VirtualFile previousFile, Document document, String extension) {
         super("Show differences",
                 "Shows differences from the previous version of bytecode for this file",
                 null);

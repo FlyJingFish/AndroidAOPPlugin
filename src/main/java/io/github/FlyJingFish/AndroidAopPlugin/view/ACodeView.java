@@ -34,8 +34,8 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.PopupHandler;
-import io.github.FlyJingFish.AndroidAopPlugin.action.ShowASMDiffAction;
-import io.github.FlyJingFish.AndroidAopPlugin.action.ShowASMSettingsAction;
+import io.github.FlyJingFish.AndroidAopPlugin.action.ShowAOPDiffAction;
+import io.github.FlyJingFish.AndroidAopPlugin.action.ShowAOPSettingsAction;
 import io.github.FlyJingFish.AndroidAopPlugin.common.Constants;
 
 import javax.swing.*;
@@ -49,7 +49,7 @@ public class ACodeView extends SimpleToolWindowPanel implements Disposable {
     protected final ToolWindowManager toolWindowManager;
     protected final KeymapManager keymapManager;
     protected Editor editor;
-    private ShowASMDiffAction showASMDiffAction;
+    private ShowAOPDiffAction showAOPDiffAction;
     private String fileExtension;
     private DefaultActionGroup group;
 
@@ -75,13 +75,13 @@ public class ACodeView extends SimpleToolWindowPanel implements Disposable {
         final EditorFactory editorFactory = EditorFactory.getInstance();
         Document document = editorFactory.createDocument("");
         editor = editorFactory.createEditor(document, project, FileTypeManager.getInstance().getFileTypeByExtension(extension), true);
-        showASMDiffAction = new ShowASMDiffAction(null, null, document, extension);
+        showAOPDiffAction = new ShowAOPDiffAction(null, null, document, extension);
 
         final JComponent editorComponent = editor.getComponent();
         add(editorComponent);
         group = new DefaultActionGroup();
-        group.add(showASMDiffAction);
-        group.add(new ShowASMSettingsAction());
+        group.add(showAOPDiffAction);
+        group.add(new ShowAOPSettingsAction());
 
         final ActionManager actionManager = ActionManager.getInstance();
         final ActionToolbar actionToolBar = actionManager.createActionToolbar(Constants.PLUGIN_WINDOW_NAME, group, true);
@@ -121,14 +121,14 @@ public class ACodeView extends SimpleToolWindowPanel implements Disposable {
 
             fileExtension = extension;
         }
-        final String text = showASMDiffAction.getDocument().getText();
-        if (showASMDiffAction.getPreviousFile() == null || file == null || showASMDiffAction.getPreviousFile().getPath().equals(file.getPath()) && !Constants.NO_CLASS_FOUND.equals(text)) {
-            if (file != null) showASMDiffAction.setPreviousCode(text);
-        } else if (!showASMDiffAction.getPreviousFile().getPath().equals(file.getPath())) {
-            showASMDiffAction.setPreviousCode(""); // reset previous code
+        final String text = showAOPDiffAction.getDocument().getText();
+        if (showAOPDiffAction.getPreviousFile() == null || file == null || showAOPDiffAction.getPreviousFile().getPath().equals(file.getPath()) && !Constants.NO_CLASS_FOUND.equals(text)) {
+            if (file != null) showAOPDiffAction.setPreviousCode(text);
+        } else if (!showAOPDiffAction.getPreviousFile().getPath().equals(file.getPath())) {
+            showAOPDiffAction.setPreviousCode(""); // reset previous code
         }
-        showASMDiffAction.getDocument().setText(code);
-        if (file != null) showASMDiffAction.setPreviousFile(file);
+        showAOPDiffAction.getDocument().setText(code);
+        if (file != null) showAOPDiffAction.setPreviousFile(file);
         editor.getScrollingModel().scrollTo(editor.offsetToLogicalPosition(0), ScrollType.MAKE_VISIBLE);
     }
 

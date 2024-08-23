@@ -13,7 +13,7 @@ import io.github.FlyJingFish.AndroidAopPlugin.common.Constants;
                 @Storage(file = "$PROJECT_FILE$")
         }
 )
-public class ASMPluginComponent implements PersistentStateComponent<Element> {
+public class AOPPluginComponent implements PersistentStateComponent<Element> {
 
     private static ApplicationConfig applicationConfig = new ApplicationConfig();
 

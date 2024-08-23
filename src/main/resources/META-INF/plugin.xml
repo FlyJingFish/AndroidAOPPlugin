@@ -17,12 +17,12 @@
 
     <project-components>
         <component>
-            <implementation-class>io.github.FlyJingFish.AndroidAopPlugin.config.ASMPluginComponent</implementation-class>
+            <implementation-class>io.github.FlyJingFish.AndroidAopPlugin.config.AOPPluginComponent</implementation-class>
         </component>
     </project-components>
 
     <actions>
-        <action class="io.github.FlyJingFish.AndroidAopPlugin.action.ShowBytecodeViewerAction"
+        <action class="io.github.FlyJingFish.AndroidAopPlugin.action.ShowAopCodeViewerAction"
                 description="Shows the AndroidAOP Code from the current class"
                 id="showBytecodeViewer"
                 text="AndroidAOP Code">
@@ -34,7 +34,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable groupId="tools" instance="io.github.FlyJingFish.AndroidAopPlugin.config.PluginConfig" />
-        <toolWindow anchor="right" factoryClass="io.github.FlyJingFish.AndroidAopPlugin.view.BytecodeOutlineToolWindowFactory" icon="/images/pluginIcon.svg"
+        <toolWindow anchor="right" factoryClass="io.github.FlyJingFish.AndroidAopPlugin.view.AOPCodeOutlineToolWindowFactory" icon="/images/pluginIcon.svg"
                     id="AOPCode" />
         <projectService serviceImplementation="io.github.FlyJingFish.AndroidAopPlugin.view.ReplaceView"
                         serviceInterface="io.github.FlyJingFish.AndroidAopPlugin.view.ReplaceView" />

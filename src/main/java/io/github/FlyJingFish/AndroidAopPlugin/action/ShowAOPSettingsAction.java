@@ -8,9 +8,9 @@ import io.github.FlyJingFish.AndroidAopPlugin.MyPluginClass;
 import io.github.FlyJingFish.AndroidAopPlugin.config.PluginConfig;
 
 
-public class ShowASMSettingsAction extends AnAction {
+public class ShowAOPSettingsAction extends AnAction {
 
-    public ShowASMSettingsAction() {
+    public ShowAOPSettingsAction() {
         super("Settings", "Show settings for AndroidAOP plugin", IconLoader.getIcon("/icons/setting.svg", MyPluginClass.class));
     }
 

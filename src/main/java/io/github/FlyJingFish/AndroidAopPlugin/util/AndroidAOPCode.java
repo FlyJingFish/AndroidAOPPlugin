@@ -1,7 +1,7 @@
 package io.github.FlyJingFish.AndroidAopPlugin.util;
 
 import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension;
-import io.github.FlyJingFish.AndroidAopPlugin.config.ASMPluginComponent;
+import io.github.FlyJingFish.AndroidAopPlugin.config.AOPPluginComponent;
 import io.github.FlyJingFish.AndroidAopPlugin.config.ApplicationConfig;
 import io.github.FlyJingFish.AndroidAopPlugin.config.ReplaceProxy;
 import org.objectweb.asm.*;
@@ -32,7 +32,7 @@ public class AndroidAOPCode {
 
     public AndroidAOPCode(ClassReader cr) {
         scanner = new MethodParamNamesScanner(cr);
-        ApplicationConfig applicationConfig = ASMPluginComponent.getApplicationConfig();
+        ApplicationConfig applicationConfig = AOPPluginComponent.getApplicationConfig();
         useProxyMethod = applicationConfig.getReplaceProxy() == ReplaceProxy.Proxy;
     }
 

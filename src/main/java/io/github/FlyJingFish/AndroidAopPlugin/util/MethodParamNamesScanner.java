@@ -1,7 +1,7 @@
 package io.github.FlyJingFish.AndroidAopPlugin.util;
 
 
-import io.github.FlyJingFish.AndroidAopPlugin.config.ASMPluginComponent;
+import io.github.FlyJingFish.AndroidAopPlugin.config.AOPPluginComponent;
 import io.github.FlyJingFish.AndroidAopPlugin.config.ApplicationConfig;
 import org.objectweb.asm.*;
 import org.objectweb.asm.tree.*;
@@ -23,7 +23,7 @@ public class MethodParamNamesScanner {
     }
 
     public MethodParamNamesScanner(ClassReader cr){
-        ApplicationConfig applicationConfig = ASMPluginComponent.getApplicationConfig();
+        ApplicationConfig applicationConfig = AOPPluginComponent.getApplicationConfig();
         cr.accept(cn, 0);
         this.methods.addAll(cn.methods);
         Iterator<MethodNode> iterator = methods.iterator();

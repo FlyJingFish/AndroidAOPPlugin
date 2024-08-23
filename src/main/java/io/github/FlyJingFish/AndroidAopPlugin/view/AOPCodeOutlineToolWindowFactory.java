@@ -24,7 +24,7 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.ContentFactory;
 
-public class BytecodeOutlineToolWindowFactory implements ToolWindowFactory {
+public class AOPCodeOutlineToolWindowFactory implements ToolWindowFactory {
 
     public void createToolWindowContent(final Project project, final ToolWindow toolWindow) {
         toolWindow.getContentManager().addContent(ApplicationManager.getApplication().getService(ContentFactory.class).createContent(ReplaceView.getInstance(project), "Replace", false));

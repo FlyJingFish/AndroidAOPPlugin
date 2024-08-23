@@ -24,7 +24,7 @@ import com.intellij.util.io.URLUtil;
 
 import io.github.FlyJingFish.AndroidAopPlugin.common.Constants;
 import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension;
-import io.github.FlyJingFish.AndroidAopPlugin.config.ASMPluginComponent;
+import io.github.FlyJingFish.AndroidAopPlugin.config.AOPPluginComponent;
 import io.github.FlyJingFish.AndroidAopPlugin.config.ApplicationConfig;
 import io.github.FlyJingFish.AndroidAopPlugin.util.AndroidAOPCode;
 import io.github.FlyJingFish.AndroidAopPlugin.view.MatchViewKt;
@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ShowBytecodeViewerAction extends AnAction {
+public class ShowAopCodeViewerAction extends AnAction {
 
     Module module;
 
@@ -53,7 +53,7 @@ public class ShowBytecodeViewerAction extends AnAction {
         final Presentation presentation = e.getPresentation();
         if (project == null || virtualFile == null) {
             presentation.setEnabled(false);
-            Logger.getInstance(ShowBytecodeViewerAction.class).error("project == null || virtualFile == null");
+            Logger.getInstance(ShowAopCodeViewerAction.class).error("project == null || virtualFile == null");
             return;
         }
         final PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
@@ -65,12 +65,12 @@ public class ShowBytecodeViewerAction extends AnAction {
         Project project = e.getProject();
         PsiFile psiFile = e.getData(LangDataKeys.PSI_FILE);
         if (psiFile == null) {
-            Logger.getInstance(ShowBytecodeViewerAction.class).error("psiFile == null");
+            Logger.getInstance(ShowAopCodeViewerAction.class).error("psiFile == null");
             return;
         }
         VirtualFile virtualFile = psiFile.getVirtualFile();
         if (virtualFile == null) {
-            Logger.getInstance(ShowBytecodeViewerAction.class).error("virtualFile == null");
+            Logger.getInstance(ShowAopCodeViewerAction.class).error("virtualFile == null");
             return;
         }
         module = ProjectRootManager.getInstance(project).getFileIndex().getModuleForFile(virtualFile);
@@ -78,14 +78,14 @@ public class ShowBytecodeViewerAction extends AnAction {
         ProjectTaskManager projectTaskManager = ProjectTaskManager.getInstance(project);
         ProjectTask buildTask = projectTaskManager.createModulesBuildTask(module, true, true, true);
 
-        Logger.getInstance(ShowBytecodeViewerAction.class).info("run buildTask");
+        Logger.getInstance(ShowAopCodeViewerAction.class).info("run buildTask");
         projectTaskManager.run(buildTask).onSuccess(result -> {
 
             if (!result.hasErrors()) {
                 PsiClassOwner file = (PsiClassOwner) PsiManager.getInstance(project).findFile(virtualFile);
 
                 if (file == null) {
-                    Logger.getInstance(ShowBytecodeViewerAction.class).error("file == null");
+                    Logger.getInstance(ShowAopCodeViewerAction.class).error("file == null");
                     return;
                 }
                 VirtualFile fileOutputDirectory = getOutputFile(file, virtualFile);
@@ -105,13 +105,13 @@ public class ShowBytecodeViewerAction extends AnAction {
 
         VirtualFileSystem virtualFileManager = VirtualFileManager.getInstance().getFileSystem(URLUtil.FILE_PROTOCOL);
 
-        Logger.getInstance(ShowBytecodeViewerAction.class).warn("pkg " + pkg);
+        Logger.getInstance(ShowAopCodeViewerAction.class).warn("pkg " + pkg);
         for (String possibleOutputDirectory : possibleOutputDirectories) {
-            Logger.getInstance(ShowBytecodeViewerAction.class).warn("possibleOutputDirectory " + possibleOutputDirectory);
+            Logger.getInstance(ShowAopCodeViewerAction.class).warn("possibleOutputDirectory " + possibleOutputDirectory);
             String classFile = vFile.getNameWithoutExtension() + ".class";
-            Logger.getInstance(ShowBytecodeViewerAction.class).warn("classFile " + classFile);
+            Logger.getInstance(ShowAopCodeViewerAction.class).warn("classFile " + classFile);
             String path = Paths.get(possibleOutputDirectory, pkg, classFile).toString();
-            Logger.getInstance(ShowBytecodeViewerAction.class).warn("path " + path);
+            Logger.getInstance(ShowAopCodeViewerAction.class).warn("path " + path);
             VirtualFile file1 = virtualFileManager.refreshAndFindFileByPath(path);
             if (file1 != null) {
                 return file1;
@@ -131,7 +131,7 @@ public class ShowBytecodeViewerAction extends AnAction {
             if (moduleFile != null) {
                 outputPaths.add(moduleFile.getPath());
             } else {
-                Logger.getInstance(ShowBytecodeViewerAction.class).warn("moduleFile == null ");
+                Logger.getInstance(ShowAopCodeViewerAction.class).warn("moduleFile == null ");
                 VirtualFile projectFile = compilerProjectExtension.getCompilerOutput();
                 if (projectFile != null) {
                     outputPaths.add(projectFile.getPath());
@@ -189,7 +189,7 @@ public class ShowBytecodeViewerAction extends AnAction {
                 toolWindowManager.getToolWindow(Constants.PLUGIN_WINDOW_NAME).activate(null);
                 return;
             } else {
-                Logger.getInstance(ShowBytecodeViewerAction.class).warn("file " + file.toString());
+                Logger.getInstance(ShowAopCodeViewerAction.class).warn("file " + file.toString());
             }
 
 
@@ -200,7 +200,7 @@ public class ShowBytecodeViewerAction extends AnAction {
             } catch (IOException e) {
                 return;
             }
-            ApplicationConfig applicationConfig = ASMPluginComponent.getApplicationConfig();
+            ApplicationConfig applicationConfig = AOPPluginComponent.getApplicationConfig();
 
 
 //            reader.accept(new TraceClassVisitor(new PrintWriter(stringWriter)), flags);

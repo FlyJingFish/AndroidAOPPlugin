@@ -2,14 +2,28 @@
     <name>AndroidAOP Code Viewer</name>
     <description>
         <![CDATA[
-        <h3>Code showing @AndroidAopReplaceClass and @AndroidAopMatchClassMethod using AndroidAOP</h3>
+        <h3>The following AndroidAOP code is shown</h3>
+        <ul>
+            <li>@AndroidAopReplaceClass</li>
+            <li>@AndroidAopMatchClassMethod</li>
+        </ul>
         ]]>
     </description>
     <version>1.0.1</version>
     <vendor>Raven</vendor>
     <idea-version since-build="222.4554" until-build="241.*"/>
     <depends>com.intellij.modules.java</depends>
-    
+
+    <change-notes><![CDATA[
+        <b>Version 1.0.1</b>
+        <ul>
+            <li>Adapt to the latest version of IC</li>
+        </ul>
+        <b>Version 1.0.0</b>
+        <ul>
+            <li>publish plugin</li>
+        </ul>
+    ]]></change-notes>
 
     <application-components>
 

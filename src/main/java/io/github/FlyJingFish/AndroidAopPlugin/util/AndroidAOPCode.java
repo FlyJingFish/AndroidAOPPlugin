@@ -151,12 +151,22 @@ public class AndroidAOPCode {
         return stringWriter;
     }
 
+    static boolean isHasMethodBody(int access){
+        boolean isAbstractMethod = (access & Opcodes.ACC_ABSTRACT) != 0;
+        boolean isNativeMethod = (access & Opcodes.ACC_NATIVE) != 0;
+        return !isAbstractMethod && !isNativeMethod;
+    }
 
     public static String getMatchJavaMethod(int methodAccess, String methodName, String methodDescriptor,String signature,
                                             MethodParamNamesScanner scanner) {
-        boolean isAbstractMethod = (methodAccess & Opcodes.ACC_ABSTRACT) != 0;
-        boolean isNativeMethod = (methodAccess & Opcodes.ACC_NATIVE) != 0;
-        if (!"<clinit>".equals(methodName) && !"<init>".equals(methodName) && !isAbstractMethod && !isNativeMethod){
+        boolean isHasMethodBody = isHasMethodBody(methodAccess);
+        boolean use;
+        if (scanner.isInterface()){
+            use = true;
+        }else {
+            use = isHasMethodBody;
+        }
+        if (!"<clinit>".equals(methodName) && !"<init>".equals(methodName) && use){
             StringWriter stringWriter = new StringWriter();
             boolean isSuspendMethod = methodDescriptor.endsWith("Lkotlin/coroutines/Continuation;)Ljava/lang/Object;");
 

@@ -4,6 +4,7 @@ import com.intellij.diff.DiffContentFactory;
 import com.intellij.diff.DiffManager;
 import com.intellij.diff.contents.DocumentContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.editor.Document;
@@ -12,6 +13,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import io.github.FlyJingFish.AndroidAopPlugin.common.Constants;
+import org.jetbrains.annotations.NotNull;
 
 public class ShowAOPDiffAction extends AnAction {
     private static final String DIFF_WINDOW_TITLE = "Show differences from previous class contents";
@@ -52,7 +54,10 @@ public class ShowAOPDiffAction extends AnAction {
     }
 
 
-
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.EDT;
+    }
 
     // Property files
     public String getPreviousCode() {

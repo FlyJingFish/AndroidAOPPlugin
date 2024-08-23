@@ -9,13 +9,17 @@
         </ul>
         ]]>
     </description>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <vendor>Raven</vendor>
     <idea-version since-build="222.4554" until-build="241.*"/>
     <depends>com.intellij.java</depends>
     <depends>org.jetbrains.kotlin</depends>
     <depends optional="true" config-file="withByteCodeViewer.xml">ByteCodeViewer</depends>
     <change-notes><![CDATA[
+        <b>Version 1.0.2</b>
+        <ul>
+            <li>Support jar</li>
+        </ul>
         <b>Version 1.0.1</b>
         <ul>
             <li>Adapt to the latest version of IC</li>

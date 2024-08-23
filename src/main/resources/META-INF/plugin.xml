@@ -12,8 +12,9 @@
     <version>1.0.1</version>
     <vendor>Raven</vendor>
     <idea-version since-build="222.4554" until-build="241.*"/>
-    <depends>com.intellij.modules.java</depends>
-
+    <depends>com.intellij.java</depends>
+    <depends>org.jetbrains.kotlin</depends>
+    <depends optional="true" config-file="withByteCodeViewer.xml">ByteCodeViewer</depends>
     <change-notes><![CDATA[
         <b>Version 1.0.1</b>
         <ul>

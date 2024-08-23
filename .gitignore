@@ -7,5 +7,6 @@ build
 .DS_Store
 /local.properties
 .intellijPlatform
+.kotlin
 
 

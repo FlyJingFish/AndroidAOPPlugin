@@ -75,6 +75,45 @@ public class ShowAopCodeViewerAction extends AnAction {
         }
         module = ProjectRootManager.getInstance(project).getFileIndex().getModuleForFile(virtualFile);
 
+        if (module == null){
+            ShowBytecodeAction.INSTANCE.actionPerformed(e);
+            return;
+        }
+
+        ProjectTaskManager projectTaskManager = ProjectTaskManager.getInstance(project);
+        ProjectTask buildTask = projectTaskManager.createModulesBuildTask(module, true, true, true);
+
+        Logger.getInstance(ShowAopCodeViewerAction.class).info("run buildTask");
+        projectTaskManager.run(buildTask).onSuccess(result -> {
+
+            if (!result.hasErrors()) {
+                PsiClassOwner file = (PsiClassOwner) PsiManager.getInstance(project).findFile(virtualFile);
+
+                if (file == null) {
+                    Logger.getInstance(ShowAopCodeViewerAction.class).error("file == null");
+                    return;
+                }
+                VirtualFile fileOutputDirectory = getOutputFile(file, virtualFile);
+                fileOutputDirectory.refresh(false, false);
+                updateToolWindowContents(e.getProject(), fileOutputDirectory);
+            }
+        });
+    }
+
+    public void actionPerformedCode(AnActionEvent e) {
+        Project project = e.getProject();
+        PsiFile psiFile = e.getData(LangDataKeys.PSI_FILE);
+        if (psiFile == null) {
+            Logger.getInstance(ShowAopCodeViewerAction.class).error("psiFile == null");
+            return;
+        }
+        VirtualFile virtualFile = psiFile.getVirtualFile();
+        if (virtualFile == null) {
+            Logger.getInstance(ShowAopCodeViewerAction.class).error("virtualFile == null");
+            return;
+        }
+        module = ProjectRootManager.getInstance(project).getFileIndex().getModuleForFile(virtualFile);
+
         ProjectTaskManager projectTaskManager = ProjectTaskManager.getInstance(project);
         ProjectTask buildTask = projectTaskManager.createModulesBuildTask(module, true, true, true);
 

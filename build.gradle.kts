@@ -1,6 +1,6 @@
 plugins {
-    alias(libs.plugins.kotlin) apply false
     id("org.jetbrains.intellij.platform") version "2.0.0"
+    kotlin("jvm") version "2.0.0"
 }
 
 repositories {
@@ -9,13 +9,24 @@ repositories {
         defaultRepositories()
     }
 }
+sourceSets {
+    main {
+        java {
+            setSrcDirs(listOf("src/main/java"))
+        }
+        kotlin {
+            setSrcDirs(listOf("src/main/java")) // 指定 Kotlin 文件的目录
+        }
+    }
+}
+
 
 dependencies {
     implementation("org.ow2.asm:asm:9.6")
     implementation("org.ow2.asm:asm-commons:9.6")
     intellijPlatform {
         intellijIdeaCommunity("2024.1.4")
-        bundledPlugins("com.intellij.java", "org.jetbrains.kotlin")
+        bundledPlugins("ByteCodeViewer","com.intellij.java", "org.jetbrains.kotlin")
 
         pluginVerifier()
         zipSigner()

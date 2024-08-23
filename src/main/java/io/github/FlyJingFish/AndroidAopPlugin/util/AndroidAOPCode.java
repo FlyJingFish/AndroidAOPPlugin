@@ -5,6 +5,7 @@ import io.github.FlyJingFish.AndroidAopPlugin.config.AOPPluginComponent;
 import io.github.FlyJingFish.AndroidAopPlugin.config.ApplicationConfig;
 import io.github.FlyJingFish.AndroidAopPlugin.config.ReplaceProxy;
 import org.objectweb.asm.*;
+import org.objectweb.asm.commons.Method;
 import org.objectweb.asm.tree.MethodNode;
 
 import java.io.StringWriter;
@@ -160,6 +161,7 @@ public class AndroidAOPCode {
     public static String getMatchMethod(int methodAccess, String methodName, String methodDescriptor, String signature,
                                         FileTypeExtension codeStyle) {
         if (!"<clinit>".equals(methodName) && !"<init>".equals(methodName)){
+            System.out.println("methodDescriptor="+methodDescriptor);
             StringWriter stringWriter = new StringWriter();
             boolean isSuspendMethod = methodDescriptor.endsWith("Lkotlin/coroutines/Continuation;)Ljava/lang/Object;");
 
@@ -184,7 +186,11 @@ public class AndroidAOPCode {
                 if (i == types.length - 1 && isSuspendMethod){
                     break;
                 }
-                stringWriter.append(type.getClassName());
+                if (codeStyle == FileTypeExtension.KOTLIN){
+                    stringWriter.append(type.getClassName().replace("$","\\$"));
+                }else {
+                    stringWriter.append(type.getClassName());
+                }
                 if ((isSuspendMethod && i < types.length - 2) || (!isSuspendMethod && i != types.length -1)){
                     stringWriter.append(",");
                 }
@@ -279,7 +285,7 @@ public class AndroidAOPCode {
                 if (i == types.length - 1 && isSuspendMethod){
                     break;
                 }
-                stringWriter.append(type.getClassName().replaceAll("\\$","."));
+                stringWriter.append(type.getClassName().replace("$","\\$"));
                 if ((isSuspendMethod && i < types.length - 2) || (!isSuspendMethod && i != types.length -1)){
                     stringWriter.append(",");
                 }
@@ -401,7 +407,7 @@ public class AndroidAOPCode {
 
             for (int i = 0; i < types.length; i++) {
                 Type type = types[i];
-                stringWriter.append(type.getClassName().replaceAll("\\$","."));
+                stringWriter.append(type.getClassName());
                 if (i != types.length -1){
                     stringWriter.append(",");
                 }

@@ -221,10 +221,10 @@ public class ShowAopCodeViewerAction extends AnAction {
 
 
             if (file == null) {
-                replaceView.setCode(file, Constants.NO_CLASS_FOUND);
-                replaceViewKt.setCode(file, Constants.NO_CLASS_FOUND);
-                matchView.setCode(file, Constants.NO_CLASS_FOUND);
-                matchViewKt.setCode(file, Constants.NO_CLASS_FOUND);
+                replaceView.setCode(null, Constants.NO_CLASS_FOUND);
+                replaceViewKt.setCode(null, Constants.NO_CLASS_FOUND);
+                matchView.setCode(null, Constants.NO_CLASS_FOUND);
+                matchViewKt.setCode(null, Constants.NO_CLASS_FOUND);
                 toolWindowManager.getToolWindow(Constants.PLUGIN_WINDOW_NAME).activate(null);
                 return;
             } else {
@@ -232,44 +232,15 @@ public class ShowAopCodeViewerAction extends AnAction {
             }
 
 
-            ClassReader reader = null;
+            ClassReader reader;
             try {
                 file.refresh(false, false);
                 reader = new ClassReader(file.contentsToByteArray());
             } catch (IOException e) {
                 return;
             }
-            ApplicationConfig applicationConfig = AOPPluginComponent.getApplicationConfig();
 
-
-//            reader.accept(new TraceClassVisitor(new PrintWriter(stringWriter)), flags);
-
-            AndroidAOPCode androidAOPCode = new AndroidAOPCode(reader);
-
-
-            StringWriter replaceJavaCode = androidAOPCode.getReplaceContent(FileTypeExtension.JAVA);
-            PsiFile psiFile = PsiFileFactory.getInstance(project).createFileFromText(Constants.FILE_NAME, FileTypeManager.getInstance().getFileTypeByExtension(FileTypeExtension.JAVA.getValue()), replaceJavaCode.toString());
-            CodeStyleManager.getInstance(project).reformat(psiFile);
-            replaceView.setCode(file, psiFile.getText());
-
-
-            StringWriter replaceKotlinCode = androidAOPCode.getReplaceContent(FileTypeExtension.KOTLIN);
-            PsiFile psiFileKt = PsiFileFactory.getInstance(project).createFileFromText(Constants.FILE_NAME, FileTypeManager.getInstance().getFileTypeByExtension(FileTypeExtension.KOTLIN.getValue()), replaceKotlinCode.toString());
-            CodeStyleManager.getInstance(project).reformat(psiFileKt);
-            replaceViewKt.setCode(file, psiFileKt.getText());
-
-            StringWriter matchJavaCode = androidAOPCode.getMatchContent(FileTypeExtension.JAVA,false,false,false);
-            PsiFile matchPsiFile = PsiFileFactory.getInstance(project).createFileFromText(Constants.FILE_NAME, FileTypeManager.getInstance().getFileTypeByExtension(FileTypeExtension.JAVA.getValue()), matchJavaCode.toString());
-            CodeStyleManager.getInstance(project).reformat(matchPsiFile);
-            matchView.setCode(file, matchPsiFile.getText());
-
-            StringWriter matchKotlinCode = androidAOPCode.getMatchContent(FileTypeExtension.KOTLIN,false,false,false);
-            PsiFile matchPsiFileKt = PsiFileFactory.getInstance(project).createFileFromText(Constants.FILE_NAME, FileTypeManager.getInstance().getFileTypeByExtension(FileTypeExtension.KOTLIN.getValue()), matchKotlinCode.toString());
-            CodeStyleManager.getInstance(project).reformat(matchPsiFileKt);
-            matchViewKt.setCode(file, matchPsiFileKt.getText());
-
-
-            toolWindowManager.getToolWindow(Constants.PLUGIN_WINDOW_NAME).activate(null);
+            ClassFileLocationKt.showCode(project,replaceView,replaceViewKt,matchView,matchViewKt,toolWindowManager,file,reader);
         });
     }
 }

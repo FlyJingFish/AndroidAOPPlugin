@@ -15,9 +15,10 @@ import com.intellij.openapi.util.IconLoader
 import com.intellij.psi.PsiClassOwner
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiUtilBase
+import io.github.FlyJingFish.AndroidAopPlugin.MyPluginClass
 
 object ShowBytecodeAction  {
-    val ICON = IconLoader.getIcon("/icons/jclasslib.png", ShowBytecodeAction::class.java) // 13x13
+    val ICON = IconLoader.getIcon("/images/pluginIcon.svg", MyPluginClass::class.java) // 13x13
     fun update(e: AnActionEvent) {
         e.presentation.apply {
             isEnabled = getPsiElement(e)?.run { containingFile is PsiClassOwner && isContainedInClass(this) } == true

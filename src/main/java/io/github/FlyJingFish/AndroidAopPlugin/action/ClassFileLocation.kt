@@ -56,7 +56,7 @@ private class LocationResult private constructor(val locatedClassFile: LocatedCl
 
 data class LocatedClassFile(val jvmClassName: String, val virtualFile: VirtualFile, var writableUrl: String? = null)
 
-fun isContainedInClass(psiElement: PsiElement) : Boolean {
+fun isContainedInClass(psiElement: PsiElement): Boolean {
     val containingClass = getContainingClass(psiElement)
     return if (containingClass != null) {
         getJVMClassName(containingClass) != null
@@ -83,13 +83,13 @@ fun openClassFile(psiElement: PsiElement, project: Project) {
         override fun onSuccess() {
             val locatedClassFile = locationResult?.locatedClassFile
             if (locatedClassFile != null) {
-                updateToolWindowContents(project,locatedClassFile)
+                updateToolWindowContents(project, locatedClassFile)
             } else {
                 if (!project.isDisposed) {
                     Messages.showWarningDialog(
                         project,
                         locationResult?.errorMessage ?: "internal error",
-                        "Jclasslib Bytecode Viewer"
+                        "AndroidAOP Code Viewer"
                     )
                 }
             }
@@ -156,12 +156,12 @@ private fun updateToolWindowContents(project: Project, locatedClassFile: Located
         val matchViewKt = MatchViewKt.getInstance(project)
         val toolWindowManager = ToolWindowManager.getInstance(project)
 
-        val file:VirtualFile? = locatedClassFile?.virtualFile
+        val file: VirtualFile? = locatedClassFile?.virtualFile
         if (file == null) {
-            replaceView.setCode(file, Constants.NO_CLASS_FOUND)
-            replaceViewKt.setCode(file, Constants.NO_CLASS_FOUND)
-            matchView.setCode(file, Constants.NO_CLASS_FOUND)
-            matchViewKt.setCode(file, Constants.NO_CLASS_FOUND)
+            replaceView.setCode(null, Constants.NO_CLASS_FOUND)
+            replaceViewKt.setCode(null, Constants.NO_CLASS_FOUND)
+            matchView.setCode(null, Constants.NO_CLASS_FOUND)
+            matchViewKt.setCode(null, Constants.NO_CLASS_FOUND)
             toolWindowManager.getToolWindow(Constants.PLUGIN_WINDOW_NAME)!!
                 .activate(null)
             return@runWriteAction
@@ -171,79 +171,89 @@ private fun updateToolWindowContents(project: Project, locatedClassFile: Located
         }
 
 
-
-
-        var reader: ClassReader? = null
+        val reader: ClassReader?
         try {
-            reader = ClassReader(readClassFile(locatedClassFile,project))
+            reader = ClassReader(readClassFile(locatedClassFile, project))
         } catch (e: Exception) {
             return@runWriteAction
         }
-        val applicationConfig = AOPPluginComponent.getApplicationConfig()
+
+        showCode(project,replaceView,replaceViewKt,matchView,matchViewKt,toolWindowManager,file,reader)
+    }
+}
+
+fun showCode(
+    project: Project, replaceView: ReplaceView,
+    replaceViewKt: ReplaceViewKt,
+    matchView: MatchView,
+    matchViewKt: MatchViewKt,
+    toolWindowManager: ToolWindowManager,
+    file: VirtualFile,
+    reader: ClassReader
+) {
 
 
-        //            reader.accept(new TraceClassVisitor(new PrintWriter(stringWriter)), flags);
-        val androidAOPCode = AndroidAOPCode(reader)
+    //            reader.accept(new TraceClassVisitor(new PrintWriter(stringWriter)), flags);
+    val androidAOPCode = AndroidAOPCode(reader)
 
 
-        val replaceJavaCode =
-            androidAOPCode.getReplaceContent(FileTypeExtension.JAVA)
-        val psiFile = PsiFileFactory.getInstance(project).createFileFromText(
+    val replaceJavaCode =
+        androidAOPCode.getReplaceContent(FileTypeExtension.JAVA)
+    val psiFile = PsiFileFactory.getInstance(project).createFileFromText(
+        Constants.FILE_NAME,
+        FileTypeManager.getInstance()
+            .getFileTypeByExtension(FileTypeExtension.JAVA.value),
+        replaceJavaCode.toString()
+    )
+    CodeStyleManager.getInstance(project).reformat(psiFile)
+    replaceView.setCode(file, psiFile.text)
+
+
+    val replaceKotlinCode =
+        androidAOPCode.getReplaceContent(FileTypeExtension.KOTLIN)
+    val psiFileKt = PsiFileFactory.getInstance(project)
+        .createFileFromText(
+            Constants.FILE_NAME,
+            FileTypeManager.getInstance()
+                .getFileTypeByExtension(FileTypeExtension.KOTLIN.value),
+            replaceKotlinCode.toString()
+        )
+    CodeStyleManager.getInstance(project).reformat(psiFileKt)
+    replaceViewKt.setCode(file, psiFileKt.text)
+
+    val matchJavaCode = androidAOPCode.getMatchContent(
+        FileTypeExtension.JAVA,
+        false,
+        false,
+        false
+    )
+    val matchPsiFile = PsiFileFactory.getInstance(project)
+        .createFileFromText(
             Constants.FILE_NAME,
             FileTypeManager.getInstance()
                 .getFileTypeByExtension(FileTypeExtension.JAVA.value),
-            replaceJavaCode.toString()
+            matchJavaCode.toString()
         )
-        CodeStyleManager.getInstance(project).reformat(psiFile)
-        replaceView.setCode(file, psiFile.text)
+    CodeStyleManager.getInstance(project).reformat(matchPsiFile)
+    matchView.setCode(file, matchPsiFile.text)
 
-
-        val replaceKotlinCode =
-            androidAOPCode.getReplaceContent(FileTypeExtension.KOTLIN)
-        val psiFileKt = PsiFileFactory.getInstance(project)
-            .createFileFromText(
-                Constants.FILE_NAME,
-                FileTypeManager.getInstance()
-                    .getFileTypeByExtension(FileTypeExtension.KOTLIN.value),
-                replaceKotlinCode.toString()
-            )
-        CodeStyleManager.getInstance(project).reformat(psiFileKt)
-        replaceViewKt.setCode(file, psiFileKt.text)
-
-        val matchJavaCode = androidAOPCode.getMatchContent(
-            FileTypeExtension.JAVA,
-            false,
-            false,
-            false
+    val matchKotlinCode = androidAOPCode.getMatchContent(
+        FileTypeExtension.KOTLIN,
+        false,
+        false,
+        false
+    )
+    val matchPsiFileKt = PsiFileFactory.getInstance(project)
+        .createFileFromText(
+            Constants.FILE_NAME,
+            FileTypeManager.getInstance()
+                .getFileTypeByExtension(FileTypeExtension.KOTLIN.value),
+            matchKotlinCode.toString()
         )
-        val matchPsiFile = PsiFileFactory.getInstance(project)
-            .createFileFromText(
-                Constants.FILE_NAME,
-                FileTypeManager.getInstance()
-                    .getFileTypeByExtension(FileTypeExtension.JAVA.value),
-                matchJavaCode.toString()
-            )
-        CodeStyleManager.getInstance(project).reformat(matchPsiFile)
-        matchView.setCode(file, matchPsiFile.text)
-
-        val matchKotlinCode = androidAOPCode.getMatchContent(
-            FileTypeExtension.KOTLIN,
-            false,
-            false,
-            false
-        )
-        val matchPsiFileKt = PsiFileFactory.getInstance(project)
-            .createFileFromText(
-                Constants.FILE_NAME,
-                FileTypeManager.getInstance()
-                    .getFileTypeByExtension(FileTypeExtension.KOTLIN.value),
-                matchKotlinCode.toString()
-            )
-        CodeStyleManager.getInstance(project).reformat(matchPsiFileKt)
-        matchViewKt.setCode(file, matchPsiFileKt.text)
-        toolWindowManager.getToolWindow(Constants.PLUGIN_WINDOW_NAME)!!
-            .activate(null)
-    }
+    CodeStyleManager.getInstance(project).reformat(matchPsiFileKt)
+    matchViewKt.setCode(file, matchPsiFileKt.text)
+    toolWindowManager.getToolWindow(Constants.PLUGIN_WINDOW_NAME)!!
+        .activate(null)
 }
 
 private fun locateClassFile(psiElement: PsiElement): LocationResult {
@@ -281,7 +291,8 @@ private fun getContainingClass(psiElement: PsiElement): PsiClass? {
 
 private fun getJVMClassName(containingClass: PsiClass): String? {
     return if (containingClass is PsiAnonymousClass) {
-        val containingClassOfAnonymous = PsiTreeUtil.getParentOfType(containingClass, PsiClass::class.java) ?: return null
+        val containingClassOfAnonymous =
+            PsiTreeUtil.getParentOfType(containingClass, PsiClass::class.java) ?: return null
         getJVMClassName(containingClassOfAnonymous) + JavaAnonymousClassesHelper.getName(containingClass)
     } else {
         ClassUtil.getJVMClassName(containingClass)

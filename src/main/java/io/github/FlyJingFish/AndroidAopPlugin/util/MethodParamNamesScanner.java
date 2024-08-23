@@ -58,6 +58,10 @@ public class MethodParamNamesScanner {
         }
     }
 
+    public boolean isInterface(){
+         return (cn.access & Opcodes.ACC_INTERFACE) != 0;
+    }
+
     public String getClassName(){
         return cn.name.replaceAll("/",".");
     }
@@ -88,6 +92,9 @@ public class MethodParamNamesScanner {
             Map<Integer, LocalVariable> varNames = new HashMap<>();
             if (desc.equals(methodNode.desc) && name.equals(methodNode.name)) {
                 List<LocalVariableNode> localVariables = methodNode.localVariables;
+                if (localVariables == null){
+                    continue;
+                }
                 for (int i1 = 0; i1 < localVariables.size(); i1++) {
                     String varName = localVariables.get(i1).name;
                     // index-记录了正确的方法本地变量索引。(方法本地变量顺序可能会被打乱。而index记录了原始的顺序)

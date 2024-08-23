@@ -88,9 +88,12 @@ public class AndroidAOPCode {
                     .append(scanner.getClassName())
                     .append("\",\n");
         }
+        if (scanner.isInterface() && !useReplaceName){
+            stringWriter.append("   type = MatchType.EXTENDS,\n");
+        }else {
+            stringWriter.append("   type = MatchType.SELF,\n");
+        }
 
-
-        stringWriter.append("   type = MatchType.SELF,\n");
         if (codeStyle == FileTypeExtension.KOTLIN){
             stringWriter.append("   methodName = [");
         }else {

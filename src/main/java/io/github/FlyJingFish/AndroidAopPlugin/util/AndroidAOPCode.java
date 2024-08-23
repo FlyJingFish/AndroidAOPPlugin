@@ -88,7 +88,7 @@ public class AndroidAOPCode {
                     .append(scanner.getClassName())
                     .append("\",\n");
         }
-        if (scanner.isInterface() && !useReplaceName){
+        if (!useReplaceName){
             stringWriter.append("   type = MatchType.EXTENDS,\n");
         }else {
             stringWriter.append("   type = MatchType.SELF,\n");
@@ -159,14 +159,7 @@ public class AndroidAOPCode {
 
     public static String getMatchJavaMethod(int methodAccess, String methodName, String methodDescriptor,String signature,
                                             MethodParamNamesScanner scanner) {
-        boolean isHasMethodBody = isHasMethodBody(methodAccess);
-        boolean use;
-        if (scanner.isInterface()){
-            use = true;
-        }else {
-            use = isHasMethodBody;
-        }
-        if (!"<clinit>".equals(methodName) && !"<init>".equals(methodName) && use){
+        if (!"<clinit>".equals(methodName) && !"<init>".equals(methodName)){
             StringWriter stringWriter = new StringWriter();
             boolean isSuspendMethod = methodDescriptor.endsWith("Lkotlin/coroutines/Continuation;)Ljava/lang/Object;");
 

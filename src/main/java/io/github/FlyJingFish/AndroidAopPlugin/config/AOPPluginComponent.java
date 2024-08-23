@@ -15,7 +15,7 @@ import io.github.FlyJingFish.AndroidAopPlugin.common.Constants;
 )
 public class AOPPluginComponent implements PersistentStateComponent<Element> {
 
-    private static ApplicationConfig applicationConfig = new ApplicationConfig();
+    private static final ApplicationConfig applicationConfig = new ApplicationConfig();
 
     @Override
     public Element getState() {

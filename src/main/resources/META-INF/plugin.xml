@@ -1,4 +1,5 @@
 <idea-plugin version="2">
+    <id>AndroidAOPPlugin</id>
     <name>AndroidAOP Code Viewer</name>
     <description>
         <![CDATA[
@@ -12,6 +13,7 @@
     <version>1.0.2</version>
     <vendor>Raven</vendor>
     <idea-version since-build="222.4554" until-build="241.*"/>
+    <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.java</depends>
     <depends>org.jetbrains.kotlin</depends>
     <depends optional="true" config-file="withByteCodeViewer.xml">ByteCodeViewer</depends>

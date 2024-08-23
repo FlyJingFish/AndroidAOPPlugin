@@ -45,7 +45,7 @@
     <actions>
         <action class="io.github.FlyJingFish.AndroidAopPlugin.action.ShowAopCodeViewerAction"
                 description="Shows the AndroidAOP Code from the current class"
-                id="showBytecodeViewer"
+                id="AndroidAOPPlugin"
                 text="AndroidAOP Code">
             <add-to-group anchor="last" group-id="EditorPopupMenu" />
             <add-to-group anchor="last" group-id="ProjectViewPopupMenu" />

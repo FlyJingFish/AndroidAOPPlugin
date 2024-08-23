@@ -29,6 +29,16 @@ intellijPlatform {
 
 tasks {
     patchPluginXml {
+        changeNotes = """
+            <b>Version 1.0.1</b>
+            <ul>
+                <li>Adapt to the latest version of IC</li>
+            </ul>
+            <b>Version 1.0.0</b>
+            <ul>
+                <li>publish plugin</li>
+            </ul>
+        """.trimIndent()
         version = project.version.toString()
     }
 

@@ -74,12 +74,23 @@ public class AndroidAOPCode {
         javaKotlinMap.put("Object","Any");
     }
 
-    public StringWriter getMatchContent(FileTypeExtension codeStyle,boolean allMethod,boolean useProxyMethod) {
+    public StringWriter getMatchContent(FileTypeExtension codeStyle,boolean allMethod,boolean useProxyMethod,boolean useReplaceName) {
 
         StringWriter stringWriter = new StringWriter();
-        stringWriter.append("@AndroidAopMatchClassMethod(\n")
-                .append("   targetClassName = \"").append(scanner.getClassName()).append("\",\n")
-                .append("   type = MatchType.SELF,\n");
+        stringWriter.append("@AndroidAopMatchClassMethod(\n");
+        if (useReplaceName){
+            stringWriter.append("   targetClassName = ")
+                    .append("⬇️⬇️设置为下边的 包名.Replace")
+                    .append(getShowMethodClassName(scanner.getClassName()))
+                    .append("⬇️⬇️,\n");
+        }else {
+            stringWriter.append("   targetClassName = \"")
+                    .append(scanner.getClassName())
+                    .append("\",\n");
+        }
+
+
+        stringWriter.append("   type = MatchType.SELF,\n");
         if (codeStyle == FileTypeExtension.KOTLIN){
             stringWriter.append("   methodName = [");
         }else {
@@ -111,10 +122,18 @@ public class AndroidAOPCode {
 
 
         if (codeStyle == FileTypeExtension.KOTLIN){
+            boolean hasSuspend = false;
+            for (MethodNode method : scanner.getMethods()) {
+                boolean isSuspendMethod = method.desc.endsWith("Lkotlin/coroutines/Continuation;)Ljava/lang/Object;");
+                if (isSuspendMethod){
+                    hasSuspend = true;
+                    break;
+                }
+            }
             stringWriter.append("]\n)\n");
             stringWriter.append("class Match")
                     .append(getShowMethodClassName(scanner.getClassName()))
-                    .append(" : ").append(useProxyMethod?"MatchClassMethodProxy()":"MatchClassMethod").append("{\n\n");
+                    .append(" : ").append(useProxyMethod?(hasSuspend?"MatchClassMethodSuspendProxy()":"MatchClassMethodProxy()"):"MatchClassMethod").append("{\n\n");
         }else {
             stringWriter.append("}\n)\n");
             stringWriter.append("public class Match")
@@ -170,7 +189,7 @@ public class AndroidAOPCode {
         StringWriter stringWriter = new StringWriter();
 
         if (useProxyMethod){
-            StringWriter matchContent = getMatchContent(codeStyle,true,true);
+            StringWriter matchContent = getMatchContent(codeStyle,true,true,true);
             stringWriter.append(matchContent.toString()).append("\n");
         }
 

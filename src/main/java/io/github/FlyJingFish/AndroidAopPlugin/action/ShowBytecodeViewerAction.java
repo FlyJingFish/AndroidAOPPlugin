@@ -237,12 +237,12 @@ public class ShowBytecodeViewerAction extends AnAction {
             CodeStyleManager.getInstance(project).reformat(psiFileKt);
             replaceViewKt.setCode(file, psiFileKt.getText());
 
-            StringWriter matchJavaCode = androidAOPCode.getMatchContent(FileTypeExtension.JAVA,false,false);
+            StringWriter matchJavaCode = androidAOPCode.getMatchContent(FileTypeExtension.JAVA,false,false,false);
             PsiFile matchPsiFile = PsiFileFactory.getInstance(project).createFileFromText(Constants.FILE_NAME, FileTypeManager.getInstance().getFileTypeByExtension(FileTypeExtension.JAVA.getValue()), matchJavaCode.toString());
             CodeStyleManager.getInstance(project).reformat(matchPsiFile);
             matchView.setCode(file, matchPsiFile.getText());
 
-            StringWriter matchKotlinCode = androidAOPCode.getMatchContent(FileTypeExtension.KOTLIN,false,false);
+            StringWriter matchKotlinCode = androidAOPCode.getMatchContent(FileTypeExtension.KOTLIN,false,false,false);
             PsiFile matchPsiFileKt = PsiFileFactory.getInstance(project).createFileFromText(Constants.FILE_NAME, FileTypeManager.getInstance().getFileTypeByExtension(FileTypeExtension.KOTLIN.getValue()), matchKotlinCode.toString());
             CodeStyleManager.getInstance(project).reformat(matchPsiFileKt);
             matchViewKt.setCode(file, matchPsiFileKt.getText());

@@ -10,12 +10,6 @@
     <idea-version since-build="222.4554" until-build="241.*"/>
     <depends>com.intellij.modules.java</depends>
     
-    <change-notes><![CDATA[
-        <b>Version 1.0.1</b>
-        <ul>
-            <li>publish plugin</li>
-        </ul>
-    ]]></change-notes>
 
     <application-components>
 

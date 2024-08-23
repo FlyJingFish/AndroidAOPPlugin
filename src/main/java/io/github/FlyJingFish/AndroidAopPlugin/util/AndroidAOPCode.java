@@ -80,9 +80,9 @@ public class AndroidAOPCode {
         stringWriter.append("@AndroidAopMatchClassMethod(\n");
         if (useReplaceName){
             stringWriter.append("   targetClassName = ")
-                    .append("⬇️⬇️设置为下边的 包名.Replace")
+                    .append("👇👇设置为下边的 包名.Replace")
                     .append(getShowMethodClassName(scanner.getClassName()))
-                    .append("⬇️⬇️,\n");
+                    .append("👇👇,\n");
         }else {
             stringWriter.append("   targetClassName = \"")
                     .append(scanner.getClassName().replaceAll("\\$","."))

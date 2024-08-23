@@ -85,7 +85,7 @@ public class AndroidAOPCode {
                     .append("⬇️⬇️,\n");
         }else {
             stringWriter.append("   targetClassName = \"")
-                    .append(scanner.getClassName())
+                    .append(scanner.getClassName().replaceAll("\\$","."))
                     .append("\",\n");
         }
         if (!useReplaceName){
@@ -105,7 +105,7 @@ public class AndroidAOPCode {
         }else {
             List<String> methodName = new ArrayList<>();
             for (MethodNode method : scanner.getMethods()) {
-                String name = getMatchJavaMethod(method.access,method.name,method.desc,method.signature,scanner);
+                String name = getMatchMethod(method.access,method.name,method.desc,method.signature,codeStyle);
                 if (name != null){
                     methodName.add(name);
                 }
@@ -157,8 +157,8 @@ public class AndroidAOPCode {
         return !isAbstractMethod && !isNativeMethod;
     }
 
-    public static String getMatchJavaMethod(int methodAccess, String methodName, String methodDescriptor,String signature,
-                                            MethodParamNamesScanner scanner) {
+    public static String getMatchMethod(int methodAccess, String methodName, String methodDescriptor, String signature,
+                                        FileTypeExtension codeStyle) {
         if (!"<clinit>".equals(methodName) && !"<init>".equals(methodName)){
             StringWriter stringWriter = new StringWriter();
             boolean isSuspendMethod = methodDescriptor.endsWith("Lkotlin/coroutines/Continuation;)Ljava/lang/Object;");
@@ -173,7 +173,11 @@ public class AndroidAOPCode {
             }else {
                 stringWriter.append(returnTypeClassName).append(" ");
             }
-            stringWriter.append(methodName).append("(");
+            if (codeStyle == FileTypeExtension.KOTLIN){
+                stringWriter.append(methodName.replace("$","\\$")).append("(");
+            }else {
+                stringWriter.append(methodName).append("(");
+            }
 
             for (int i = 0; i < types.length; i++) {
                 Type type = types[i];
@@ -202,7 +206,7 @@ public class AndroidAOPCode {
         }
 
         stringWriter.append("@AndroidAopReplaceClass(\"")
-                .append(scanner.getClassName())
+                .append(scanner.getClassName().replaceAll("\\$","."))
                 .append("\")\n");
         if (codeStyle == FileTypeExtension.JAVA){
             stringWriter.append("public class Replace")
@@ -268,7 +272,7 @@ public class AndroidAOPCode {
             }else if (!isInit){
                 stringWriter.append(returnTypeClassName).append(" ");
             }
-            stringWriter.append(methodName).append("(");
+            stringWriter.append(methodName.replace("$","\\$")).append("(");
 
             for (int i = 0; i < types.length; i++) {
                 Type type = types[i];
@@ -474,7 +478,8 @@ public class AndroidAOPCode {
 
     private static String getShowMethodClassName(String className){
         if (className.contains(".")){
-            return className.replaceAll("\\$",".").substring(className.lastIndexOf(".")+1);
+            String newName = className.replaceAll("\\$",".");
+            return newName.substring(newName.lastIndexOf(".")+1);
         }else {
             return className;
         }

@@ -5,6 +5,6 @@
 
 [点此下载插件](https://github.com/FlyJingFish/AndroidAOPPlugin/blob/master/out/artifacts/AndroidAOPPlugin_jar/AndroidAOPPlugin.jar?raw=true)
 
-![image](/screenshot/111111.png)
+![image](/screenshot/about.png)
 
 

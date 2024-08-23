@@ -12,7 +12,7 @@
     </description>
     <version>1.0.3</version>
     <vendor>Raven</vendor>
-    <idea-version since-build="222.4554" until-build="241.*"/>
+    <idea-version since-build="222.4554" until-build="242.*"/>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.java</depends>
     <depends>org.jetbrains.kotlin</depends>

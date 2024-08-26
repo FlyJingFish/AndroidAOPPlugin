@@ -24,6 +24,7 @@ sourceSets {
 dependencies {
     implementation("org.ow2.asm:asm:9.6")
     implementation("org.ow2.asm:asm-commons:9.6")
+    implementation("org.javassist:javassist:3.25.0-GA")
     intellijPlatform {
         intellijIdeaCommunity("2024.1.4")
         bundledPlugins("ByteCodeViewer","com.intellij.java", "org.jetbrains.kotlin")

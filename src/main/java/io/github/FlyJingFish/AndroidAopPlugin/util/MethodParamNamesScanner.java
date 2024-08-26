@@ -3,15 +3,25 @@ package io.github.FlyJingFish.AndroidAopPlugin.util;
 
 import io.github.FlyJingFish.AndroidAopPlugin.config.AOPPluginComponent;
 import io.github.FlyJingFish.AndroidAopPlugin.config.ApplicationConfig;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtMethod;
+import javassist.NotFoundException;
+import javassist.bytecode.BadBytecode;
+import javassist.bytecode.SignatureAttribute;
 import org.objectweb.asm.*;
 import org.objectweb.asm.tree.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.regex.Pattern;
 
 public class MethodParamNamesScanner {
     private final List<MethodNode> methods = new ArrayList<>();
     private final ClassNode cn = new ClassNode();
+    private CtClass ctClass;
     private int initCount;
     private static final Pattern pattern1 = Pattern.compile("^lambda\\$.*?\\$.+");
     private static final Pattern pattern2 = Pattern.compile("^access\\$\\d+");
@@ -63,6 +73,166 @@ public class MethodParamNamesScanner {
             }
             iterator.remove();
         }
+
+        ClassWriter cw = new ClassWriter(cr, 0);
+        cr.accept(new ClassVisitor(Opcodes.ASM9,cw) {
+            @Override
+            public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+                super.visit(version, access, name, signature, superName, interfaces);
+            }
+        },0);
+
+        ClassPool cp = ClassPool.getDefault();
+        InputStream byteArrayInputStream  =
+                new ByteArrayInputStream(cw.toByteArray());
+        try {
+            ctClass = cp.makeClass(byteArrayInputStream);
+        } catch (Throwable e) {
+        }
+    }
+
+    private CtMethod getCtMethod(String methodName, String descriptor) {
+        if (ctClass == null) return null;
+        try {
+            CtMethod[] ctMethods = ctClass.getDeclaredMethods(methodName);
+            if (ctMethods != null) {
+                for (CtMethod ctMethod : ctMethods) {
+                    String allSignature = ctMethod.getSignature();
+                    if (descriptor.equals(allSignature)) {
+                        return ctMethod;
+                    }
+                }
+            }
+        } catch (NotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        return null;
+    }
+
+
+    public boolean returnNull(String name,
+                               String desc){
+        boolean[] result = new boolean[]{false};
+        for (MethodNode methodNode : methods) {
+            if (desc.equals(methodNode.desc) && name.equals(methodNode.name)) {
+                methodNode.accept(new MethodVisitor(Opcodes.ASM9) {
+
+                    @Override
+                    public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+                        String annotationClassName = Type.getType(descriptor).getClassName();
+                        if (annotationClassName.equals("org.jetbrains.annotations.Nullable") || annotationClassName.equals("androidx.annotation.Nullable")) {
+                            result[0] = true;
+                        }
+                        return super.visitAnnotation(descriptor, visible);
+                    }
+                });
+            }
+        }
+        return result[0];
+    }
+
+    public boolean[] paramsNull(String name,
+                              String desc){
+        Type[] types = Type.getArgumentTypes(desc);
+        boolean[] result = new boolean[types.length];
+        for (MethodNode methodNode : methods) {
+            if (desc.equals(methodNode.desc) && name.equals(methodNode.name)) {
+                methodNode.accept(new MethodVisitor(Opcodes.ASM9) {
+                    @Override
+                    public AnnotationVisitor visitParameterAnnotation(int parameter, String descriptor, boolean visible) {
+                        String annotationClassName = Type.getType(descriptor).getClassName();
+//                        System.out.println(method.name+"==Parameter " + parameter + " has annotation: " + annotationClassName);
+                        if (annotationClassName.equals("org.jetbrains.annotations.Nullable") || annotationClassName.equals("androidx.annotation.Nullable")) {
+                            result[parameter] = true;
+                        }
+                        return super.visitParameterAnnotation(parameter, descriptor, visible);
+                    }
+                });
+            }
+        }
+        return result;
+    }
+
+    public List<String> getParamsTypes(String name,
+                                String desc){
+        List<String> paramsList = new ArrayList<>();
+        CtMethod ctMethod = getCtMethod(name, desc);
+        if (ctMethod != null){
+            String descCt = ctMethod.getSignature();
+            System.out.println("desc="+desc+",descCt="+descCt);
+            if (desc.equals(ctMethod.getSignature()) && name.equals(ctMethod.getName())) {
+                try {
+                    SignatureAttribute signatureAttribute = (SignatureAttribute) ctMethod.getMethodInfo().getAttribute(SignatureAttribute.tag);
+                    if (signatureAttribute != null) {
+                        // 解析签名
+                        SignatureAttribute.MethodSignature methodSignature = SignatureAttribute.toMethodSignature(signatureAttribute.getSignature());
+
+                        SignatureAttribute.Type[] params = methodSignature.getParameterTypes();
+                        for (SignatureAttribute.Type paramType : params) {
+                            paramsList.add(paramType.jvmTypeName());
+                        }
+                        return paramsList;
+                    }
+                } catch (BadBytecode e) {
+                }
+            }
+        }
+        Type[] types = Type.getArgumentTypes(desc);
+        for (Type type : types) {
+            paramsList.add(type.getClassName());
+        }
+        return paramsList;
+    }
+
+    public String getReturnType(String name, String desc){
+        CtMethod ctMethod = getCtMethod(name, desc);
+        if (ctMethod != null){
+            if (desc.equals(ctMethod.getSignature()) && name.equals(ctMethod.getName())) {
+                try {
+                    SignatureAttribute signatureAttribute = (SignatureAttribute) ctMethod.getMethodInfo().getAttribute(SignatureAttribute.tag);
+                    if (signatureAttribute != null) {
+                        // 解析签名
+                        SignatureAttribute.MethodSignature methodSignature = SignatureAttribute.toMethodSignature(signatureAttribute.getSignature());
+                        return methodSignature.getReturnType().jvmTypeName();
+                    }
+                } catch (BadBytecode e) {
+                }
+            }
+        }
+        return Type.getReturnType(desc).getClassName();
+    }
+    public List<String> getJavaParamsTypes(String name,
+                                             String desc){
+        List<String> paramsList = getParamsTypes(name, desc);
+        List<String> newList = new ArrayList<>();
+        for (String s : paramsList) {
+            newList.add(JavaToKotlinTypeConverter.removePackageNames(s));
+        }
+        return newList;
+    }
+
+    public String getJavaReturnType(String name,
+                                      String desc){
+        String returnType = getReturnType(name, desc);
+        return JavaToKotlinTypeConverter.removePackageNames(returnType);
+    }
+    public List<String> getKotlinParamsTypes(String name,
+                                       String desc){
+        List<String> paramsList = getParamsTypes(name, desc);
+        List<String> newList = new ArrayList<>();
+        for (String s : paramsList) {
+
+            String kotlinType = JavaToKotlinTypeConverter.convertJavaTypeToKotlin(s);
+            newList.add(kotlinType);
+        }
+        return newList;
+    }
+
+    public String getKotlinReturnType(String name,
+                                String desc){
+        String returnType = getReturnType(name, desc);
+        return JavaToKotlinTypeConverter.convertJavaTypeToKotlin(returnType);
     }
 
     public boolean isInterface(){

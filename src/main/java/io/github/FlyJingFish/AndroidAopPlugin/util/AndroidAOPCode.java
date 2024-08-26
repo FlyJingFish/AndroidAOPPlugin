@@ -84,7 +84,7 @@ public class AndroidAOPCode {
         stringWriter.append("@AndroidAopCollectMethod\n")
                 .append("public static void collect").append(showName).append("Object(")
                 .append(showName).append(" subObject")
-                .append("){\n")
+                .append("){\n        //回调继承于").append(getShowMethodClassName(scanner.getClassName())).append("的对象\n")
                 .append("collect").append(showName).append("Objects.add(subObject);\n")
                 .append("}\n");
 
@@ -92,7 +92,7 @@ public class AndroidAOPCode {
                 .append("public static void collect").append(showName).append("Class(")
                 .append("Class<? extends ")
                 .append(showName).append("> subClass")
-                .append("){\n")
+                .append("){\n        //回调继承于").append(getShowMethodClassName(scanner.getClassName())).append("的Class\n")
                 .append("collect").append(showName).append("Classes.add(subClass);\n")
                 .append("}\n");
 
@@ -114,7 +114,10 @@ public class AndroidAOPCode {
                 .append(getShowMethodClassName(scanner.getClassName()))
                 .append(" extends ")
                 .append(superName)
-                .append("{\n\n}");
+                .append("{\n")
+                .append("//").append(getShowMethodClassName(scanner.getClassName()))
+                .append("将继承Modify").append(getShowMethodClassName(scanner.getClassName()))
+                .append("\n}");
         return stringWriter;
     }
 

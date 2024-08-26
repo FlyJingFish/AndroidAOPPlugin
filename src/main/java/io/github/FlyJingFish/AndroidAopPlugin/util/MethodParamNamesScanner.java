@@ -7,10 +7,7 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
-import javassist.bytecode.BadBytecode;
-import javassist.bytecode.MethodInfo;
-import javassist.bytecode.ParameterAnnotationsAttribute;
-import javassist.bytecode.SignatureAttribute;
+import javassist.bytecode.*;
 import javassist.bytecode.annotation.Annotation;
 import org.objectweb.asm.*;
 import org.objectweb.asm.tree.*;
@@ -162,7 +159,6 @@ public class MethodParamNamesScanner {
         List<String> paramsList = new ArrayList<>();
         CtMethod ctMethod = getCtMethod(name, desc);
         if (ctMethod != null){
-            String descCt = ctMethod.getSignature();
             if (desc.equals(ctMethod.getSignature()) && name.equals(ctMethod.getName())) {
                 try {
                     SignatureAttribute signatureAttribute = (SignatureAttribute) ctMethod.getMethodInfo().getAttribute(SignatureAttribute.tag);
@@ -406,6 +402,50 @@ public class MethodParamNamesScanner {
 
                 annotations[j] = anno.replace("{","[").replace("}","]");
             }
+        }
+        return annoStr;
+    }
+
+    private String[] getReturnAnnotation(String name,
+                                        String desc){
+        CtMethod ctMethod = getCtMethod(name, desc);
+        if (ctMethod != null){
+            if (desc.equals(ctMethod.getSignature()) && name.equals(ctMethod.getName())) {
+                // 获取方法信息
+                MethodInfo methodInfo = ctMethod.getMethodInfo();
+
+                // 获取方法参数的注解
+                AnnotationsAttribute attr = (AnnotationsAttribute)
+                        methodInfo.getAttribute(AnnotationsAttribute.visibleTag);
+
+                if (attr != null) {
+                    Annotation[] annotations = attr.getAnnotations();
+                    String[] annoStr = new String[annotations.length];
+                    for (int i = 0; i < annotations.length; i++) {
+                        annoStr[i] = annotations[i].toString();
+                    }
+                    return annoStr;
+                }
+            }
+        }
+        return null;
+    }
+
+    public String[] getJavaReturnAnnotation(String name,
+                                              String desc){
+        return getReturnAnnotation(name, desc);
+    }
+
+    public String[] getKotlinReturnAnnotation(String name,
+                                                String desc){
+        String[] annoStr = getReturnAnnotation(name, desc);
+        if (annoStr == null){
+            return null;
+        }
+        for (int j = 0; j < annoStr.length; j++) {
+            String anno = annoStr[j];
+
+            annoStr[j] = anno.replace("{","[").replace("}","]");
         }
         return annoStr;
     }

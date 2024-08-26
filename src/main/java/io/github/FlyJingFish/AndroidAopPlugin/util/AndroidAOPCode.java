@@ -304,6 +304,19 @@ public class AndroidAOPCode {
 
             stringWriter.append("\")");
 
+            String[] returnAnnos = null;
+            if (applicationConfig.getCopyAnnotation() == CopyAnnotation.Copy){
+                returnAnnos = scanner.getKotlinReturnAnnotation(methodName,methodDescriptor);
+            }
+            if (returnAnnos != null){
+                stringWriter.append("\n");
+                for (String annotation : returnAnnos) {
+                    if (!annotation.contains("org.jetbrains.annotations.Nullable") && !annotation.contains("androidx.annotation.Nullable")) {
+                        stringWriter.append(annotation).append(" ");
+                    }
+                }
+            }
+
             if (isSuspendMethod){
                 stringWriter.append("\nsuspend fun ");
             }else {
@@ -343,7 +356,9 @@ public class AndroidAOPCode {
                     if (annos != null){
                         String[] annotations = annos[i];
                         for (String annotation : annotations) {
-                            stringWriter.append(annotation).append(" ");
+                            if (!annotation.contains("org.jetbrains.annotations.Nullable") && !annotation.contains("androidx.annotation.Nullable")) {
+                                stringWriter.append(annotation).append(" ");
+                            }
                         }
                     }
                     stringWriter.append(argNameList.get(i)).append(": ");
@@ -449,8 +464,16 @@ public class AndroidAOPCode {
 
             stringWriter.append("\")");
 
-            boolean returnNull = scanner.returnNull(methodName,methodDescriptor);
-            if (returnNull){
+            String[] returnAnnos = null;
+            if (applicationConfig.getCopyAnnotation() == CopyAnnotation.Copy){
+                returnAnnos = scanner.getJavaReturnAnnotation(methodName,methodDescriptor);
+            }
+            if (returnAnnos != null && returnAnnos.length > 0){
+                stringWriter.append("\n");
+                for (String returnAnno : returnAnnos) {
+                    stringWriter.append(returnAnno).append(" ");
+                }
+            }else if (scanner.returnNull(methodName,methodDescriptor)){
                 stringWriter.append("\n@Nullable");
             }
 
@@ -484,14 +507,14 @@ public class AndroidAOPCode {
                 }
                 for (int i = 0; i < paramsList.size(); i++) {
                     String type = paramsList.get(i);
-                    if (i< paramsNull.length && paramsNull[i]){
-                        stringWriter.append("@Nullable ");
-                    }
+
                     if (annos != null){
                         String[] annotations = annos[i];
                         for (String annotation : annotations) {
                             stringWriter.append(annotation).append(" ");
                         }
+                    }else if (i< paramsNull.length && paramsNull[i]){
+                        stringWriter.append("@Nullable ");
                     }
                     stringWriter.append(type);
                     stringWriter.append(" ").append(argNameList.get(i));

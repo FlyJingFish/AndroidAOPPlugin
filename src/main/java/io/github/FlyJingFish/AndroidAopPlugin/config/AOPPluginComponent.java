@@ -29,6 +29,10 @@ public class AOPPluginComponent implements PersistentStateComponent<Element> {
         Element proxy = new Element("proxy");
         proxy.setAttribute("proxyType", applicationConfig.getReplaceProxy().toString());
         root.addContent(proxy);
+
+        Element anno = new Element("anno");
+        anno.setAttribute("annoType", applicationConfig.getCopyAnnotation().toString());
+        root.addContent(anno);
         return root;
     }
 
@@ -49,6 +53,12 @@ public class AOPPluginComponent implements PersistentStateComponent<Element> {
         if (proxy != null) {
             String codeStyleStr = proxy.getAttributeValue("proxyType");
             if (codeStyleStr != null) applicationConfig.setReplaceProxy(ReplaceProxy.valueOf(codeStyleStr));
+        }
+
+        Element anno = state.getChild("anno");
+        if (anno != null) {
+            String codeStyleStr = anno.getAttributeValue("annoType");
+            if (codeStyleStr != null) applicationConfig.setCopyAnnotation(CopyAnnotation.valueOf(codeStyleStr));
         }
     }
 

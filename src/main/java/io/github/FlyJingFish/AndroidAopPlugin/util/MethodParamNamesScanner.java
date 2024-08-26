@@ -8,7 +8,10 @@ import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.BadBytecode;
+import javassist.bytecode.MethodInfo;
+import javassist.bytecode.ParameterAnnotationsAttribute;
 import javassist.bytecode.SignatureAttribute;
+import javassist.bytecode.annotation.Annotation;
 import org.objectweb.asm.*;
 import org.objectweb.asm.tree.*;
 
@@ -154,13 +157,12 @@ public class MethodParamNamesScanner {
         return result;
     }
 
-    public List<String> getParamsTypes(String name,
+    private List<String> getParamsTypes(String name,
                                 String desc){
         List<String> paramsList = new ArrayList<>();
         CtMethod ctMethod = getCtMethod(name, desc);
         if (ctMethod != null){
             String descCt = ctMethod.getSignature();
-            System.out.println("desc="+desc+",descCt="+descCt);
             if (desc.equals(ctMethod.getSignature()) && name.equals(ctMethod.getName())) {
                 try {
                     SignatureAttribute signatureAttribute = (SignatureAttribute) ctMethod.getMethodInfo().getAttribute(SignatureAttribute.tag);
@@ -185,7 +187,7 @@ public class MethodParamNamesScanner {
         return paramsList;
     }
 
-    public String getReturnType(String name, String desc){
+    private String getReturnType(String name, String desc){
         CtMethod ctMethod = getCtMethod(name, desc);
         if (ctMethod != null){
             if (desc.equals(ctMethod.getSignature()) && name.equals(ctMethod.getName())) {
@@ -352,5 +354,59 @@ public class MethodParamNamesScanner {
                     ", name='" + name + '\'' +
                     '}';
         }
+    }
+
+    private String[][] getParamsAnnotation(String name,
+                                        String desc){
+        Type[] types = Type.getArgumentTypes(desc);
+        CtMethod ctMethod = getCtMethod(name, desc);
+        String[][] annoStr = new String[types.length][];
+        if (ctMethod != null){
+            if (desc.equals(ctMethod.getSignature()) && name.equals(ctMethod.getName())) {
+                // 获取方法信息
+                MethodInfo methodInfo = ctMethod.getMethodInfo();
+
+                // 获取方法参数的注解
+                ParameterAnnotationsAttribute paramAttr = (ParameterAnnotationsAttribute)
+                        methodInfo.getAttribute(ParameterAnnotationsAttribute.visibleTag);
+
+                if (paramAttr != null) {
+                    Annotation[][] annotations = paramAttr.getAnnotations();
+                    for (int i = 0; i < annotations.length; i++) {
+                        Annotation[] annotations1 = annotations[i];
+                        annoStr[i] = new String[annotations1.length];
+                        String[] annoStr1= annoStr[i];
+                        for (int i1 = 0; i1 < annotations1.length; i1++) {
+                            annoStr1[i1] = annotations1[i1].toString();
+                        }
+                    }
+                    return annoStr;
+                }
+            }
+        }
+        Arrays.fill(annoStr, new String[0]);
+        return null;
+    }
+
+    public String[][] getJavaParamsAnnotation(String name,
+                                           String desc){
+        return getParamsAnnotation(name, desc);
+    }
+
+    public String[][] getKotlinParamsAnnotation(String name,
+                                              String desc){
+        String[][] annoStr = getParamsAnnotation(name, desc);
+        if (annoStr == null){
+            return null;
+        }
+        for (int i = 0; i < annoStr.length; i++) {
+            String[] annotations = annoStr[i];
+            for (int j = 0; j < annotations.length; j++) {
+                String anno = annotations[j];
+
+                annotations[j] = anno.replace("{","[").replace("}","]");
+            }
+        }
+        return annoStr;
     }
 }

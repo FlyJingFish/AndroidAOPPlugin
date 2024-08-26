@@ -7,6 +7,7 @@ public class ApplicationConfig {
     private boolean isPackage = true;
     private boolean isPrivate = true;
     private ReplaceProxy replaceProxy = ReplaceProxy.NoneProxy;
+    private CopyAnnotation copyAnnotation = CopyAnnotation.Copy;
 
 
     public boolean isProtected() {
@@ -49,4 +50,11 @@ public class ApplicationConfig {
         this.replaceProxy = replaceProxy;
     }
 
+    public void setCopyAnnotation(CopyAnnotation copyAnnotation) {
+        this.copyAnnotation = copyAnnotation;
+    }
+
+    public CopyAnnotation getCopyAnnotation() {
+        return copyAnnotation;
+    }
 }

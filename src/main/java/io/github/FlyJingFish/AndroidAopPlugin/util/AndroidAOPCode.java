@@ -3,6 +3,7 @@ package io.github.FlyJingFish.AndroidAopPlugin.util;
 import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension;
 import io.github.FlyJingFish.AndroidAopPlugin.config.AOPPluginComponent;
 import io.github.FlyJingFish.AndroidAopPlugin.config.ApplicationConfig;
+import io.github.FlyJingFish.AndroidAopPlugin.config.CopyAnnotation;
 import io.github.FlyJingFish.AndroidAopPlugin.config.ReplaceProxy;
 import org.objectweb.asm.*;
 import org.objectweb.asm.commons.Method;
@@ -17,7 +18,8 @@ import java.util.regex.Pattern;
 public class AndroidAOPCode {
     private final MethodParamNamesScanner scanner;
     private final boolean useProxyMethod;
-//    public static void main(String[] args) throws Exception {
+    private final ApplicationConfig applicationConfig;
+    //    public static void main(String[] args) throws Exception {
 //        ClassReader cr = new ClassReader("com.testdemo1.Demo");
 //        AndroidAOPCode androidAOPCode = new AndroidAOPCode(cr);
 //        StringWriter replaceJavaCode = androidAOPCode.getReplaceContent(cr,CodeStyle.JavaCode);
@@ -30,47 +32,10 @@ public class AndroidAOPCode {
 
     public AndroidAOPCode(ClassReader cr) {
         scanner = new MethodParamNamesScanner(cr);
-        ApplicationConfig applicationConfig = AOPPluginComponent.getApplicationConfig();
+        applicationConfig = AOPPluginComponent.getApplicationConfig();
         useProxyMethod = applicationConfig.getReplaceProxy() == ReplaceProxy.Proxy;
     }
 
-//    private static final Map<String,String> javaKotlinMap = new HashMap<>();
-//    private static final Map<String,String> basejavaKotlinMap = new HashMap<>();
-//    private static final Map<String,String> basejavaKotlinArrayMap = new HashMap<>();
-//
-//    static {
-//        basejavaKotlinArrayMap.put("int","IntArray");
-//        basejavaKotlinArrayMap.put("short","ShortArray");
-//        basejavaKotlinArrayMap.put("byte","ByteArray");
-//        basejavaKotlinArrayMap.put("char","CharArray");
-//        basejavaKotlinArrayMap.put("long","LongArray");
-//        basejavaKotlinArrayMap.put("float","FloatArray");
-//        basejavaKotlinArrayMap.put("double","DoubleArray");
-//        basejavaKotlinArrayMap.put("boolean","BooleanArray");
-//
-//        basejavaKotlinMap.put("int","Int");
-//        basejavaKotlinMap.put("short","Short");
-//        basejavaKotlinMap.put("byte","Byte");
-//        basejavaKotlinMap.put("char","Char");
-//        basejavaKotlinMap.put("long","Long");
-//        basejavaKotlinMap.put("float","Float");
-//        basejavaKotlinMap.put("double","Double");
-//        basejavaKotlinMap.put("boolean","Boolean");
-//
-//        javaKotlinMap.putAll(basejavaKotlinMap);
-//        javaKotlinMap.put("Integer","Int?");
-//        javaKotlinMap.put("Short","Short?");
-//        javaKotlinMap.put("Byte","Byte?");
-//        javaKotlinMap.put("Character","Char?");
-//        javaKotlinMap.put("Long","Long?");
-//        javaKotlinMap.put("Float","Float?");
-//        javaKotlinMap.put("Double","Double?");
-//        javaKotlinMap.put("Boolean","Boolean?");
-//
-//        javaKotlinMap.put("void","");
-//        javaKotlinMap.put("Void","Unit?");
-//        javaKotlinMap.put("Object","Any");
-//    }
 
     public StringWriter getCollectContent(){
         StringWriter stringWriter = new StringWriter();
@@ -366,10 +331,20 @@ public class AndroidAOPCode {
             if (!isInit){
                 boolean[] paramsNull = scanner.paramsNull(methodName,methodDescriptor);
                 List<String> paramsList = scanner.getKotlinParamsTypes(methodName,methodDescriptor);
+                String[][] annos = null;
+                if (applicationConfig.getCopyAnnotation() == CopyAnnotation.Copy){
+                    annos = scanner.getKotlinParamsAnnotation(methodName,methodDescriptor);
+                }
                 for (int i = 0; i < paramsList.size(); i++) {
                     String typeName = paramsList.get(i);
                     if (isSuspendMethod && i == types.length - 1){
                         break;
+                    }
+                    if (annos != null){
+                        String[] annotations = annos[i];
+                        for (String annotation : annotations) {
+                            stringWriter.append(annotation).append(" ");
+                        }
                     }
                     stringWriter.append(argNameList.get(i)).append(": ");
 
@@ -503,10 +478,20 @@ public class AndroidAOPCode {
             if (!isInit){
                 boolean[] paramsNull = scanner.paramsNull(methodName,methodDescriptor);
                 List<String> paramsList = scanner.getJavaParamsTypes(methodName,methodDescriptor);
+                String[][] annos = null;
+                if (applicationConfig.getCopyAnnotation() == CopyAnnotation.Copy){
+                    annos = scanner.getJavaParamsAnnotation(methodName,methodDescriptor);
+                }
                 for (int i = 0; i < paramsList.size(); i++) {
                     String type = paramsList.get(i);
                     if (i< paramsNull.length && paramsNull[i]){
                         stringWriter.append("@Nullable ");
+                    }
+                    if (annos != null){
+                        String[] annotations = annos[i];
+                        for (String annotation : annotations) {
+                            stringWriter.append(annotation).append(" ");
+                        }
                     }
                     stringWriter.append(type);
                     stringWriter.append(" ").append(argNameList.get(i));

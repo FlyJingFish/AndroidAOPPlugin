@@ -33,6 +33,7 @@ public class AOPPluginConfiguration {
     private JCheckBox packageCheckBox;
     private JCheckBox privateCheckBox;
     private JComboBox<ReplaceProxy> replaceProxyComboBox;
+    private JComboBox<CopyAnnotation> copyAnnotationJComboBox;
 
     public AOPPluginConfiguration() {
     }
@@ -47,6 +48,7 @@ public class AOPPluginConfiguration {
         packageCheckBox.setSelected(applicationConfig.isPackage());
         privateCheckBox.setSelected(applicationConfig.isPrivate());
         replaceProxyComboBox.setSelectedItem(applicationConfig.getReplaceProxy());
+        copyAnnotationJComboBox.setSelectedItem(applicationConfig.getCopyAnnotation());
     }
 
     public void getData(ApplicationConfig applicationConfig) {
@@ -55,19 +57,25 @@ public class AOPPluginConfiguration {
         applicationConfig.setPackage(packageCheckBox.isSelected());
         applicationConfig.setPrivate(privateCheckBox.isSelected());
         applicationConfig.setReplaceProxy((ReplaceProxy) replaceProxyComboBox.getSelectedItem());
+        applicationConfig.setCopyAnnotation((CopyAnnotation) copyAnnotationJComboBox.getSelectedItem());
     }
     public boolean isModified(ApplicationConfig applicationConfig) {
         if (publicCheckBox.isSelected() != applicationConfig.isPublic()) return true;
         if (protectedCheckBox.isSelected() != applicationConfig.isProtected()) return true;
         if (packageCheckBox.isSelected() != applicationConfig.isPackage()) return true;
         if (privateCheckBox.isSelected() != applicationConfig.isPrivate()) return true;
-        return !Objects.equals(replaceProxyComboBox.getSelectedItem(), applicationConfig.getReplaceProxy());
+        return !Objects.equals(replaceProxyComboBox.getSelectedItem(), applicationConfig.getReplaceProxy())
+                || !Objects.equals(replaceProxyComboBox.getSelectedItem(), applicationConfig.getCopyAnnotation());
     }
 
     private void createUIComponents() {
         ComboBoxModel<ReplaceProxy> model = new EnumComboBoxModel<>(ReplaceProxy.class);
         replaceProxyComboBox = new ComboBox<>(model);
         replaceProxyComboBox.setRenderer(new GroovyCodeStyleCellRenderer<>());
+
+        ComboBoxModel<CopyAnnotation> model2 = new EnumComboBoxModel<>(CopyAnnotation.class);
+        copyAnnotationJComboBox = new ComboBox<>(model2);
+        copyAnnotationJComboBox.setRenderer(new CopyAnnotationCellRenderer<>());
     }
 
     private static class GroovyCodeStyleCellRenderer<T> implements ListCellRenderer<T> {
@@ -76,6 +84,21 @@ public class AOPPluginConfiguration {
         private GroovyCodeStyleCellRenderer() {
             labels = new EnumMap<>(ReplaceProxy.class);
             for (ReplaceProxy replaceProxy : ReplaceProxy.values()) {
+                labels.put(replaceProxy, new JLabel(replaceProxy.label));
+            }
+        }
+
+        public Component getListCellRendererComponent(final JList list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
+            return labels.get(value);
+        }
+    }
+
+    private static class CopyAnnotationCellRenderer<T> implements ListCellRenderer<T> {
+        private EnumMap<CopyAnnotation, JLabel> labels;
+
+        private CopyAnnotationCellRenderer() {
+            labels = new EnumMap<>(CopyAnnotation.class);
+            for (CopyAnnotation replaceProxy : CopyAnnotation.values()) {
                 labels.put(replaceProxy, new JLabel(replaceProxy.label));
             }
         }

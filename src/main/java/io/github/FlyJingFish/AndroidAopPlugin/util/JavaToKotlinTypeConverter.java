@@ -75,12 +75,14 @@ public class JavaToKotlinTypeConverter {
         // 处理数组类型 (e.g., String[] -> Array<String>)
         javaType = javaType.replaceAll("(\\w+)\\[\\]", "Array<$1>");
 
-        return removePackageNames(javaType);
+        return removePackageNames(javaType).replace("? extends","out")
+                .replace("? super","in");
     }
 
     public static String removePackageNames(String input) {
         // 使用正则表达式匹配包名，并将其替换为空字符串
-        return input.replaceAll("\\b[a-zA-Z_][a-zA-Z0-9_]*\\.", "").replaceAll("\\b[a-zA-Z_][a-zA-Z0-9_]*\\$","");
+        return input.replaceAll("\\b[a-zA-Z_][a-zA-Z0-9_]*\\.", "")
+                .replaceAll("\\b[a-zA-Z_][a-zA-Z0-9_]*\\$","");
     }
 
     public static void main(String[] args) {

@@ -231,6 +231,14 @@ public class MethodParamNamesScanner {
 
     public String getKotlinReturnType(String name,
                                 String desc){
+        boolean isSuspendMethod = desc.endsWith("Lkotlin/coroutines/Continuation;)Ljava/lang/Object;");
+        if (isSuspendMethod){
+            for (MethodNode methodNode : methods) {
+                if (desc.equals(methodNode.desc) && name.equals(methodNode.name)) {
+                    return JavaToKotlinTypeConverter.convertJavaTypeToKotlin(AndroidAOPCode.getSuspendMethodType(methodNode.signature));
+                }
+            }
+        }
         String returnType = getReturnType(name, desc);
         return JavaToKotlinTypeConverter.convertJavaTypeToKotlin(returnType);
     }

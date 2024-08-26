@@ -38,6 +38,9 @@ import io.github.FlyJingFish.AndroidAopPlugin.common.Constants
 import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension
 import io.github.FlyJingFish.AndroidAopPlugin.config.AOPPluginComponent
 import io.github.FlyJingFish.AndroidAopPlugin.util.AndroidAOPCode
+import io.github.FlyJingFish.AndroidAopPlugin.view.ACodeView
+import io.github.FlyJingFish.AndroidAopPlugin.view.CollectView
+import io.github.FlyJingFish.AndroidAopPlugin.view.ExtendsView
 import io.github.FlyJingFish.AndroidAopPlugin.view.MatchView
 import io.github.FlyJingFish.AndroidAopPlugin.view.MatchViewKt
 import io.github.FlyJingFish.AndroidAopPlugin.view.ReplaceView
@@ -154,6 +157,8 @@ private fun updateToolWindowContents(project: Project, locatedClassFile: Located
         val replaceViewKt = ReplaceViewKt.getInstance(project)
         val matchView = MatchView.getInstance(project)
         val matchViewKt = MatchViewKt.getInstance(project)
+        val extendsView = ExtendsView.getInstance(project)
+        val collectView = CollectView.getInstance(project)
         val toolWindowManager = ToolWindowManager.getInstance(project)
 
         val file: VirtualFile? = locatedClassFile?.virtualFile
@@ -162,6 +167,8 @@ private fun updateToolWindowContents(project: Project, locatedClassFile: Located
             replaceViewKt.setCode(null, Constants.NO_CLASS_FOUND)
             matchView.setCode(null, Constants.NO_CLASS_FOUND)
             matchViewKt.setCode(null, Constants.NO_CLASS_FOUND)
+            extendsView.setCode(null, Constants.NO_CLASS_FOUND)
+            collectView.setCode(null, Constants.NO_CLASS_FOUND)
             toolWindowManager.getToolWindow(Constants.PLUGIN_WINDOW_NAME)!!
                 .activate(null)
             return@runWriteAction
@@ -178,7 +185,7 @@ private fun updateToolWindowContents(project: Project, locatedClassFile: Located
             return@runWriteAction
         }
 
-        showCode(project,replaceView,replaceViewKt,matchView,matchViewKt,toolWindowManager,file,reader)
+        showCode(project,replaceView,replaceViewKt,matchView,matchViewKt,extendsView,collectView,toolWindowManager,file,reader)
     }
 }
 
@@ -187,6 +194,8 @@ fun showCode(
     replaceViewKt: ReplaceViewKt,
     matchView: MatchView,
     matchViewKt: MatchViewKt,
+    extendsView: ExtendsView,
+    collectView: CollectView,
     toolWindowManager: ToolWindowManager,
     file: VirtualFile,
     reader: ClassReader
@@ -199,27 +208,12 @@ fun showCode(
 
     val replaceJavaCode =
         androidAOPCode.getReplaceContent(FileTypeExtension.JAVA)
-    val psiFile = PsiFileFactory.getInstance(project).createFileFromText(
-        Constants.FILE_NAME,
-        FileTypeManager.getInstance()
-            .getFileTypeByExtension(FileTypeExtension.JAVA.value),
-        replaceJavaCode.toString()
-    )
-    CodeStyleManager.getInstance(project).reformat(psiFile)
-    replaceView.setCode(file, psiFile.text)
+    setCode(replaceJavaCode.toString(),replaceView,project,file,FileTypeExtension.JAVA)
 
 
     val replaceKotlinCode =
         androidAOPCode.getReplaceContent(FileTypeExtension.KOTLIN)
-    val psiFileKt = PsiFileFactory.getInstance(project)
-        .createFileFromText(
-            Constants.FILE_NAME,
-            FileTypeManager.getInstance()
-                .getFileTypeByExtension(FileTypeExtension.KOTLIN.value),
-            replaceKotlinCode.toString()
-        )
-    CodeStyleManager.getInstance(project).reformat(psiFileKt)
-    replaceViewKt.setCode(file, psiFileKt.text)
+    setCode(replaceKotlinCode.toString(),replaceViewKt,project,file,FileTypeExtension.KOTLIN)
 
     val matchJavaCode = androidAOPCode.getMatchContent(
         FileTypeExtension.JAVA,
@@ -227,15 +221,7 @@ fun showCode(
         false,
         false
     )
-    val matchPsiFile = PsiFileFactory.getInstance(project)
-        .createFileFromText(
-            Constants.FILE_NAME,
-            FileTypeManager.getInstance()
-                .getFileTypeByExtension(FileTypeExtension.JAVA.value),
-            matchJavaCode.toString()
-        )
-    CodeStyleManager.getInstance(project).reformat(matchPsiFile)
-    matchView.setCode(file, matchPsiFile.text)
+    setCode(matchJavaCode.toString(),matchView,project,file,FileTypeExtension.JAVA)
 
     val matchKotlinCode = androidAOPCode.getMatchContent(
         FileTypeExtension.KOTLIN,
@@ -243,17 +229,28 @@ fun showCode(
         false,
         false
     )
+    setCode(matchKotlinCode.toString(),matchViewKt,project,file,FileTypeExtension.KOTLIN)
+
+    val extendsJavaCode = androidAOPCode.modifyExtendsContent
+    setCode(extendsJavaCode.toString(),extendsView,project,file,FileTypeExtension.JAVA)
+
+    val collectJavaCode = androidAOPCode.collectContent
+    setCode(collectJavaCode.toString(),collectView,project,file,FileTypeExtension.JAVA)
+
+    toolWindowManager.getToolWindow(Constants.PLUGIN_WINDOW_NAME)!!
+        .activate(null)
+}
+
+private fun setCode(code: String,matchViewKt: ACodeView,project: Project,file: VirtualFile,fileTypeExtension: FileTypeExtension){
     val matchPsiFileKt = PsiFileFactory.getInstance(project)
         .createFileFromText(
             Constants.FILE_NAME,
             FileTypeManager.getInstance()
-                .getFileTypeByExtension(FileTypeExtension.KOTLIN.value),
-            matchKotlinCode.toString()
+                .getFileTypeByExtension(fileTypeExtension.value),
+            code
         )
     CodeStyleManager.getInstance(project).reformat(matchPsiFileKt)
     matchViewKt.setCode(file, matchPsiFileKt.text)
-    toolWindowManager.getToolWindow(Constants.PLUGIN_WINDOW_NAME)!!
-        .activate(null)
 }
 
 private fun locateClassFile(psiElement: PsiElement): LocationResult {

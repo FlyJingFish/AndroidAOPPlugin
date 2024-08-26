@@ -31,6 +31,8 @@ public class AOPCodeOutlineToolWindowFactory implements ToolWindowFactory {
         toolWindow.getContentManager().addContent(ApplicationManager.getApplication().getService(ContentFactory.class).createContent(ReplaceViewKt.getInstance(project), "Replace.Kt", false));
         toolWindow.getContentManager().addContent(ApplicationManager.getApplication().getService(ContentFactory.class).createContent(MatchView.getInstance(project), "Match", false));
         toolWindow.getContentManager().addContent(ApplicationManager.getApplication().getService(ContentFactory.class).createContent(MatchViewKt.getInstance(project), "Match.Kt", false));
+        toolWindow.getContentManager().addContent(ApplicationManager.getApplication().getService(ContentFactory.class).createContent(ExtendsView.getInstance(project), "Extends", false));
+        toolWindow.getContentManager().addContent(ApplicationManager.getApplication().getService(ContentFactory.class).createContent(CollectView.getInstance(project), "Collect", false));
     }
 
 }

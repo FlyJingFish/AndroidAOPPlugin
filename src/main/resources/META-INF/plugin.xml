@@ -65,5 +65,9 @@
             serviceInterface="io.github.FlyJingFish.AndroidAopPlugin.view.MatchView" />
         <projectService serviceImplementation="io.github.FlyJingFish.AndroidAopPlugin.view.MatchViewKt"
                         serviceInterface="io.github.FlyJingFish.AndroidAopPlugin.view.MatchViewKt" />
+        <projectService serviceImplementation="io.github.FlyJingFish.AndroidAopPlugin.view.ExtendsView"
+                        serviceInterface="io.github.FlyJingFish.AndroidAopPlugin.view.ExtendsView" />
+        <projectService serviceImplementation="io.github.FlyJingFish.AndroidAopPlugin.view.CollectView"
+                        serviceInterface="io.github.FlyJingFish.AndroidAopPlugin.view.CollectView" />
     </extensions>
 </idea-plugin>

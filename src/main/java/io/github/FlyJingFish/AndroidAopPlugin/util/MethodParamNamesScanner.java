@@ -248,7 +248,26 @@ public class MethodParamNamesScanner {
     }
 
     public String getClassName(){
-        return cn.name.replaceAll("/",".");
+        return cn.name.replace("/",".");
+    }
+
+    public String getExtendsClassName(){
+        // 获取类签名
+        try {
+            SignatureAttribute signatureAttribute = (SignatureAttribute) ctClass.getClassFile().getAttribute(SignatureAttribute.tag);
+            if (signatureAttribute != null) {
+                // 解析签名
+                SignatureAttribute.ClassSignature classSignature = SignatureAttribute.toClassSignature(signatureAttribute.getSignature());
+                return JavaToKotlinTypeConverter.removePackageNames(classSignature.getSuperClass().toString());
+            }
+        } catch (BadBytecode ignore) {
+
+        }
+        return JavaToKotlinTypeConverter.removePackageNames(cn.superName.replace("/","."));
+    }
+
+    public String getSuperClassName(){
+        return JavaToKotlinTypeConverter.removePackageNames(cn.superName.replace("/","."));
     }
 
     public int getInitCount() {

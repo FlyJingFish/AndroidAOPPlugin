@@ -27,10 +27,7 @@ import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension;
 import io.github.FlyJingFish.AndroidAopPlugin.config.AOPPluginComponent;
 import io.github.FlyJingFish.AndroidAopPlugin.config.ApplicationConfig;
 import io.github.FlyJingFish.AndroidAopPlugin.util.AndroidAOPCode;
-import io.github.FlyJingFish.AndroidAopPlugin.view.MatchViewKt;
-import io.github.FlyJingFish.AndroidAopPlugin.view.ReplaceView;
-import io.github.FlyJingFish.AndroidAopPlugin.view.MatchView;
-import io.github.FlyJingFish.AndroidAopPlugin.view.ReplaceViewKt;
+import io.github.FlyJingFish.AndroidAopPlugin.view.*;
 import org.objectweb.asm.ClassReader;
 
 
@@ -217,6 +214,8 @@ public class ShowAopCodeViewerAction extends AnAction {
             ReplaceViewKt replaceViewKt = ReplaceViewKt.getInstance(project);
             MatchView matchView = MatchView.getInstance(project);
             MatchViewKt matchViewKt = MatchViewKt.getInstance(project);
+            ExtendsView extendsView = ExtendsView.getInstance(project);
+            CollectView collectView = CollectView.getInstance(project);
             ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
 
 
@@ -225,6 +224,8 @@ public class ShowAopCodeViewerAction extends AnAction {
                 replaceViewKt.setCode(null, Constants.NO_CLASS_FOUND);
                 matchView.setCode(null, Constants.NO_CLASS_FOUND);
                 matchViewKt.setCode(null, Constants.NO_CLASS_FOUND);
+                extendsView.setCode(null, Constants.NO_CLASS_FOUND);
+                collectView.setCode(null, Constants.NO_CLASS_FOUND);
                 toolWindowManager.getToolWindow(Constants.PLUGIN_WINDOW_NAME).activate(null);
                 return;
             } else {
@@ -240,7 +241,7 @@ public class ShowAopCodeViewerAction extends AnAction {
                 return;
             }
 
-            ClassFileLocationKt.showCode(project,replaceView,replaceViewKt,matchView,matchViewKt,toolWindowManager,file,reader);
+            ClassFileLocationKt.showCode(project,replaceView,replaceViewKt,matchView,matchViewKt,extendsView,collectView,toolWindowManager,file,reader);
         });
     }
 }

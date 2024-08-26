@@ -72,6 +72,52 @@ public class AndroidAOPCode {
 //        javaKotlinMap.put("Object","Any");
 //    }
 
+    public StringWriter getCollectContent(){
+        StringWriter stringWriter = new StringWriter();
+        String showName = getShowMethodClassName(scanner.getClassName());
+        stringWriter
+                .append("public class Collect")
+                .append(getShowMethodClassName(scanner.getClassName()))
+                .append("{\n ")
+                .append("private static final List<").append(showName).append("> collect").append(showName).append("Objects = new ArrayList<>();\n")
+                .append("private static final List<Class<? extends ").append(showName).append(">> collect").append(showName).append("Classes = new ArrayList<>();\n");
+        stringWriter.append("@AndroidAopCollectMethod\n")
+                .append("public static void collect").append(showName).append("Object(")
+                .append(showName).append(" subObject")
+                .append("){\n")
+                .append("collect").append(showName).append("Objects.add(subObject);\n")
+                .append("}\n");
+
+        stringWriter.append("@AndroidAopCollectMethod\n")
+                .append("public static void collect").append(showName).append("Class(")
+                .append("Class<? extends ")
+                .append(showName).append("> subClass")
+                .append("){\n")
+                .append("collect").append(showName).append("Classes.add(subClass);\n")
+                .append("}\n");
+
+        stringWriter.append("}");
+        return stringWriter;
+    }
+
+    public StringWriter getModifyExtendsContent(){
+        StringWriter stringWriter = new StringWriter();
+        stringWriter.append("@AndroidAopModifyExtendsClass(");
+        String superName = scanner.getExtendsClassName();
+        if (superName.equals("Object")){
+            superName = "_";
+        }
+        stringWriter.append("\"")
+                .append(scanner.getClassName().replace("\\$","."))
+                .append("\")\n")
+                .append("public class Modify")
+                .append(getShowMethodClassName(scanner.getClassName()))
+                .append(" extends ")
+                .append(superName)
+                .append("{\n\n}");
+        return stringWriter;
+    }
+
     public StringWriter getMatchContent(FileTypeExtension codeStyle,boolean allMethod,boolean useProxyMethod,boolean useReplaceName) {
 
         StringWriter stringWriter = new StringWriter();
@@ -83,7 +129,7 @@ public class AndroidAOPCode {
                     .append("👇👇,\n");
         }else {
             stringWriter.append("   targetClassName = \"")
-                    .append(scanner.getClassName().replaceAll("\\$","."))
+                    .append(scanner.getClassName().replace("$","."))
                     .append("\",\n");
         }
         if (!useReplaceName){
@@ -208,7 +254,7 @@ public class AndroidAOPCode {
         }
 
         stringWriter.append("@AndroidAopReplaceClass(\"")
-                .append(scanner.getClassName().replaceAll("\\$","."))
+                .append(scanner.getClassName().replace("$","."))
                 .append("\")\n");
         if (codeStyle == FileTypeExtension.JAVA){
             stringWriter.append("public class Replace")
@@ -504,7 +550,7 @@ public class AndroidAOPCode {
 
     private static String getShowMethodClassName(String className){
         if (className.contains(".")){
-            String newName = className.replaceAll("\\$",".");
+            String newName = className.replace("$",".");
             return newName.substring(newName.lastIndexOf(".")+1);
         }else {
             return className;

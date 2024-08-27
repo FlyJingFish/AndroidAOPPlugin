@@ -171,7 +171,7 @@ public class AndroidAOPCode {
 
     public static String getMatchMethod(int methodAccess, String methodName, String methodDescriptor, String signature,
                                         FileTypeExtension codeStyle) {
-        if (!"<clinit>".equals(methodName) && !"<init>".equals(methodName)){
+        if (!"<clinit>".equals(methodName) && !"<init>".equals(methodName) && isHasMethodBody(methodAccess)){
             StringWriter stringWriter = new StringWriter();
             boolean isSuspendMethod = methodDescriptor.endsWith("Lkotlin/coroutines/Continuation;)Ljava/lang/Object;");
 

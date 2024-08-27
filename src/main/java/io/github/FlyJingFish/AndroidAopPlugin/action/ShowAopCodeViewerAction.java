@@ -209,39 +209,17 @@ public class ShowAopCodeViewerAction extends AnAction {
      * @param file    the class file
      */
     private void updateToolWindowContents(final Project project, final VirtualFile file) {
-        ApplicationManager.getApplication().runWriteAction(() -> {
-            ReplaceView replaceView = ReplaceView.getInstance(project);
-            ReplaceViewKt replaceViewKt = ReplaceViewKt.getInstance(project);
-            MatchView matchView = MatchView.getInstance(project);
-            MatchViewKt matchViewKt = MatchViewKt.getInstance(project);
-            ExtendsView extendsView = ExtendsView.getInstance(project);
-            CollectView collectView = CollectView.getInstance(project);
-            ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
-
-
-            if (file == null) {
-                replaceView.setCode(null, Constants.NO_CLASS_FOUND);
-                replaceViewKt.setCode(null, Constants.NO_CLASS_FOUND);
-                matchView.setCode(null, Constants.NO_CLASS_FOUND);
-                matchViewKt.setCode(null, Constants.NO_CLASS_FOUND);
-                extendsView.setCode(null, Constants.NO_CLASS_FOUND);
-                collectView.setCode(null, Constants.NO_CLASS_FOUND);
-                toolWindowManager.getToolWindow(Constants.PLUGIN_WINDOW_NAME).activate(null);
-                return;
-            } else {
-                Logger.getInstance(ShowAopCodeViewerAction.class).warn("file " + file.toString());
-            }
-
-
+        try {
             ClassReader reader;
-            try {
+            if (file != null){
                 file.refresh(false, false);
                 reader = new ClassReader(file.contentsToByteArray());
-            } catch (IOException e) {
-                return;
+            }else {
+                reader = null;
             }
 
-            ClassFileLocationKt.showCode(project,replaceView,replaceViewKt,matchView,matchViewKt,extendsView,collectView,toolWindowManager,file,reader);
-        });
+            ClassFileLocationKt.showCode(project,file,reader);
+        } catch (IOException e) {
+        }
     }
 }

@@ -2,6 +2,7 @@ package io.github.FlyJingFish.AndroidAopPlugin.config;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import io.github.FlyJingFish.AndroidAopPlugin.util.CurrentFileUtils;
 import org.jetbrains.annotations.Nls;
 
 import javax.swing.*;
@@ -42,6 +43,7 @@ public class PluginConfig implements Configurable {
     public void apply() throws ConfigurationException {
         if (configDialog != null) {
             configDialog.getData(applicationConfig);
+            CurrentFileUtils.INSTANCE.showCode();
         }
     }
 

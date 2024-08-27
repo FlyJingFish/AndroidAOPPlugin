@@ -36,8 +36,8 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.PsiUtil
 import io.github.FlyJingFish.AndroidAopPlugin.common.Constants
 import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension
-import io.github.FlyJingFish.AndroidAopPlugin.config.AOPPluginComponent
 import io.github.FlyJingFish.AndroidAopPlugin.util.AndroidAOPCode
+import io.github.FlyJingFish.AndroidAopPlugin.util.CurrentFileUtils
 import io.github.FlyJingFish.AndroidAopPlugin.view.ACodeView
 import io.github.FlyJingFish.AndroidAopPlugin.view.CollectView
 import io.github.FlyJingFish.AndroidAopPlugin.view.ExtendsView
@@ -152,6 +152,18 @@ private fun loadSourceClassFileBytes(locatedClassFile: LocatedClassFile, project
 }
 
 private fun updateToolWindowContents(project: Project, locatedClassFile: LocatedClassFile?) {
+    if (locatedClassFile != null){
+        try {
+            val reader = ClassReader(readClassFile(locatedClassFile, project))
+            showCode(project,locatedClassFile.virtualFile,reader)
+        } catch (_: Exception) {
+        }
+    }else{
+        showCode(project,null,null)
+    }
+}
+
+fun showCode(project: Project, file: VirtualFile?, reader: ClassReader?){
     ApplicationManager.getApplication().runWriteAction {
         val replaceView = ReplaceView.getInstance(project)
         val replaceViewKt = ReplaceViewKt.getInstance(project)
@@ -161,7 +173,6 @@ private fun updateToolWindowContents(project: Project, locatedClassFile: Located
         val collectView = CollectView.getInstance(project)
         val toolWindowManager = ToolWindowManager.getInstance(project)
 
-        val file: VirtualFile? = locatedClassFile?.virtualFile
         if (file == null) {
             replaceView.setCode(null, Constants.NO_CLASS_FOUND)
             replaceViewKt.setCode(null, Constants.NO_CLASS_FOUND)
@@ -177,20 +188,19 @@ private fun updateToolWindowContents(project: Project, locatedClassFile: Located
                 .warn("file $file")
         }
 
-
-        val reader: ClassReader?
-        try {
-            reader = ClassReader(readClassFile(locatedClassFile, project))
-        } catch (e: Exception) {
+        if (reader == null){
             return@runWriteAction
         }
-
+        CurrentFileUtils.INSTANCE.project = project
+        CurrentFileUtils.INSTANCE.file = file
+        CurrentFileUtils.INSTANCE.reader = reader
         showCode(project,replaceView,replaceViewKt,matchView,matchViewKt,extendsView,collectView,toolWindowManager,file,reader)
     }
 }
 
-fun showCode(
-    project: Project, replaceView: ReplaceView,
+private fun showCode(
+    project: Project,
+    replaceView: ReplaceView,
     replaceViewKt: ReplaceViewKt,
     matchView: MatchView,
     matchViewKt: MatchViewKt,

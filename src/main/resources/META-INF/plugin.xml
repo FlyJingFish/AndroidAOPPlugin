@@ -7,17 +7,24 @@
         <ul>
             <li>@AndroidAopReplaceClass</li>
             <li>@AndroidAopMatchClassMethod</li>
+            <li>@AndroidAopModifyExtendsClass</li>
+            <li>@AndroidAopCollectMethod</li>
         </ul>
         ]]>
     </description>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <vendor>Raven</vendor>
-    <idea-version since-build="222.4554" until-build="242.*"/>
+<!--    <idea-version since-build="222.4554" until-build="242.*"/>-->
+    <idea-version since-build="222.4554"/>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.java</depends>
     <depends>org.jetbrains.kotlin</depends>
     <depends optional="true" config-file="withByteCodeViewer.xml">ByteCodeViewer</depends>
     <change-notes><![CDATA[
+        <b>Version 1.0.4</b>
+        <ul>
+            <li>Improve the function</li>
+        </ul>
         <b>Version 1.0.3</b>
         <ul>
             <li>fix bug</li>

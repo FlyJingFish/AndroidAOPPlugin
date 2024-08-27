@@ -85,14 +85,14 @@ public class JavaToKotlinTypeConverter {
                 .replaceAll("\\b[a-zA-Z_][a-zA-Z0-9_]*\\$","");
     }
 
-    public static void main(String[] args) {
-        String javaType = "java.util.List<java.lang.String>";
-        String kotlinType = removePackageNames(javaType);
-        System.out.println(kotlinType);  // 输出 "List<List<Array<String>>>"
-
-//        String javaType = "java.util.regex.Pattern";
+//    public static void main(String[] args) {
+//        String javaType = "java.util.List<java.lang.String>";
 //        String kotlinType = removePackageNames(javaType);
 //        System.out.println(kotlinType);  // 输出 "List<List<Array<String>>>"
-    }
+//
+////        String javaType = "java.util.regex.Pattern";
+////        String kotlinType = removePackageNames(javaType);
+////        System.out.println(kotlinType);  // 输出 "List<List<Array<String>>>"
+//    }
 }
 

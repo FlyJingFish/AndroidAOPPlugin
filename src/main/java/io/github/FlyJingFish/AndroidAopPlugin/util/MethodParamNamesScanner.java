@@ -13,7 +13,6 @@ import org.objectweb.asm.*;
 import org.objectweb.asm.tree.*;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -297,10 +296,10 @@ public class MethodParamNamesScanner {
                 if (localVariables == null){
                     continue;
                 }
-                for (int i1 = 0; i1 < localVariables.size(); i1++) {
-                    String varName = localVariables.get(i1).name;
+                for (LocalVariableNode localVariable : localVariables) {
+                    String varName = localVariable.name;
                     // index-记录了正确的方法本地变量索引。(方法本地变量顺序可能会被打乱。而index记录了原始的顺序)
-                    int index = localVariables.get(i1).index;
+                    int index = localVariable.index;
                     if (!"this".equals(varName)) {
                         varNames.put(index, new LocalVariable(index, varName));
                     }
@@ -372,8 +371,8 @@ public class MethodParamNamesScanner {
                         Annotation[] annotations1 = annotations[i];
                         annoStr[i] = new String[annotations1.length];
                         String[] annoStr1= annoStr[i];
-                        for (int i1 = 0; i1 < annotations1.length; i1++) {
-                            annoStr1[i1] = getAnnotationShortString(annotations1[i1]);
+                        for (int j = 0; j < annotations1.length; j++) {
+                            annoStr1[j] = getAnnotationShortString(annotations1[j]);
                         }
                     }
                     return annoStr;
@@ -395,12 +394,11 @@ public class MethodParamNamesScanner {
         if (annoStr == null){
             return null;
         }
-        for (int i = 0; i < annoStr.length; i++) {
-            String[] annotations = annoStr[i];
+        for (String[] annotations : annoStr) {
             for (int j = 0; j < annotations.length; j++) {
                 String anno = annotations[j];
 
-                annotations[j] = anno.replace("{","[").replace("}","]");
+                annotations[j] = anno.replace("{", "[").replace("}", "]");
             }
         }
         return annoStr;

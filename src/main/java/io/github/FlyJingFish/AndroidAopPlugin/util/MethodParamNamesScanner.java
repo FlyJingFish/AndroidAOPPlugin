@@ -373,7 +373,7 @@ public class MethodParamNamesScanner {
                         annoStr[i] = new String[annotations1.length];
                         String[] annoStr1= annoStr[i];
                         for (int i1 = 0; i1 < annotations1.length; i1++) {
-                            annoStr1[i1] = annotations1[i1].toString();
+                            annoStr1[i1] = getAnnotationShortString(annotations1[i1]);
                         }
                     }
                     return annoStr;
@@ -422,13 +422,20 @@ public class MethodParamNamesScanner {
                     Annotation[] annotations = attr.getAnnotations();
                     String[] annoStr = new String[annotations.length];
                     for (int i = 0; i < annotations.length; i++) {
-                        annoStr[i] = annotations[i].toString();
+                        annoStr[i] = getAnnotationShortString(annotations[i]);
                     }
                     return annoStr;
                 }
             }
         }
         return null;
+    }
+
+    public static String getAnnotationShortString(Annotation annotation){
+        String longString = annotation.toString();
+        String regex = "^@"+annotation.getTypeName();
+        String replaceText = "@" +JavaToKotlinTypeConverter.removePackageNames(annotation.getTypeName());
+        return longString.replaceFirst(regex,replaceText);
     }
 
     public String[] getJavaReturnAnnotation(String name,

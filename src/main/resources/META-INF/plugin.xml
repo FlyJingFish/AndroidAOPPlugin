@@ -14,7 +14,7 @@
         ]]>
     </description>
     <version>1.0.4</version>
-    <vendor>Raven</vendor>
+    <vendor>FlyJingFish</vendor>
 <!--    <idea-version since-build="222.4554" until-build="242.*"/>-->
     <idea-version since-build="222.4554"/>
     <depends>com.intellij.modules.platform</depends>

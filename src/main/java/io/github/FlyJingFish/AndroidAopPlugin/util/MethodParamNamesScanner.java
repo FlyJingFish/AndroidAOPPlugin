@@ -447,9 +447,17 @@ public class MethodParamNamesScanner {
                         annoStr = annoItemValue.toString();
                     }
                 }else if (annoItemValue instanceof EnumMemberValue){
-                    annoStr = JavaToKotlinTypeConverter.removePackageNames(annoItemValue.toString());
+                    annoStr = removeBeforeSecondLastDot(annoItemValue.toString());
                 }else if (annoItemValue instanceof ClassMemberValue){
                     annoStr = JavaToKotlinTypeConverter.removePackageNames(annoItemValue.toString().replaceAll(".class$",""))+(extension == FileTypeExtension.KOTLIN?"::class.java":".class");
+                }else if (annoItemValue instanceof AnnotationMemberValue){
+                    Annotation annotationMember = ((AnnotationMemberValue) annoItemValue).getValue();
+                    String value = getAnnotationShortString(annotationMember,extension);
+                    if (extension == FileTypeExtension.KOTLIN){
+                        annoStr = value.replaceFirst("^@","");
+                    }else {
+                        annoStr = value;
+                    }
                 }else {
                     annoStr = annoItemValue.toString();
                 }
@@ -463,6 +471,28 @@ public class MethodParamNamesScanner {
         }
 
         return buf.toString();
+    }
+
+//    public static void main(String[] args) {
+//        String name = "com.CollectType.EXTENDS";
+//        System.out.println("NAME="+removeBeforeSecondLastDot(name));
+//    }
+
+    public static String removeBeforeSecondLastDot(String input) {
+        // 找到最后一个 '.' 的位置
+        int lastDotIndex = input.lastIndexOf(".");
+        if (lastDotIndex == -1) {
+            return input; // 如果没有找到 '.'，返回原始字符串
+        }
+
+        // 找到倒数第二个 '.' 的位置
+        int secondLastDotIndex = input.lastIndexOf(".", lastDotIndex - 1);
+        if (secondLastDotIndex == -1) {
+            return input; // 如果只有一个 '.'，返回原始字符串
+        }
+
+        // 截取从倒数第二个 '.' 之后的字符串
+        return input.substring(secondLastDotIndex + 1);
     }
 
     public static String getAnnotationShortString(Annotation annotation, FileTypeExtension extension){

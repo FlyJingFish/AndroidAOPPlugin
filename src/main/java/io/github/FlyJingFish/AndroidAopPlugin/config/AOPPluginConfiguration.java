@@ -60,12 +60,16 @@ public class AOPPluginConfiguration {
         applicationConfig.setCopyAnnotation((CopyAnnotation) copyAnnotationJComboBox.getSelectedItem());
     }
     public boolean isModified(ApplicationConfig applicationConfig) {
+        if (publicCheckBox == null || protectedCheckBox == null || packageCheckBox == null
+                || privateCheckBox == null || replaceProxyComboBox == null || copyAnnotationJComboBox == null){
+            return false;
+        }
         if (publicCheckBox.isSelected() != applicationConfig.isPublic()) return true;
         if (protectedCheckBox.isSelected() != applicationConfig.isProtected()) return true;
         if (packageCheckBox.isSelected() != applicationConfig.isPackage()) return true;
         if (privateCheckBox.isSelected() != applicationConfig.isPrivate()) return true;
         return !Objects.equals(replaceProxyComboBox.getSelectedItem(), applicationConfig.getReplaceProxy())
-                || !Objects.equals(replaceProxyComboBox.getSelectedItem(), applicationConfig.getCopyAnnotation());
+                || !Objects.equals(copyAnnotationJComboBox.getSelectedItem(), applicationConfig.getCopyAnnotation());
     }
 
     private void createUIComponents() {

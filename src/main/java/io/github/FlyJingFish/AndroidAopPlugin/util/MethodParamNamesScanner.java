@@ -440,14 +440,16 @@ public class MethodParamNamesScanner {
             for (String name:annotation.getMemberNames()) {
                 MemberValue annoItemValue = annotation.getMemberValue(name);
                 String annoStr;
-                if (extension == FileTypeExtension.JAVA){
-                    annoStr = annoItemValue.toString();
-                }else if (annoItemValue instanceof ArrayMemberValue){
-                    annoStr = annoItemValue.toString().replaceAll("^\\{","[").replaceAll("}$","]");
+                if (annoItemValue instanceof ArrayMemberValue){
+                    if (extension == FileTypeExtension.KOTLIN){
+                        annoStr = annoItemValue.toString().replaceAll("^\\{","[").replaceAll("}$","]");
+                    }else {
+                        annoStr = annoItemValue.toString();
+                    }
                 }else if (annoItemValue instanceof EnumMemberValue){
                     annoStr = JavaToKotlinTypeConverter.removePackageNames(annoItemValue.toString());
                 }else if (annoItemValue instanceof ClassMemberValue){
-                    annoStr = JavaToKotlinTypeConverter.removePackageNames(annoItemValue.toString().replaceAll(".class$",""))+"::class.java";
+                    annoStr = JavaToKotlinTypeConverter.removePackageNames(annoItemValue.toString().replaceAll(".class$",""))+(extension == FileTypeExtension.KOTLIN?"::class.java":".class");
                 }else {
                     annoStr = annoItemValue.toString();
                 }

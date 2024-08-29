@@ -147,5 +147,9 @@ public class JavaToKotlinTypeConverter {
     public static boolean isBaseType(String name){
         return basejavaKotlinMap.containsKey(name) && !name.contains(".");
     }
+
+    public static boolean isImport(String name){
+        return !isBaseType(name) && !"void".equals(name) && !name.startsWith("java.lang.");
+    }
 }
 

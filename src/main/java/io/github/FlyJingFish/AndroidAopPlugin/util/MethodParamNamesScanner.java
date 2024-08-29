@@ -607,15 +607,19 @@ public class MethodParamNamesScanner {
     }
 
     private void addData(Set<String> packageList,String name,FileTypeExtension extension){
-        if (!JavaToKotlinTypeConverter.isBaseType(name) && !"void".equals(name)){
+        boolean isAdd = false;
+        if (JavaToKotlinTypeConverter.isImport(name)){
             if (name.contains("[]")) {
                 String type = name.replaceAll("\\[]", "");
-                if (!JavaToKotlinTypeConverter.isBaseType(type) && !"void".equals(type)){
-                    packageList.add("import "+type.replace("$",".")+(extension == FileTypeExtension.JAVA?";":""));
+                if (JavaToKotlinTypeConverter.isImport(type)){
+                    isAdd = true;
                 }
             }else {
-                packageList.add("import "+name.replace("$",".")+(extension == FileTypeExtension.JAVA?";":""));
+                isAdd = true;
             }
+        }
+        if (isAdd){
+            packageList.add("import "+name.replace("$",".")+(extension == FileTypeExtension.JAVA?";":""));
         }
     }
 

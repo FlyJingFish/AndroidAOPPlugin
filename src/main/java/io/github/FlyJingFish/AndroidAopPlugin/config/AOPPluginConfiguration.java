@@ -23,6 +23,7 @@ import com.intellij.ui.EnumComboBoxModel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.lang.annotation.Annotation;
 import java.util.EnumMap;
 import java.util.Objects;
 
@@ -34,6 +35,7 @@ public class AOPPluginConfiguration {
     private JCheckBox privateCheckBox;
     private JComboBox<ReplaceProxy> replaceProxyComboBox;
     private JComboBox<CopyAnnotation> copyAnnotationJComboBox;
+    private JComboBox<ImportPackage> importPackageJComboBox;
 
     public AOPPluginConfiguration() {
     }
@@ -49,6 +51,7 @@ public class AOPPluginConfiguration {
         privateCheckBox.setSelected(applicationConfig.isPrivate());
         replaceProxyComboBox.setSelectedItem(applicationConfig.getReplaceProxy());
         copyAnnotationJComboBox.setSelectedItem(applicationConfig.getCopyAnnotation());
+        importPackageJComboBox.setSelectedItem(applicationConfig.getImportPackage());
     }
 
     public void getData(ApplicationConfig applicationConfig) {
@@ -58,10 +61,12 @@ public class AOPPluginConfiguration {
         applicationConfig.setPrivate(privateCheckBox.isSelected());
         applicationConfig.setReplaceProxy((ReplaceProxy) replaceProxyComboBox.getSelectedItem());
         applicationConfig.setCopyAnnotation((CopyAnnotation) copyAnnotationJComboBox.getSelectedItem());
+        applicationConfig.setImportPackage((ImportPackage) importPackageJComboBox.getSelectedItem());
     }
     public boolean isModified(ApplicationConfig applicationConfig) {
         if (publicCheckBox == null || protectedCheckBox == null || packageCheckBox == null
-                || privateCheckBox == null || replaceProxyComboBox == null || copyAnnotationJComboBox == null){
+                || privateCheckBox == null || replaceProxyComboBox == null || copyAnnotationJComboBox == null
+                || importPackageJComboBox == null){
             return false;
         }
         if (publicCheckBox.isSelected() != applicationConfig.isPublic()) return true;
@@ -69,7 +74,9 @@ public class AOPPluginConfiguration {
         if (packageCheckBox.isSelected() != applicationConfig.isPackage()) return true;
         if (privateCheckBox.isSelected() != applicationConfig.isPrivate()) return true;
         return !Objects.equals(replaceProxyComboBox.getSelectedItem(), applicationConfig.getReplaceProxy())
-                || !Objects.equals(copyAnnotationJComboBox.getSelectedItem(), applicationConfig.getCopyAnnotation());
+                || !Objects.equals(copyAnnotationJComboBox.getSelectedItem(), applicationConfig.getCopyAnnotation())
+                || !Objects.equals(importPackageJComboBox.getSelectedItem(), applicationConfig.getImportPackage());
+
     }
 
     private void createUIComponents() {
@@ -80,6 +87,10 @@ public class AOPPluginConfiguration {
         ComboBoxModel<CopyAnnotation> model2 = new EnumComboBoxModel<>(CopyAnnotation.class);
         copyAnnotationJComboBox = new ComboBox<>(model2);
         copyAnnotationJComboBox.setRenderer(new CopyAnnotationCellRenderer<>());
+
+        ComboBoxModel<ImportPackage> model3 = new EnumComboBoxModel<>(ImportPackage.class);
+        importPackageJComboBox = new ComboBox<>(model3);
+        importPackageJComboBox.setRenderer(new ImportPackageCellRenderer<>());
     }
 
     private static class GroovyCodeStyleCellRenderer<T> implements ListCellRenderer<T> {
@@ -103,6 +114,21 @@ public class AOPPluginConfiguration {
         private CopyAnnotationCellRenderer() {
             labels = new EnumMap<>(CopyAnnotation.class);
             for (CopyAnnotation replaceProxy : CopyAnnotation.values()) {
+                labels.put(replaceProxy, new JLabel(replaceProxy.label));
+            }
+        }
+
+        public Component getListCellRendererComponent(final JList list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
+            return labels.get(value);
+        }
+    }
+
+    private static class ImportPackageCellRenderer<T> implements ListCellRenderer<T> {
+        private EnumMap<ImportPackage, JLabel> labels;
+
+        private ImportPackageCellRenderer() {
+            labels = new EnumMap<>(ImportPackage.class);
+            for (ImportPackage replaceProxy : ImportPackage.values()) {
                 labels.put(replaceProxy, new JLabel(replaceProxy.label));
             }
         }

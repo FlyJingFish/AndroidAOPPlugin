@@ -33,6 +33,10 @@ public class AOPPluginComponent implements PersistentStateComponent<Element> {
         Element anno = new Element("anno");
         anno.setAttribute("annoType", applicationConfig.getCopyAnnotation().toString());
         root.addContent(anno);
+
+        Element importPackage = new Element("import");
+        importPackage.setAttribute("importPackage", applicationConfig.getImportPackage().toString());
+        root.addContent(importPackage);
         return root;
     }
 
@@ -59,6 +63,12 @@ public class AOPPluginComponent implements PersistentStateComponent<Element> {
         if (anno != null) {
             String codeStyleStr = anno.getAttributeValue("annoType");
             if (codeStyleStr != null) applicationConfig.setCopyAnnotation(CopyAnnotation.valueOf(codeStyleStr));
+        }
+
+        Element importPackage = state.getChild("import");
+        if (importPackage != null) {
+            String codeStyleStr = importPackage.getAttributeValue("importPackage");
+            if (codeStyleStr != null) applicationConfig.setImportPackage(ImportPackage.valueOf(codeStyleStr));
         }
     }
 

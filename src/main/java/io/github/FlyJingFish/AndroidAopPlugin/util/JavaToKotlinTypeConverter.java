@@ -143,5 +143,9 @@ public class JavaToKotlinTypeConverter {
 ////        String kotlinType = removePackageNames(javaType);
 ////        System.out.println(kotlinType);  // 输出 "List<List<Array<String>>>"
 //    }
+
+    public static boolean isBaseType(String name){
+        return basejavaKotlinMap.containsKey(name) && !name.contains(".");
+    }
 }
 

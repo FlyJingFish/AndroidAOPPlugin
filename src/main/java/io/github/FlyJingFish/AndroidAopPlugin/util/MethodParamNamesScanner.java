@@ -4,6 +4,7 @@ package io.github.FlyJingFish.AndroidAopPlugin.util;
 import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension;
 import io.github.FlyJingFish.AndroidAopPlugin.config.AOPPluginComponent;
 import io.github.FlyJingFish.AndroidAopPlugin.config.ApplicationConfig;
+import io.github.FlyJingFish.AndroidAopPlugin.config.CopyAnnotation;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
@@ -16,12 +17,12 @@ import org.objectweb.asm.tree.*;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MethodParamNamesScanner {
     private final List<MethodNode> methods = new ArrayList<>();
     private final ClassNode cn = new ClassNode();
+    private final ApplicationConfig applicationConfig;
     private CtClass ctClass;
     private int initCount;
     private static final Pattern pattern1 = Pattern.compile("^lambda\\$.*?\\$.+");
@@ -41,7 +42,7 @@ public class MethodParamNamesScanner {
 //    }
 
     public MethodParamNamesScanner(ClassReader cr){
-        ApplicationConfig applicationConfig = AOPPluginComponent.getApplicationConfig();
+        applicationConfig = AOPPluginComponent.getApplicationConfig();
         cr.accept(cn, 0);
         this.methods.addAll(cn.methods);
         Iterator<MethodNode> iterator = methods.iterator();
@@ -251,22 +252,30 @@ public class MethodParamNamesScanner {
     }
 
     public String getExtendsClassName(){
+        return JavaToKotlinTypeConverter.removePackageNames(getExtendsLongClassName());
+    }
+
+    public String getExtendsLongClassName(){
         // 获取类签名
         try {
             SignatureAttribute signatureAttribute = (SignatureAttribute) ctClass.getClassFile().getAttribute(SignatureAttribute.tag);
             if (signatureAttribute != null) {
                 // 解析签名
                 SignatureAttribute.ClassSignature classSignature = SignatureAttribute.toClassSignature(signatureAttribute.getSignature());
-                return JavaToKotlinTypeConverter.removePackageNames(classSignature.getSuperClass().toString());
+                return classSignature.getSuperClass().toString();
             }
         } catch (BadBytecode ignore) {
 
         }
-        return JavaToKotlinTypeConverter.removePackageNames(cn.superName.replace("/","."));
+        return cn.superName.replace("/",".");
     }
 
     public String getSuperClassName(){
-        return JavaToKotlinTypeConverter.removePackageNames(cn.superName.replace("/","."));
+        return JavaToKotlinTypeConverter.removePackageNames(getSuperLongClassName());
+    }
+
+    public String getSuperLongClassName(){
+        return cn.superName.replace("/",".");
     }
 
     public int getInitCount() {
@@ -520,4 +529,94 @@ public class MethodParamNamesScanner {
         }
         return annoStr;
     }
+
+    public Set<String> getReplaceImportPackage(FileTypeExtension extension){
+        Set<String> packageList = new HashSet<>();
+        for (MethodNode method : methods) {
+            Type[] argTypes = Type.getArgumentTypes(method.desc);
+            Type returnType = Type.getReturnType(method.desc);
+            if (!"kotlin.coroutines.Continuation".equals(returnType.getClassName())){
+                addData(packageList,returnType.getClassName(),extension);
+            }
+            for (Type argType : argTypes) {
+                if (!"kotlin.coroutines.Continuation".equals(argType.getClassName())){
+                    addData(packageList,argType.getClassName(),extension);
+                }
+            }
+
+            if (applicationConfig.getCopyAnnotation() == CopyAnnotation.Copy){
+                CtMethod ctMethod = getCtMethod(method.name, method.desc);
+                if (ctMethod != null){
+                    if (method.desc.equals(ctMethod.getSignature()) && method.name.equals(ctMethod.getName())) {
+                        // 获取方法信息
+                        MethodInfo methodInfo = ctMethod.getMethodInfo();
+
+                        // 获取方法参数的注解
+                        ParameterAnnotationsAttribute paramAttr = (ParameterAnnotationsAttribute)
+                                methodInfo.getAttribute(ParameterAnnotationsAttribute.visibleTag);
+
+                        if (paramAttr != null) {
+                            Annotation[][] annotations = paramAttr.getAnnotations();
+                            for (Annotation[] annotations1 : annotations) {
+                                for (Annotation annotation : annotations1) {
+                                    Set<String> packageList2 = getPackage4Annotation(annotation, extension);
+                                    packageList.addAll(packageList2);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return packageList;
+    }
+
+    private Set<String> getPackage4Annotation(Annotation annotation, FileTypeExtension extension){
+        Set<String> packageList = new HashSet<>();
+
+        addData(packageList,annotation.getTypeName(),extension);
+        for (String name:annotation.getMemberNames()) {
+            MemberValue annoItemValue = annotation.getMemberValue(name);
+            Set<String> packageList2 = getPackage4Annotation(annoItemValue,extension);
+            packageList.addAll(packageList2);
+        }
+        return packageList;
+    }
+
+    private Set<String> getPackage4Annotation(MemberValue annoItemValue, FileTypeExtension extension){
+        Set<String> packageList = new HashSet<>();
+        if (annoItemValue instanceof ArrayMemberValue){
+            if (((ArrayMemberValue) annoItemValue).getValue() != null) {
+                for (int i = 0; i < ((ArrayMemberValue) annoItemValue).getValue().length; i++) {
+                    MemberValue annoItemValue2 = ((ArrayMemberValue) annoItemValue).getValue()[i];
+                    Set<String> packageList2 = getPackage4Annotation(annoItemValue2,extension);
+                    packageList.addAll(packageList2);
+                }
+            }
+        }else if (annoItemValue instanceof EnumMemberValue){
+            addData(packageList,((EnumMemberValue) annoItemValue).getType(),extension);
+        }else if (annoItemValue instanceof ClassMemberValue){
+            addData(packageList,((ClassMemberValue) annoItemValue).getValue(),extension);
+        }else if (annoItemValue instanceof AnnotationMemberValue){
+            Annotation annotationMember = ((AnnotationMemberValue) annoItemValue).getValue();
+
+            Set<String> packageList2 = getPackage4Annotation(annotationMember,extension);
+            packageList.addAll(packageList2);
+        }
+        return packageList;
+    }
+
+    private void addData(Set<String> packageList,String name,FileTypeExtension extension){
+        if (!JavaToKotlinTypeConverter.isBaseType(name) && !"void".equals(name)){
+            if (name.contains("[]")) {
+                String type = name.replaceAll("\\[]", "");
+                if (!JavaToKotlinTypeConverter.isBaseType(type) && !"void".equals(type)){
+                    packageList.add("import "+type.replace("$",".")+(extension == FileTypeExtension.JAVA?";":""));
+                }
+            }else {
+                packageList.add("import "+name.replace("$",".")+(extension == FileTypeExtension.JAVA?";":""));
+            }
+        }
+    }
+
 }

@@ -1,10 +1,7 @@
 package io.github.FlyJingFish.AndroidAopPlugin.util;
 
 import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension;
-import io.github.FlyJingFish.AndroidAopPlugin.config.AOPPluginComponent;
-import io.github.FlyJingFish.AndroidAopPlugin.config.ApplicationConfig;
-import io.github.FlyJingFish.AndroidAopPlugin.config.CopyAnnotation;
-import io.github.FlyJingFish.AndroidAopPlugin.config.ReplaceProxy;
+import io.github.FlyJingFish.AndroidAopPlugin.config.*;
 import org.objectweb.asm.*;
 import org.objectweb.asm.commons.Method;
 import org.objectweb.asm.tree.MethodNode;
@@ -40,6 +37,12 @@ public class AndroidAOPCode {
     public StringWriter getCollectContent(){
         StringWriter stringWriter = new StringWriter();
         String showName = getShowMethodClassName(scanner.getClassName());
+        if (applicationConfig.getImportPackage() == ImportPackage.Import){
+            stringWriter.append("import ").append("com.flyjingfish.android_aop_annotation.anno.AndroidAopCollectMethod")
+                    .append(";").append("\n");
+            stringWriter.append("import ").append(scanner.getClassName().replace("$","."))
+                    .append(";").append("\n");
+        }
         stringWriter
                 .append("public class Collect")
                 .append(getShowMethodClassName(scanner.getClassName()))
@@ -67,11 +70,21 @@ public class AndroidAOPCode {
 
     public StringWriter getModifyExtendsContent(){
         StringWriter stringWriter = new StringWriter();
-        stringWriter.append("@AndroidAopModifyExtendsClass(");
         String superName = scanner.getExtendsClassName();
         if (superName.equals("Object")){
             superName = "_";
         }
+        if (applicationConfig.getImportPackage() == ImportPackage.Import){
+            stringWriter.append("import ").append("com.flyjingfish.android_aop_annotation.anno.AndroidAopModifyExtendsClass")
+                    .append(";").append("\n");
+            if (!"_".equals(superName)){
+                stringWriter.append("import ").append(scanner.getSuperLongClassName().replace("$","."))
+                        .append(";").append("\n");
+            }
+
+        }
+        stringWriter.append("@AndroidAopModifyExtendsClass(");
+
         stringWriter.append("\"")
                 .append(scanner.getClassName().replace("\\$","."))
                 .append("\")\n")
@@ -87,8 +100,45 @@ public class AndroidAOPCode {
     }
 
     public StringWriter getMatchContent(FileTypeExtension codeStyle,boolean allMethod,boolean useProxyMethod,boolean useReplaceName) {
-
+        boolean hasSuspend = false;
+        for (MethodNode method : scanner.getMethods()) {
+            boolean isSuspendMethod = method.desc.endsWith("Lkotlin/coroutines/Continuation;)Ljava/lang/Object;");
+            if (isSuspendMethod){
+                hasSuspend = true;
+                break;
+            }
+        }
         StringWriter stringWriter = new StringWriter();
+        if (applicationConfig.getImportPackage() == ImportPackage.Import){
+            stringWriter.append("import com.flyjingfish.android_aop_annotation.anno.AndroidAopMatchClassMethod")
+                    .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
+
+            stringWriter.append("import com.flyjingfish.android_aop_annotation.enums.MatchType")
+                    .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
+            if (codeStyle == FileTypeExtension.KOTLIN){
+                if (useProxyMethod){
+                    if (hasSuspend){
+                        stringWriter.append("import com.flyjingfish.android_aop_core.proxy.MatchClassMethodSuspendProxy")
+                                .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
+                    }else {
+                        stringWriter.append("import com.flyjingfish.android_aop_core.proxy.MatchClassMethodProxy")
+                                .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
+                    }
+                }else {
+                    stringWriter.append("import com.flyjingfish.android_aop_annotation.base.MatchClassMethod")
+                            .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
+                }
+            }else {
+                if (useProxyMethod){
+                    stringWriter.append("import com.flyjingfish.android_aop_core.proxy.MatchClassMethodProxy")
+                            .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
+                }else {
+                    stringWriter.append("import com.flyjingfish.android_aop_annotation.base.MatchClassMethod")
+                            .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
+                }
+            }
+
+        }
         stringWriter.append("@AndroidAopMatchClassMethod(\n");
         if (useReplaceName){
             stringWriter.append("   targetClassName = ")
@@ -137,14 +187,6 @@ public class AndroidAOPCode {
 
 
         if (codeStyle == FileTypeExtension.KOTLIN){
-            boolean hasSuspend = false;
-            for (MethodNode method : scanner.getMethods()) {
-                boolean isSuspendMethod = method.desc.endsWith("Lkotlin/coroutines/Continuation;)Ljava/lang/Object;");
-                if (isSuspendMethod){
-                    hasSuspend = true;
-                    break;
-                }
-            }
             stringWriter.append("]\n)\n");
             stringWriter.append("class Match")
                     .append(getShowMethodClassName(scanner.getClassName()))
@@ -217,8 +259,38 @@ public class AndroidAOPCode {
         StringWriter stringWriter = new StringWriter();
 
         if (useProxyMethod){
+//            if (applicationConfig.getImportPackage() == ImportPackage.Import){
+//                stringWriter.append("import com.flyjingfish.android_aop_annotation.anno.AndroidAopMatchClassMethod")
+//                        .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
+//                stringWriter.append("import com.flyjingfish.android_aop_core.proxy.MatchClassMethodSuspendProxy")
+//                        .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
+//                stringWriter.append("import com.flyjingfish.android_aop_core.proxy.MatchClassMethodProxy")
+//                        .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
+//                stringWriter.append("import com.flyjingfish.android_aop_annotation.enums.MatchType")
+//                        .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
+//            }
             StringWriter matchContent = getMatchContent(codeStyle,true,true,true);
             stringWriter.append(matchContent.toString()).append("\n");
+        }
+
+        if (applicationConfig.getImportPackage() == ImportPackage.Import){
+            stringWriter.append("\n").append("import com.flyjingfish.android_aop_annotation.anno.AndroidAopReplaceClass")
+                    .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
+            stringWriter.append("import com.flyjingfish.android_aop_annotation.anno.AndroidAopReplaceMethod")
+                    .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
+            if (useProxyMethod){
+                stringWriter.append("import com.flyjingfish.android_aop_core.proxy.ProxyMethod")
+                        .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
+                stringWriter.append("import com.flyjingfish.android_aop_core.proxy.ProxyType")
+                        .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
+            }
+            stringWriter.append("import ")
+                    .append(scanner.getClassName().replace("$","."))
+                    .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
+            Set<String> set = scanner.getReplaceImportPackage(codeStyle);
+            for (String s : set) {
+                stringWriter.append(s).append("\n");
+            }
         }
 
         stringWriter.append("@AndroidAopReplaceClass(\"")

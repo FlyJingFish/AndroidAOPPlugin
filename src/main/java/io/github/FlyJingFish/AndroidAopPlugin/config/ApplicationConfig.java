@@ -8,6 +8,7 @@ public class ApplicationConfig {
     private boolean isPrivate = true;
     private ReplaceProxy replaceProxy = ReplaceProxy.NoneProxy;
     private CopyAnnotation copyAnnotation = CopyAnnotation.NoneCopy;
+    private ImportPackage importPackage = ImportPackage.NoneImport;
 
 
     public boolean isProtected() {
@@ -56,5 +57,13 @@ public class ApplicationConfig {
 
     public CopyAnnotation getCopyAnnotation() {
         return copyAnnotation;
+    }
+
+    public ImportPackage getImportPackage() {
+        return importPackage;
+    }
+
+    public void setImportPackage(ImportPackage importPackage) {
+        this.importPackage = importPackage;
     }
 }

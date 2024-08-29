@@ -1,22 +1,12 @@
 plugins {
+    alias(libs.plugins.kotlin) apply false
     id("org.jetbrains.intellij.platform") version "2.0.0"
-    kotlin("jvm") version "2.0.0"
 }
 
 repositories {
     mavenCentral()
     intellijPlatform {
         defaultRepositories()
-    }
-}
-sourceSets {
-    main {
-        java {
-            setSrcDirs(listOf("src/main/java"))
-        }
-        kotlin {
-            setSrcDirs(listOf("src/main/java")) // 指定 Kotlin 文件的目录
-        }
     }
 }
 

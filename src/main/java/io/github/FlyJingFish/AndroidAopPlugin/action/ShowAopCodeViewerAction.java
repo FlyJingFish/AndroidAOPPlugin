@@ -73,7 +73,7 @@ public class ShowAopCodeViewerAction extends AnAction {
         module = ProjectRootManager.getInstance(project).getFileIndex().getModuleForFile(virtualFile);
 
         if (module == null){
-            ShowBytecodeAction.INSTANCE.actionPerformed(e);
+            ShowBytecodeAction.getInstance().actionPerformed(e);
             return;
         }
 

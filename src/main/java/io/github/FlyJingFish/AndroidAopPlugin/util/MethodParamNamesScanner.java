@@ -431,7 +431,7 @@ public class MethodParamNamesScanner {
     }
 
     public static String toAnnotationString(Annotation annotation, FileTypeExtension extension) {
-        StringBuffer buf = new StringBuffer("@");
+        StringBuilder buf = new StringBuilder("@");
         buf.append(annotation.getTypeName());
         if (annotation.getMemberNames() != null) {
             buf.append("(");

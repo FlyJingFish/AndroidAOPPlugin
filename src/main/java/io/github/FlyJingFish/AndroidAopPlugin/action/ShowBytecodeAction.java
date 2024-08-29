@@ -39,12 +39,15 @@ public class ShowBytecodeAction {
             return e.getDataContext().getData(CommonDataKeys.PSI_ELEMENT);
         }
         PsiFile psiFile = PsiUtilBase.getPsiFileInEditor(editor, project);
-        int offset = editor.getCaretModel().getOffset();
-        PsiElement psiElement = InjectedLanguageManager.getInstance(project).findInjectedElementAt(psiFile, offset);
-        if (psiElement == null){
-            psiElement = psiFile.findElementAt(offset);
+        if (psiFile != null){
+            int offset = editor.getCaretModel().getOffset();
+            PsiElement psiElement = InjectedLanguageManager.getInstance(project).findInjectedElementAt(psiFile, offset);
+            if (psiElement == null){
+                psiElement = psiFile.findElementAt(offset);
+            }
+            return psiElement;
         }
-        return psiElement;
+        return null;
     }
 
 }

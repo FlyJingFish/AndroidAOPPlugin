@@ -5,35 +5,24 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.*;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.VirtualFileSystem;
-import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.*;
-import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.task.ProjectTask;
 import com.intellij.task.ProjectTaskManager;
 import com.intellij.util.containers.OrderedSet;
 import com.intellij.util.io.URLUtil;
 
-import io.github.FlyJingFish.AndroidAopPlugin.common.Constants;
-import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension;
-import io.github.FlyJingFish.AndroidAopPlugin.config.AOPPluginComponent;
-import io.github.FlyJingFish.AndroidAopPlugin.config.ApplicationConfig;
-import io.github.FlyJingFish.AndroidAopPlugin.util.AndroidAOPCode;
-import io.github.FlyJingFish.AndroidAopPlugin.view.*;
 import org.objectweb.asm.ClassReader;
 
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;

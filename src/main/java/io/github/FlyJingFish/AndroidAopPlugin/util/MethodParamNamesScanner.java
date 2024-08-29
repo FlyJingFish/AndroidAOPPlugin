@@ -16,6 +16,7 @@ import org.objectweb.asm.tree.*;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MethodParamNamesScanner {
@@ -442,11 +443,11 @@ public class MethodParamNamesScanner {
                 if (extension == FileTypeExtension.JAVA){
                     annoStr = annoItemValue.toString();
                 }else if (annoItemValue instanceof ArrayMemberValue){
-                    annoStr = replaceLastChar(annoItemValue.toString().replaceFirst("^\\{","["),'}',']');
+                    annoStr = annoItemValue.toString().replaceAll("^\\{","[").replaceAll("}$","]");
                 }else if (annoItemValue instanceof EnumMemberValue){
                     annoStr = JavaToKotlinTypeConverter.removePackageNames(annoItemValue.toString());
                 }else if (annoItemValue instanceof ClassMemberValue){
-                    annoStr = annoItemValue.toString().replace(".class","::class.java");
+                    annoStr = JavaToKotlinTypeConverter.removePackageNames(annoItemValue.toString().replaceAll(".class$",""))+"::class.java";
                 }else {
                     annoStr = annoItemValue.toString();
                 }
@@ -462,17 +463,6 @@ public class MethodParamNamesScanner {
         return buf.toString();
     }
 
-//    public static void main(String[] args) {
-//        String name = "{\"www\",\"{}\"}";
-//        System.out.println(replaceLastChar(name.replaceFirst("^\\{","["),'}',']'));
-//    }
-    public static String replaceLastChar(String input, char target, char replacement) {
-        int lastIndex = input.lastIndexOf(target);
-        if (lastIndex == -1) {
-            return input; // 如果找不到目标字符，则返回原始字符串
-        }
-        return input.substring(0, lastIndex) + replacement + input.substring(lastIndex + 1);
-    }
     public static String getAnnotationShortString(Annotation annotation, FileTypeExtension extension){
         String longString = toAnnotationString(annotation,extension);
         String regex = "^@"+annotation.getTypeName();

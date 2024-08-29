@@ -1,16 +1,25 @@
 package io.github.FlyJingFish.AndroidAopPlugin.util;
 
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class JavaToKotlinTypeConverter {
 
     private static final Map<String,String> basejavaKotlinMap = new HashMap<>();
     private static final Map<String, String> javaToKotlinMap = new HashMap<>();
+    private static final Set<String> baseKotlinSet = new HashSet<>();
+    private static final Map<String,String> baseKotlinArrayMap = new HashMap<>();
 
     static {
+        baseKotlinArrayMap.put("Int","IntArray");
+        baseKotlinArrayMap.put("Short","ShortArray");
+        baseKotlinArrayMap.put("Byte","ByteArray");
+        baseKotlinArrayMap.put("Char","CharArray");
+        baseKotlinArrayMap.put("Long","LongArray");
+        baseKotlinArrayMap.put("Float","FloatArray");
+        baseKotlinArrayMap.put("Double","DoubleArray");
+        baseKotlinArrayMap.put("Boolean","BooleanArray");
+
         basejavaKotlinMap.put("int","Int");
         basejavaKotlinMap.put("short","Short");
         basejavaKotlinMap.put("byte","Byte");
@@ -19,6 +28,15 @@ public class JavaToKotlinTypeConverter {
         basejavaKotlinMap.put("float","Float");
         basejavaKotlinMap.put("double","Double");
         basejavaKotlinMap.put("boolean","Boolean");
+
+        baseKotlinSet.add("Int");
+        baseKotlinSet.add("Short");
+        baseKotlinSet.add("Byte");
+        baseKotlinSet.add("Char");
+        baseKotlinSet.add("Long");
+        baseKotlinSet.add("Float");
+        baseKotlinSet.add("Double");
+        baseKotlinSet.add("Boolean");
 
         javaToKotlinMap.putAll(basejavaKotlinMap);
 
@@ -73,10 +91,41 @@ public class JavaToKotlinTypeConverter {
         }
 
         // 处理数组类型 (e.g., String[] -> Array<String>)
-        javaType = javaType.replaceAll("(\\w+)\\[\\]", "Array<$1>");
+//        javaType = javaType.replaceAll("(\\w+)\\[\\]", "Array<$1>");
+        javaType = getKotlinArray(javaType);
 
         return removePackageNames(javaType).replace("? extends","out")
                 .replace("? super","in");
+    }
+
+    private static String getKotlinArray(String showName){
+        if (showName.contains("[]")){
+            String type = showName.replaceAll("\\[]","");
+            boolean isBaseType = baseKotlinSet.contains(type);
+            String subStr = "[]";
+            int count = 0;
+            int index = 0;
+            while ((index = showName.indexOf(subStr, index)) != -1) {
+                index += subStr.length();
+                count++;
+            }
+            if (isBaseType){
+                if (count == 1){
+                    return baseKotlinArrayMap.get(type);
+                }else {
+                    return "Array<".repeat(Math.max(0, count - 1)) +
+                            baseKotlinArrayMap.get(type) +
+                            ">".repeat(Math.max(0, count - 1));
+                }
+            }else {
+                return "Array<".repeat(Math.max(0, count)) +
+                        type +
+                        ">".repeat(Math.max(0, count));
+            }
+        }else {
+            return showName;
+        }
+
     }
 
     public static String removePackageNames(String input) {

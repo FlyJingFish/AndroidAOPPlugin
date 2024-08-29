@@ -1,6 +1,7 @@
 package io.github.FlyJingFish.AndroidAopPlugin.util;
 
 
+import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension;
 import io.github.FlyJingFish.AndroidAopPlugin.config.AOPPluginComponent;
 import io.github.FlyJingFish.AndroidAopPlugin.config.ApplicationConfig;
 import javassist.ClassPool;
@@ -8,7 +9,7 @@ import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.*;
-import javassist.bytecode.annotation.Annotation;
+import javassist.bytecode.annotation.*;
 import org.objectweb.asm.*;
 import org.objectweb.asm.tree.*;
 
@@ -352,7 +353,7 @@ public class MethodParamNamesScanner {
     }
 
     private String[][] getParamsAnnotation(String name,
-                                        String desc){
+                                        String desc, FileTypeExtension extension){
         Type[] types = Type.getArgumentTypes(desc);
         CtMethod ctMethod = getCtMethod(name, desc);
         String[][] annoStr = new String[types.length][];
@@ -372,7 +373,7 @@ public class MethodParamNamesScanner {
                         annoStr[i] = new String[annotations1.length];
                         String[] annoStr1= annoStr[i];
                         for (int j = 0; j < annotations1.length; j++) {
-                            annoStr1[j] = getAnnotationShortString(annotations1[j]);
+                            annoStr1[j] = getAnnotationShortString(annotations1[j],extension);
                         }
                     }
                     return annoStr;
@@ -385,12 +386,12 @@ public class MethodParamNamesScanner {
 
     public String[][] getJavaParamsAnnotation(String name,
                                            String desc){
-        return getParamsAnnotation(name, desc);
+        return getParamsAnnotation(name, desc,FileTypeExtension.JAVA);
     }
 
     public String[][] getKotlinParamsAnnotation(String name,
                                               String desc){
-        String[][] annoStr = getParamsAnnotation(name, desc);
+        String[][] annoStr = getParamsAnnotation(name, desc,FileTypeExtension.KOTLIN);
         if (annoStr == null){
             return null;
         }
@@ -398,14 +399,14 @@ public class MethodParamNamesScanner {
             for (int j = 0; j < annotations.length; j++) {
                 String anno = annotations[j];
 
-                annotations[j] = anno.replace("{", "[").replace("}", "]");
+                annotations[j] = anno;
             }
         }
         return annoStr;
     }
 
     private String[] getReturnAnnotation(String name,
-                                        String desc){
+                                        String desc, FileTypeExtension extension){
         CtMethod ctMethod = getCtMethod(name, desc);
         if (ctMethod != null){
             if (desc.equals(ctMethod.getSignature()) && name.equals(ctMethod.getName())) {
@@ -420,7 +421,7 @@ public class MethodParamNamesScanner {
                     Annotation[] annotations = attr.getAnnotations();
                     String[] annoStr = new String[annotations.length];
                     for (int i = 0; i < annotations.length; i++) {
-                        annoStr[i] = getAnnotationShortString(annotations[i]);
+                        annoStr[i] = getAnnotationShortString(annotations[i],extension);
                     }
                     return annoStr;
                 }
@@ -429,8 +430,40 @@ public class MethodParamNamesScanner {
         return null;
     }
 
-    public static String getAnnotationShortString(Annotation annotation){
-        String longString = annotation.toString();
+    public static String toAnnotationString(Annotation annotation, FileTypeExtension extension) {
+        StringBuffer buf = new StringBuffer("@");
+        buf.append(annotation.getTypeName());
+        if (annotation.getMemberNames() != null) {
+            buf.append("(");
+
+            for (String name:annotation.getMemberNames()) {
+                MemberValue annoItemValue = annotation.getMemberValue(name);
+                String annoStr;
+                if (extension == FileTypeExtension.JAVA){
+                    annoStr = annoItemValue.toString();
+                }else if (annoItemValue instanceof ArrayMemberValue){
+                    annoStr = annoItemValue.toString().replace("{","[").replace("}","]");
+                }else if (annoItemValue instanceof EnumMemberValue){
+                    annoStr = JavaToKotlinTypeConverter.removePackageNames(annoItemValue.toString());
+                }else if (annoItemValue instanceof ClassMemberValue){
+                    annoStr = annoItemValue.toString().replace(".class","::class.java");
+                }else {
+                    annoStr = annoItemValue.toString();
+                }
+
+                buf.append(name).append("=")
+                        .append(annoStr)
+                        .append(", ");
+            }
+            buf.setLength(buf.length()-2);
+            buf.append(")");
+        }
+
+        return buf.toString();
+    }
+
+    public static String getAnnotationShortString(Annotation annotation, FileTypeExtension extension){
+        String longString = toAnnotationString(annotation,extension);
         String regex = "^@"+annotation.getTypeName();
         String replaceText = "@" +JavaToKotlinTypeConverter.removePackageNames(annotation.getTypeName());
         return longString.replaceFirst(regex,replaceText);
@@ -438,19 +471,19 @@ public class MethodParamNamesScanner {
 
     public String[] getJavaReturnAnnotation(String name,
                                               String desc){
-        return getReturnAnnotation(name, desc);
+        return getReturnAnnotation(name, desc,FileTypeExtension.JAVA);
     }
 
     public String[] getKotlinReturnAnnotation(String name,
                                                 String desc){
-        String[] annoStr = getReturnAnnotation(name, desc);
+        String[] annoStr = getReturnAnnotation(name, desc,FileTypeExtension.KOTLIN);
         if (annoStr == null){
             return null;
         }
         for (int j = 0; j < annoStr.length; j++) {
             String anno = annoStr[j];
 
-            annoStr[j] = anno.replace("{","[").replace("}","]");
+            annoStr[j] = anno;
         }
         return annoStr;
     }

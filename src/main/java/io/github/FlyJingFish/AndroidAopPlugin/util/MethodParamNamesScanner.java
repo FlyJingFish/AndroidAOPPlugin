@@ -564,6 +564,18 @@ public class MethodParamNamesScanner {
                                 }
                             }
                         }
+
+                        // 获取方法参数的注解
+                        AnnotationsAttribute attr = (AnnotationsAttribute)
+                                methodInfo.getAttribute(AnnotationsAttribute.visibleTag);
+
+                        if (attr != null) {
+                            Annotation[] annotations = attr.getAnnotations();
+                            for (Annotation annotation : annotations) {
+                                Set<String> packageList2 = getPackage4Annotation(annotation, extension);
+                                packageList.addAll(packageList2);
+                            }
+                        }
                     }
                 }
             }
@@ -573,9 +585,17 @@ public class MethodParamNamesScanner {
 
     private Set<String> getPackage4Annotation(Annotation annotation, FileTypeExtension extension){
         Set<String> packageList = new HashSet<>();
+        if (annotation == null){
+            return packageList;
+        }
 
         addData(packageList,annotation.getTypeName(),extension);
-        for (String name:annotation.getMemberNames()) {
+
+        Set<String> members = annotation.getMemberNames();
+        if (members == null){
+            return packageList;
+        }
+        for (String name:members) {
             MemberValue annoItemValue = annotation.getMemberValue(name);
             Set<String> packageList2 = getPackage4Annotation(annoItemValue,extension);
             packageList.addAll(packageList2);

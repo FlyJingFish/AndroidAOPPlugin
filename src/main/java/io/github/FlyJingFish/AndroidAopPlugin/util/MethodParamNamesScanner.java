@@ -442,7 +442,7 @@ public class MethodParamNamesScanner {
                 if (extension == FileTypeExtension.JAVA){
                     annoStr = annoItemValue.toString();
                 }else if (annoItemValue instanceof ArrayMemberValue){
-                    annoStr = annoItemValue.toString().replace("{","[").replace("}","]");
+                    annoStr = replaceLastChar(annoItemValue.toString().replaceFirst("^\\{","["),'}',']');
                 }else if (annoItemValue instanceof EnumMemberValue){
                     annoStr = JavaToKotlinTypeConverter.removePackageNames(annoItemValue.toString());
                 }else if (annoItemValue instanceof ClassMemberValue){
@@ -462,6 +462,17 @@ public class MethodParamNamesScanner {
         return buf.toString();
     }
 
+//    public static void main(String[] args) {
+//        String name = "{\"www\",\"{}\"}";
+//        System.out.println(replaceLastChar(name.replaceFirst("^\\{","["),'}',']'));
+//    }
+    public static String replaceLastChar(String input, char target, char replacement) {
+        int lastIndex = input.lastIndexOf(target);
+        if (lastIndex == -1) {
+            return input; // 如果找不到目标字符，则返回原始字符串
+        }
+        return input.substring(0, lastIndex) + replacement + input.substring(lastIndex + 1);
+    }
     public static String getAnnotationShortString(Annotation annotation, FileTypeExtension extension){
         String longString = toAnnotationString(annotation,extension);
         String regex = "^@"+annotation.getTypeName();

@@ -1,4 +1,4 @@
-
+[![](https://jitpack.io/v/FlyJingFish/AndroidAOPPlugin.svg)](https://jitpack.io/#FlyJingFish/AndroidAOPPlugin)
 ## About
 
 针对 https://github.com/FlyJingFish/AndroidAOP 的辅助插件

@@ -2,6 +2,7 @@
 package io.github.FlyJingFish.AndroidAopPlugin.config;
 
 import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import org.jdom.Element;
@@ -9,13 +10,25 @@ import io.github.FlyJingFish.AndroidAopPlugin.common.Constants;
 
 @State(
         name = Constants.COMPONENT_NAME,
-        storages = {
-                @Storage(file = "$PROJECT_FILE$")
-        }
+        storages = {@Storage(
+                value = "AOPPluginComponent.xml"
+        )}
 )
 public class AOPPluginComponent implements PersistentStateComponent<Element> {
 
-    private static final ApplicationConfig applicationConfig = new ApplicationConfig();
+    private ApplicationConfig applicationConfig = new ApplicationConfig();
+    private static AOPPluginComponent aopPluginComponent;
+
+    public static AOPPluginComponent getInstance() {
+        if (aopPluginComponent == null) {
+            aopPluginComponent = ServiceManager.getService(AOPPluginComponent.class);
+        }
+        return aopPluginComponent;
+    }
+
+    public static AOPPluginComponent getInstanceForce() {
+        return ServiceManager.getService(AOPPluginComponent.class);
+    }
 
     @Override
     public Element getState() {
@@ -75,7 +88,7 @@ public class AOPPluginComponent implements PersistentStateComponent<Element> {
 
     // Property methods
     public static ApplicationConfig getApplicationConfig() {
-        return applicationConfig;
+        return getInstance().applicationConfig;
     }
 
 }

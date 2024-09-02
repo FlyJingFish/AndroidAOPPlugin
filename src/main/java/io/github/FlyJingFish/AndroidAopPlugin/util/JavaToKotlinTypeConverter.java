@@ -9,6 +9,7 @@ public class JavaToKotlinTypeConverter {
     private static final Map<String, String> javaToKotlinMap = new HashMap<>();
     private static final Set<String> baseKotlinSet = new HashSet<>();
     private static final Map<String,String> baseKotlinArrayMap = new HashMap<>();
+    private static final Set<String> ignorePackageSet = new HashSet<>();
 
     static {
         baseKotlinArrayMap.put("Int","IntArray");
@@ -65,6 +66,15 @@ public class JavaToKotlinTypeConverter {
 
         javaToKotlinMap.put("java.util.concurrent.Future", "kotlin.concurrent.Future");
         javaToKotlinMap.put("java.util.concurrent.CompletableFuture", "kotlin.concurrent.CompletableFuture");
+
+        ignorePackageSet.add("java.util.List");
+        ignorePackageSet.add("java.util.ArrayList");
+        ignorePackageSet.add("java.util.Map");
+        ignorePackageSet.add("java.util.HashMap");
+        ignorePackageSet.add("java.util.Set");
+        ignorePackageSet.add("java.util.HashSet");
+        ignorePackageSet.add("java.util.Iterator");
+        ignorePackageSet.add("java.util.Collection");
     }
 
     private static String getShowMethodClassName(String className){
@@ -150,6 +160,10 @@ public class JavaToKotlinTypeConverter {
 
     public static boolean isImport(String name){
         return !isBaseType(name) && !"void".equals(name) && !name.startsWith("java.lang.");
+    }
+
+    public static boolean isIgnorePackage(String packageName) {
+        return ignorePackageSet.contains(packageName);
     }
 }
 

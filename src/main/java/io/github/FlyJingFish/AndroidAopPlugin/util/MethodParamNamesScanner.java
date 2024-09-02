@@ -639,6 +639,9 @@ public class MethodParamNamesScanner {
             }
         }
         if (isAdd){
+            if (extension == FileTypeExtension.KOTLIN && JavaToKotlinTypeConverter.isIgnorePackage(name)){
+                return;
+            }
             packageList.add("import "+name.replace("$",".")+(extension == FileTypeExtension.JAVA?";":""));
         }
     }

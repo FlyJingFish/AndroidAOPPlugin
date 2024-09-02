@@ -64,8 +64,8 @@ public class JavaToKotlinTypeConverter {
         javaToKotlinMap.put("java.lang.Void","Unit?");
         javaToKotlinMap.put("java.lang.Object","Any");
 
-        javaToKotlinMap.put("java.util.concurrent.Future", "kotlin.concurrent.Future");
-        javaToKotlinMap.put("java.util.concurrent.CompletableFuture", "kotlin.concurrent.CompletableFuture");
+//        javaToKotlinMap.put("java.util.concurrent.Future", "kotlin.concurrent.Future");
+//        javaToKotlinMap.put("java.util.concurrent.CompletableFuture", "kotlin.concurrent.CompletableFuture");
 
         ignorePackageSet.add("java.util.List");
         ignorePackageSet.add("java.util.ArrayList");

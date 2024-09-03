@@ -1,4 +1,4 @@
-[![](https://jitpack.io/v/FlyJingFish/AndroidAOPPlugin.svg)](https://jitpack.io/#FlyJingFish/AndroidAOPPlugin)
+[![idea 插件版本](https://img.shields.io/github/v/tag/FlyJingFish/AndroidAOPPlugin?label=尝鲜插件版本&color=blue&style=flat)](https://jitpack.io/#FlyJingFish/AndroidAOPPlugin)
 [![GitHub license](https://img.shields.io/github/license/FlyJingFish/AndroidAOPPlugin.svg)](https://github.com/FlyJingFish/AndroidAOPPlugin/blob/master/LICENSE)
 ## About
 

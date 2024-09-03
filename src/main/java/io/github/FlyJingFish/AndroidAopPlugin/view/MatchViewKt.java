@@ -1,4 +1,3 @@
-
 package io.github.FlyJingFish.AndroidAopPlugin.view;
 
 import com.intellij.openapi.keymap.KeymapManager;

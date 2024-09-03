@@ -1,4 +1,3 @@
-
 package io.github.FlyJingFish.AndroidAopPlugin.common;
 
 public enum FileTypeExtension {

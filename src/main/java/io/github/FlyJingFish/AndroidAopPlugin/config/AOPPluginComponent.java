@@ -1,4 +1,3 @@
-
 package io.github.FlyJingFish.AndroidAopPlugin.config;
 
 import com.intellij.openapi.components.PersistentStateComponent;

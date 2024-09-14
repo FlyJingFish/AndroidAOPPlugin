@@ -3,7 +3,6 @@ package io.github.FlyJingFish.AndroidAopPlugin.util;
 import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension;
 import io.github.FlyJingFish.AndroidAopPlugin.config.*;
 import org.objectweb.asm.*;
-import org.objectweb.asm.commons.Method;
 import org.objectweb.asm.tree.MethodNode;
 
 import java.io.StringWriter;
@@ -118,10 +117,10 @@ public class AndroidAOPCode {
             if (codeStyle == FileTypeExtension.KOTLIN){
                 if (useProxyMethod){
                     if (hasSuspend){
-                        stringWriter.append("import com.flyjingfish.android_aop_core.proxy.MatchClassMethodSuspendProxy")
+                        stringWriter.append("import com.flyjingfish.android_aop_annotation.proxy.MatchClassMethodSuspendProxy")
                                 .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
                     }else {
-                        stringWriter.append("import com.flyjingfish.android_aop_core.proxy.MatchClassMethodProxy")
+                        stringWriter.append("import com.flyjingfish.android_aop_annotation.proxy.MatchClassMethodProxy")
                                 .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
                     }
                 }else {
@@ -130,7 +129,7 @@ public class AndroidAOPCode {
                 }
             }else {
                 if (useProxyMethod){
-                    stringWriter.append("import com.flyjingfish.android_aop_core.proxy.MatchClassMethodProxy")
+                    stringWriter.append("import com.flyjingfish.android_aop_annotation.proxy.MatchClassMethodProxy")
                             .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
                 }else {
                     stringWriter.append("import com.flyjingfish.android_aop_annotation.base.MatchClassMethod")
@@ -262,9 +261,9 @@ public class AndroidAOPCode {
 //            if (applicationConfig.getImportPackage() == ImportPackage.Import){
 //                stringWriter.append("import com.flyjingfish.android_aop_annotation.anno.AndroidAopMatchClassMethod")
 //                        .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
-//                stringWriter.append("import com.flyjingfish.android_aop_core.proxy.MatchClassMethodSuspendProxy")
+//                stringWriter.append("import com.flyjingfish.android_aop_annotation.proxy.MatchClassMethodSuspendProxy")
 //                        .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
-//                stringWriter.append("import com.flyjingfish.android_aop_core.proxy.MatchClassMethodProxy")
+//                stringWriter.append("import com.flyjingfish.android_aop_annotation.proxy.MatchClassMethodProxy")
 //                        .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
 //                stringWriter.append("import com.flyjingfish.android_aop_annotation.enums.MatchType")
 //                        .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
@@ -279,9 +278,9 @@ public class AndroidAOPCode {
             stringWriter.append("import com.flyjingfish.android_aop_annotation.anno.AndroidAopReplaceMethod")
                     .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
             if (useProxyMethod){
-                stringWriter.append("import com.flyjingfish.android_aop_core.proxy.ProxyMethod")
+                stringWriter.append("import com.flyjingfish.android_aop_annotation.proxy.ProxyMethod")
                         .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
-                stringWriter.append("import com.flyjingfish.android_aop_core.proxy.ProxyType")
+                stringWriter.append("import com.flyjingfish.android_aop_annotation.proxy.ProxyType")
                         .append(codeStyle == FileTypeExtension.JAVA ? ";" : "").append("\n");
             }
             stringWriter.append("import ")

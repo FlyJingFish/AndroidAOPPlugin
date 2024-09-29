@@ -13,15 +13,18 @@
         </ul>
         ]]>
     </description>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
     <vendor>FlyJingFish</vendor>
 <!--    <idea-version since-build="222.4554" until-build="242.*"/>-->
     <idea-version since-build="222.4554"/>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.java</depends>
-    <depends>org.jetbrains.kotlin</depends>
     <depends optional="true" config-file="withByteCodeViewer.xml">ByteCodeViewer</depends>
     <change-notes><![CDATA[
+        <b>Version 1.0.8</b>
+        <ul>
+            <li>Improve compatibility</li>
+        </ul>
         <b>Version 1.0.7</b>
         <ul>
             <li>Adapt to the latest version of AndroidAOP</li>

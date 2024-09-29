@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.kotlin) apply false
+    id("java-library")
     id("org.jetbrains.intellij.platform") version "2.0.0"
 }
 
@@ -17,7 +17,7 @@ dependencies {
     implementation("org.javassist:javassist:3.25.0-GA")
     intellijPlatform {
         intellijIdeaCommunity("2024.1.4")
-        bundledPlugins("ByteCodeViewer","com.intellij.java", "org.jetbrains.kotlin")
+        bundledPlugins("ByteCodeViewer","com.intellij.java")
 
         pluginVerifier()
         zipSigner()

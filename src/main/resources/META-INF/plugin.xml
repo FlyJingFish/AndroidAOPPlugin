@@ -78,8 +78,22 @@
             <add-to-group anchor="last" group-id="ProjectViewPopupMenu" />
             <add-to-group anchor="last" group-id="CodeMenu" />
         </action>
+        <action popup="true" id="dev.turingcomplete.intellijbytecodeplugin.analyzeByteCodeAction"
+                class="dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal.AnalyzeByteCodeAction">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="CodeMenu" anchor="last"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
     </actions>
-
+    <extensionPoints>
+        <extensionPoint name="openClassFilesAction"
+                        interface="dev.turingcomplete.intellijbytecodeplugin.openclassfiles.OpenClassFilesToolWindowAction"/>
+        <extensionPoint name="byteCodeTool" interface="dev.turingcomplete.intellijbytecodeplugin.tool.ByteCodeTool"/>
+        <extensionPoint name="byteCodeView"
+                        interface="dev.turingcomplete.intellijbytecodeplugin.view.ByteCodeView$Creator"/>
+        <extensionPoint name="byteCodeAction"
+                        interface="dev.turingcomplete.intellijbytecodeplugin.view.ByteCodeAction"/>
+    </extensionPoints>
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable groupId="tools" instance="io.github.FlyJingFish.AndroidAopPlugin.config.PluginConfig" />
         <toolWindow anchor="right" factoryClass="io.github.FlyJingFish.AndroidAopPlugin.view.AOPCodeOutlineToolWindowFactory" icon="/images/pluginIcon.svg"
@@ -98,5 +112,48 @@
                         serviceInterface="io.github.FlyJingFish.AndroidAopPlugin.view.ExtendsView" />
         <projectService serviceImplementation="io.github.FlyJingFish.AndroidAopPlugin.view.CollectView"
                         serviceInterface="io.github.FlyJingFish.AndroidAopPlugin.view.CollectView" />
+
+        <applicationService
+                serviceImplementation="dev.turingcomplete.intellijbytecodeplugin.settings.ByteCodeAnalyserSettingsService"/>
+
+        <toolWindow id="Byte Code" factoryClass="dev.turingcomplete.intellijbytecodeplugin._ui.ByteCodeToolWindowFactory"
+                    anchor="right" canCloseContents="true" secondary="true" icon="/icons/toolwindow.svg"/>
+
+        <notificationGroup displayType="BALLOON" id="dev.turingcomplete.intellijbytecodeplugin.notificationGroup"/>
+
+        <getDataRule key="dev.turingcomplete.intellijbytecodeplugin.classFileContext"
+                     implementationClass="dev.turingcomplete.intellijbytecodeplugin.common.CommonDataKeys$ClassFileContextDataRule"/>
+        <getDataRule key="dev.turingcomplete.intellijbytecodeplugin.classFileTab"
+                     implementationClass="dev.turingcomplete.intellijbytecodeplugin.common.CommonDataKeys$ClassFileTabDataRule"/>
+        <getDataRule key="dev.turingcomplete.intellijbytecodeplugin.onError"
+                     implementationClass="dev.turingcomplete.intellijbytecodeplugin.common.CommonDataKeys$OnErrorDataRule"/>
+        <getDataRule key="dev.turingcomplete.intellijbytecodeplugin.openInEditor"
+                     implementationClass="dev.turingcomplete.intellijbytecodeplugin.common.CommonDataKeys$OpenInEditorDataRule"/>
+    </extensions>
+<!--    git@github.com:marcelkliemannel/intellij-byte-code-plugin.git-->
+    <extensions defaultExtensionNs="dev.turingcomplete.intellijbytecodeplugin">
+        <openClassFilesAction
+                implementation="dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal.CurrentEditorFileAction"/>
+        <openClassFilesAction
+                implementation="dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal.FileChooserAction"/>
+
+        <byteCodeTool implementation="dev.turingcomplete.intellijbytecodeplugin.tool._internal.AccessConverterTool"/>
+        <byteCodeTool implementation="dev.turingcomplete.intellijbytecodeplugin.tool._internal.SignatureParserTool"/>
+        <byteCodeTool implementation="dev.turingcomplete.intellijbytecodeplugin.tool._internal.InstructionsOverviewTool"/>
+        <byteCodeTool implementation="dev.turingcomplete.intellijbytecodeplugin.tool._internal.ClassVersionsOverviewTool"/>
+
+        <byteCodeView
+                implementation="dev.turingcomplete.intellijbytecodeplugin.view._internal._structure.StructureView$MyCreator"/>
+        <byteCodeView
+                implementation="dev.turingcomplete.intellijbytecodeplugin.view._internal.PlainView$MyCreator"/>
+        <byteCodeView
+                implementation="dev.turingcomplete.intellijbytecodeplugin.view._internal.AsmView$MyCreator"/>
+        <byteCodeView
+                implementation="dev.turingcomplete.intellijbytecodeplugin.view._internal._decompiler.DecompiledView$MyCreator"/>
+        <byteCodeView
+                implementation="dev.turingcomplete.intellijbytecodeplugin.view._internal._constantpool.ConstantPoolView$MyCreator"/>
+
+        <byteCodeAction implementation="dev.turingcomplete.intellijbytecodeplugin.view._internal.ReParseByteCodeAction"/>
+        <byteCodeAction implementation="dev.turingcomplete.intellijbytecodeplugin.view._internal.VerifyByteCodeAction"/>
     </extensions>
 </idea-plugin>

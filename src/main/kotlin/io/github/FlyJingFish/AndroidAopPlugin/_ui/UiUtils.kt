@@ -1,4 +1,4 @@
-package dev.turingcomplete.intellijbytecodeplugin._ui
+package io.github.FlyJingFish.AndroidAopPlugin._ui
 
 import com.intellij.openapi.actionSystem.ActionGroup
 import com.intellij.openapi.actionSystem.ActionManager

@@ -1,4 +1,4 @@
-package dev.turingcomplete.intellijbytecodeplugin.common
+package io.github.FlyJingFish.AndroidAopPlugin.common
 
 import com.google.common.base.Objects
 import com.intellij.openapi.module.Module

@@ -13,7 +13,7 @@
         </ul>
         ]]>
     </description>
-    <version>1.0.9</version>
+    <version>1.1.0</version>
     <vendor>FlyJingFish</vendor>
 <!--    <idea-version since-build="222.4554" until-build="242.*"/>-->
     <idea-version since-build="222.4554"/>
@@ -22,6 +22,10 @@
     <depends>org.jetbrains.kotlin</depends>
     <depends optional="true" config-file="withByteCodeViewer.xml">ByteCodeViewer</depends>
     <change-notes><![CDATA[
+        <b>Version 1.1.0</b>
+        <ul>
+            <li>Support Kotlin' class file</li>
+        </ul>
         <b>Version 1.0.9</b>
         <ul>
             <li>Change logo</li>
@@ -79,15 +83,9 @@
             <add-to-group anchor="last" group-id="ProjectViewPopupMenu" />
             <add-to-group anchor="last" group-id="CodeMenu" />
         </action>
-        <action popup="true" id="dev.turingcomplete.intellijbytecodeplugin.analyzeByteCodeAction"
-                class="dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal.AnalyzeByteCodeAction">
-            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
-            <add-to-group group-id="CodeMenu" anchor="last"/>
-            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
-        </action>
     </actions>
     <extensionPoints>
-        <extensionPoint name="byteCodeTool" interface="dev.turingcomplete.intellijbytecodeplugin.tool.ByteCodeTool"/>
+        <extensionPoint name="byteCodeTool" interface="io.github.FlyJingFish.AndroidAopPlugin.tool.ByteCodeTool"/>
     </extensionPoints>
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable groupId="tools" instance="io.github.FlyJingFish.AndroidAopPlugin.config.PluginConfig" />
@@ -109,5 +107,4 @@
                         serviceInterface="io.github.FlyJingFish.AndroidAopPlugin.view.CollectView" />
 
     </extensions>
-<!--    git@github.com:marcelkliemannel/intellij-byte-code-plugin.git-->
 </idea-plugin>

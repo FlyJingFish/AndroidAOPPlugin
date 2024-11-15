@@ -1,8 +1,8 @@
-package dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal
+package io.github.FlyJingFish.AndroidAopPlugin.openclassfiles._internal
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
-import dev.turingcomplete.intellijbytecodeplugin.tool.joinAsNaturalLanguage
+import io.github.FlyJingFish.AndroidAopPlugin.tool.joinAsNaturalLanguage
 import org.jsoup.internal.StringUtil.StringJoiner
 import java.nio.file.Path
 import kotlin.io.path.relativeToOrNull

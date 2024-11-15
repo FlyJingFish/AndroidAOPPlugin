@@ -1,4 +1,4 @@
-package dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal
+package io.github.FlyJingFish.AndroidAopPlugin.openclassfiles._internal
 
 import com.intellij.compiler.impl.CompositeScope
 import com.intellij.icons.AllIcons
@@ -14,10 +14,10 @@ import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.ui.dsl.builder.panel
-import dev.turingcomplete.intellijbytecodeplugin._ui.UiUtils
-import dev.turingcomplete.intellijbytecodeplugin.common.ClassFile
-import dev.turingcomplete.intellijbytecodeplugin.common.SourceFile.CompilableSourceFile
-import dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal.ClassFileCandidates.AbsoluteClassFileCandidates
+import io.github.FlyJingFish.AndroidAopPlugin._ui.UiUtils
+import io.github.FlyJingFish.AndroidAopPlugin.common.ClassFile
+import io.github.FlyJingFish.AndroidAopPlugin.common.SourceFile.CompilableSourceFile
+import io.github.FlyJingFish.AndroidAopPlugin.openclassfiles._internal.ClassFileCandidates.AbsoluteClassFileCandidates
 import org.jsoup.internal.StringUtil.StringJoiner
 import javax.swing.Action
 import javax.swing.Icon
@@ -33,9 +33,9 @@ internal class ClassFilesPreparatorService(private val project: Project) {
   // -- Exported Methods -------------------------------------------------------------------------------------------- //
 
   fun prepareClassFiles(
-    preparationTasks: List<ClassFilePreparationTask>,
-    parentComponent: JComponent? = null,
-    consumeClassFile: (ClassFile) -> Unit,
+      preparationTasks: List<ClassFilePreparationTask>,
+      parentComponent: JComponent? = null,
+      consumeClassFile: (ClassFile) -> Unit,
   ) {
     if (preparationTasks.isEmpty()) {
       return
@@ -82,10 +82,10 @@ internal class ClassFilesPreparatorService(private val project: Project) {
   }
 
   private fun determineCompileScope(
-    classFiles: MutableList<ClassFilePreparationTask>,
-    prepareReason: PrepareReason,
-    parentComponent: JComponent?,
-    openClassFile: (ClassFile) -> Unit,
+      classFiles: MutableList<ClassFilePreparationTask>,
+      prepareReason: PrepareReason,
+      parentComponent: JComponent?,
+      openClassFile: (ClassFile) -> Unit,
   ): CompileScope? {
     if (classFiles.isEmpty()) {
       return null
@@ -128,8 +128,8 @@ internal class ClassFilesPreparatorService(private val project: Project) {
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   private class OpenClassFilesAfterCompilationHandler(
-    private val classFilesNeedingPreparation: List<ClassFilePreparationTask>,
-    private val openClassFile: (ClassFile) -> Unit
+      private val classFilesNeedingPreparation: List<ClassFilePreparationTask>,
+      private val openClassFile: (ClassFile) -> Unit
   ) : CompileStatusNotification {
 
     override fun finished(aborted: Boolean, errors: Int, warnings: Int, compileContext: CompileContext) {
@@ -232,10 +232,10 @@ internal class ClassFilesPreparatorService(private val project: Project) {
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   internal class PrepareClassFilesOptionsDialog(
-    project: Project,
-    private val prepareReason: PrepareReason,
-    classFiles: List<ClassFilePreparationTask>,
-    parentComponent: JComponent? = null
+      project: Project,
+      private val prepareReason: PrepareReason,
+      classFiles: List<ClassFilePreparationTask>,
+      parentComponent: JComponent? = null
   ) : DialogWrapper(project, parentComponent, false, IdeModalityType.IDE, true) {
 
     // There could be multiple `ClassFilePreparationTask`s for the same source

@@ -1,4 +1,4 @@
-package dev.turingcomplete.intellijbytecodeplugin.common
+package io.github.FlyJingFish.AndroidAopPlugin.common
 
 import com.intellij.openapi.vfs.VirtualFile
 

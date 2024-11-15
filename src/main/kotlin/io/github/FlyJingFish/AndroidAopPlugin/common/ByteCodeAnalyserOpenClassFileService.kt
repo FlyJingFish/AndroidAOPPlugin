@@ -1,12 +1,13 @@
-package dev.turingcomplete.intellijbytecodeplugin.common
+package io.github.FlyJingFish.AndroidAopPlugin.common
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal.ClassFilesFinderService
-import dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal.ClassFilesFinderService.Result
+import io.github.FlyJingFish.AndroidAopPlugin.openclassfiles._internal.ClassFilesFinderService
+import io.github.FlyJingFish.AndroidAopPlugin.openclassfiles._internal.ClassFilesFinderService.Result
 import org.objectweb.asm.ClassReader
 
 @Service(Service.Level.PROJECT)
@@ -40,9 +41,16 @@ class ByteCodeAnalyserOpenClassFileService(val project: Project) {
   }
 
   private fun handleResult(result: Result) {
-
-    result.classFilesToOpen.forEach {
-      openClassFile(it, project)
+    if (result.classFilesToOpen.isEmpty()){
+      Messages.showWarningDialog(
+        project,
+        "实在是无法解析该class喽～",
+        "AndroidAOP Code Viewer"
+      )
+    }else{
+      result.classFilesToOpen.forEach {
+        openClassFile(it, project)
+      }
     }
   }
 

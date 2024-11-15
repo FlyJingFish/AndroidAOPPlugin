@@ -1,4 +1,4 @@
-package dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal
+package io.github.FlyJingFish.AndroidAopPlugin.openclassfiles._internal
 
 import com.intellij.debugger.engine.JVMNameUtil
 import com.intellij.ide.highlighter.JavaClassFileType
@@ -25,11 +25,11 @@ import com.intellij.psi.impl.compiled.ClsClassImpl
 import com.intellij.psi.impl.light.LightMethod
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.ClassUtil
-import dev.turingcomplete.intellijbytecodeplugin.common.ClassFile
-import dev.turingcomplete.intellijbytecodeplugin.common.SourceFile
-import dev.turingcomplete.intellijbytecodeplugin.common.SourceFile.CompilableSourceFile
-import dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal.ClassFileCandidates.Companion.fromAbsolutePaths
-import dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal.ClassFileCandidates.Companion.fromRelativePaths
+import io.github.FlyJingFish.AndroidAopPlugin.common.ClassFile
+import io.github.FlyJingFish.AndroidAopPlugin.common.SourceFile
+import io.github.FlyJingFish.AndroidAopPlugin.common.SourceFile.CompilableSourceFile
+import io.github.FlyJingFish.AndroidAopPlugin.openclassfiles._internal.ClassFileCandidates.Companion.fromAbsolutePaths
+import io.github.FlyJingFish.AndroidAopPlugin.openclassfiles._internal.ClassFileCandidates.Companion.fromRelativePaths
 import org.jetbrains.kotlin.analysis.decompiler.psi.file.KtDecompiledFile
 import org.jetbrains.kotlin.fileClasses.javaFileFacadeFqName
 import org.jetbrains.kotlin.idea.base.psi.classIdIfNonLocal
@@ -68,7 +68,12 @@ internal class ClassFilesFinderService(private val project: Project) {
       }
 
       if (virtualFile.isClassFile()) {
-        return@mapNotNull Result.withClassFileToOpen(ClassFile(file = virtualFile, sourceFile = findSource(virtualFile)))
+        return@mapNotNull Result.withClassFileToOpen(
+            ClassFile(
+                file = virtualFile,
+                sourceFile = findSource(virtualFile)
+            )
+        )
       }
 
       if (DumbService.isDumb(project)) {
@@ -90,10 +95,10 @@ internal class ClassFilesFinderService(private val project: Project) {
 
       if (workingFile.virtualFile.isClassFile()) {
         return@map Result.withClassFileToOpen(
-          ClassFile(
-            file = workingFile.virtualFile,
-            sourceFile = findSource(workingFile.virtualFile)
-          )
+            ClassFile(
+                file = workingFile.virtualFile,
+                sourceFile = findSource(workingFile.virtualFile)
+            )
         )
       }
 
@@ -145,15 +150,15 @@ internal class ClassFilesFinderService(private val project: Project) {
     return classFiles.map { classFile ->
       if (classFile.sourceFile is CompilableSourceFile) {
         val compilerOutputClassFilePath = fromAbsolutePaths(classFile.file.toNioPath())
-        Result.withClassFileToPrepare(
-          ClassFilesPreparatorService.ClassFilePreparationTask(
-            compilerOutputClassFilePath,
-            classFile.sourceFile
+          Result.withClassFileToPrepare(
+              ClassFilesPreparatorService.ClassFilePreparationTask(
+                  compilerOutputClassFilePath,
+                  classFile.sourceFile
+              )
           )
-        )
       }
       else {
-        Result.withClassFileToOpen(classFile)
+          Result.withClassFileToOpen(classFile)
       }
     }.reduce()
   }
@@ -172,10 +177,10 @@ internal class ClassFilesFinderService(private val project: Project) {
         // Disadvantage:
         // If the user tries to open an inner class of a decompiled .class file
         // during indexing, we would now open the outermost class file.
-        Result.withClassFileToOpen(ClassFile(workingFile.virtualFile))
+          Result.withClassFileToOpen(ClassFile(workingFile.virtualFile))
       }
       else {
-        Result.withErrorDumbMode()
+          Result.withErrorDumbMode()
       }
     }
 
@@ -208,10 +213,10 @@ internal class ClassFilesFinderService(private val project: Project) {
   }
 
   private fun findClassFilesIfOriginalElementIsInLibrary(
-    psiElement: PsiElement,
-    workingFile: WorkingFile,
-    alternativeRelativeClassFilePathCandidates: ClassFileCandidates? = null,
-    failWithError: Boolean = true
+      psiElement: PsiElement,
+      workingFile: WorkingFile,
+      alternativeRelativeClassFilePathCandidates: ClassFileCandidates? = null,
+      failWithError: Boolean = true
   ): Result {
     assert(isInLibrary(workingFile.virtualFile))
 
@@ -246,13 +251,13 @@ internal class ClassFilesFinderService(private val project: Project) {
     }
 
     return if (failWithError && psiElement is PsiFile) {
-      Result.withErrorNotProcessableFile(psiElement)
+        Result.withErrorNotProcessableFile(psiElement)
     }
     else if (failWithError) {
-      Result.withErrorNoContainingFileForElement()
+        Result.withErrorNoContainingFileForElement()
     }
     else {
-      Result.empty()
+        Result.empty()
     }
   }
 
@@ -304,7 +309,7 @@ internal class ClassFilesFinderService(private val project: Project) {
         // The containing file is a class file and therefore has an unambiguous
         // JVM class.
         val sourceFile = findSource(workingFile.virtualFile)
-        Result.withClassFileToOpen(ClassFile(workingFile.virtualFile, sourceFile))
+          Result.withClassFileToOpen(ClassFile(workingFile.virtualFile, sourceFile))
       }
       else {
         // The containing file is a source file. Therefore, we do not have an
@@ -341,9 +346,14 @@ internal class ClassFilesFinderService(private val project: Project) {
     return if (isClassFile) {
       relativeClassFilePathCandidates.allPaths().firstNotNullOfOrNull { relativeClassFilePathCandidate ->
         virtualFile.parent.findFileByRelativePath(relativeClassFilePathCandidate.fileName.toString())?.let { classVirtualFile ->
-          Result.withClassFileToOpen(ClassFile(file = classVirtualFile, sourceFile = findSource(virtualFile)))
+            Result.withClassFileToOpen(ClassFile(file = classVirtualFile, sourceFile = findSource(virtualFile)))
         }
-      } ?: Result.withError(relativeClassFilePathCandidates.formatNotFoundError("cannot be found in directory '${virtualFile.parent.path}'.", project))
+      } ?: Result.withError(
+          relativeClassFilePathCandidates.formatNotFoundError(
+              "cannot be found in directory '${virtualFile.parent.path}'.",
+              project
+          )
+      )
     }
     else if (isInLibrary(virtualFile)) {
       findClassFilesIfOriginalElementIsInLibrary(psiFile, this, relativeClassFilePathCandidates, failWithError = true)
@@ -430,8 +440,8 @@ internal class ClassFilesFinderService(private val project: Project) {
     FileSystems.getDefault().getPath("${this.replace('.', '/')}.class")
 
   private fun findClassFileInCompilerOutputDirOfSourceFile(
-    relativeClassFilePathCandidates: ClassFileCandidates.RelativeClassFileCandidates,
-    sourceFilePath: VirtualFile
+      relativeClassFilePathCandidates: ClassFileCandidates.RelativeClassFileCandidates,
+      sourceFilePath: VirtualFile
   ): Result {
     val module = runReadAction { projectFileIndex.getModuleForFile(sourceFilePath) }
     if (module != null) {
@@ -441,23 +451,23 @@ internal class ClassFilesFinderService(private val project: Project) {
         .mapNotNull { determineFullClassFilePathInCompilerOutputOfSourceFile(it, sourceFile) }
       if (compilerOutputClassFilePaths.isNotEmpty()) {
         return Result.withClassFileToPrepare(
-          ClassFilesPreparatorService.ClassFilePreparationTask(
-            compilerOutputClassFileCandidates = fromAbsolutePaths(*compilerOutputClassFilePaths.toTypedArray()),
-            sourceFile = sourceFile
-          )
+            ClassFilesPreparatorService.ClassFilePreparationTask(
+                compilerOutputClassFileCandidates = fromAbsolutePaths(*compilerOutputClassFilePaths.toTypedArray()),
+                sourceFile = sourceFile
+            )
         )
       }
     }
 
     return if (DumbService.isDumb(project)) {
-      Result.withErrorDumbMode()
+        Result.withErrorDumbMode()
     }
     else {
-      Result.withError(
-        "Couldn't determine the expected class file path for source file '${sourceFilePath.name}'.\n" +
-                "Try to recompile the project or, if it's a non-project Java source file, compile the file " +
-                "separately and open the resulting class file directly."
-      )
+        Result.withError(
+            "Couldn't determine the expected class file path for source file '${sourceFilePath.name}'.\n" +
+                    "Try to recompile the project or, if it's a non-project Java source file, compile the file " +
+                    "separately and open the resulting class file directly."
+        )
     }
   }
 
@@ -520,9 +530,9 @@ internal class ClassFilesFinderService(private val project: Project) {
   // -- Inner Type -------------------------------------------------------------------------------------------------- //
 
   data class Result(
-    val classFilesToOpen: MutableList<ClassFile> = mutableListOf(),
-    val classFilesToPrepare: MutableList<ClassFilesPreparatorService.ClassFilePreparationTask> = mutableListOf(),
-    val errors: MutableList<String> = mutableListOf()
+      val classFilesToOpen: MutableList<ClassFile> = mutableListOf(),
+      val classFilesToPrepare: MutableList<ClassFilesPreparatorService.ClassFilePreparationTask> = mutableListOf(),
+      val errors: MutableList<String> = mutableListOf()
   ) {
 
     fun addResult(result: Result): Result {

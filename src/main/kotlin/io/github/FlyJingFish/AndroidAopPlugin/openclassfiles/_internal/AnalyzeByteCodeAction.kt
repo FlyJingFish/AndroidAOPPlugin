@@ -1,4 +1,4 @@
-package dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal
+package io.github.FlyJingFish.AndroidAopPlugin.openclassfiles._internal
 
 import com.intellij.injected.editor.EditorWindow
 import com.intellij.lang.injection.InjectedLanguageManager
@@ -8,12 +8,11 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiUtilBase
-import dev.turingcomplete.intellijbytecodeplugin.common.ByteCodeAnalyserOpenClassFileService
+import io.github.FlyJingFish.AndroidAopPlugin.common.ByteCodeAnalyserOpenClassFileService
 
 object AnalyzeByteCodeAction  {
 
 
-  @JvmStatic
   fun actionPerformed(e: AnActionEvent) {
     val project = CommonDataKeys.PROJECT.getData(e.dataContext) ?: return
 

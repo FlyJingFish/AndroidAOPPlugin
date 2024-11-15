@@ -34,6 +34,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
 import io.github.FlyJingFish.AndroidAopPlugin.common.Constants;
 import io.github.FlyJingFish.AndroidAopPlugin.common.FileTypeExtension;
+import io.github.FlyJingFish.AndroidAopPlugin.openclassfiles._internal.AnalyzeByteCodeAction;
 import io.github.FlyJingFish.AndroidAopPlugin.util.AndroidAOPCode;
 import io.github.FlyJingFish.AndroidAopPlugin.util.CurrentFileUtils;
 import io.github.FlyJingFish.AndroidAopPlugin.view.*;
@@ -45,8 +46,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 public class ClassFileLocationKt {
     private static class LocatedClassFile {
@@ -125,12 +124,8 @@ public class ClassFileLocationKt {
                 } else {
                     if (!project.isDisposed()) {
                         try {
-                            Class clazz = Class.forName("dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal.AnalyzeByteCodeAction");
-                            Method method = clazz.getDeclaredMethod("actionPerformed",AnActionEvent.class);
-                            method.setAccessible(true);
-                            method.invoke(null,e);
-                        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException |
-                                 InvocationTargetException ex) {
+                            AnalyzeByteCodeAction.INSTANCE.actionPerformed(e);
+                        } catch (Throwable ex) {
                             Messages.showWarningDialog(
                                     project,
                                     locationResult.errorMessage != null ? locationResult.errorMessage : "internal error",

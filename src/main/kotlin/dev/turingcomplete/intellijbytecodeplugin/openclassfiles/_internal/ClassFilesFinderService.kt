@@ -30,8 +30,6 @@ import dev.turingcomplete.intellijbytecodeplugin.common.SourceFile
 import dev.turingcomplete.intellijbytecodeplugin.common.SourceFile.CompilableSourceFile
 import dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal.ClassFileCandidates.Companion.fromAbsolutePaths
 import dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal.ClassFileCandidates.Companion.fromRelativePaths
-import dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal.ClassFileCandidates.RelativeClassFileCandidates
-import dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal.ClassFilesPreparatorService.ClassFilePreparationTask
 import org.jetbrains.kotlin.analysis.decompiler.psi.file.KtDecompiledFile
 import org.jetbrains.kotlin.fileClasses.javaFileFacadeFqName
 import org.jetbrains.kotlin.idea.base.psi.classIdIfNonLocal
@@ -147,7 +145,12 @@ internal class ClassFilesFinderService(private val project: Project) {
     return classFiles.map { classFile ->
       if (classFile.sourceFile is CompilableSourceFile) {
         val compilerOutputClassFilePath = fromAbsolutePaths(classFile.file.toNioPath())
-        Result.withClassFileToPrepare(ClassFilePreparationTask(compilerOutputClassFilePath, classFile.sourceFile))
+        Result.withClassFileToPrepare(
+          ClassFilesPreparatorService.ClassFilePreparationTask(
+            compilerOutputClassFilePath,
+            classFile.sourceFile
+          )
+        )
       }
       else {
         Result.withClassFileToOpen(classFile)
@@ -261,7 +264,7 @@ internal class ClassFilesFinderService(private val project: Project) {
     JVMNameUtil.getClassVMName(this)
   }
 
-  private fun PsiElement.findRelativeClassFilePathFromContainingClass(): RelativeClassFileCandidates? {
+  private fun PsiElement.findRelativeClassFilePathFromContainingClass(): ClassFileCandidates.RelativeClassFileCandidates? {
     val containingFile = runReadAction { containingFile }
     return if (containingFile is KtFile) {
       val relativeClassFilePaths = findContainingClassNameCandidates()
@@ -334,7 +337,7 @@ internal class ClassFilesFinderService(private val project: Project) {
     return findClassFilesFromPsiClass(containingClass, workingFile)
   }
 
-  private fun WorkingFile.toResult(relativeClassFilePathCandidates: RelativeClassFileCandidates): Result {
+  private fun WorkingFile.toResult(relativeClassFilePathCandidates: ClassFileCandidates.RelativeClassFileCandidates): Result {
     return if (isClassFile) {
       relativeClassFilePathCandidates.allPaths().firstNotNullOfOrNull { relativeClassFilePathCandidate ->
         virtualFile.parent.findFileByRelativePath(relativeClassFilePathCandidate.fileName.toString())?.let { classVirtualFile ->
@@ -427,7 +430,7 @@ internal class ClassFilesFinderService(private val project: Project) {
     FileSystems.getDefault().getPath("${this.replace('.', '/')}.class")
 
   private fun findClassFileInCompilerOutputDirOfSourceFile(
-    relativeClassFilePathCandidates: RelativeClassFileCandidates,
+    relativeClassFilePathCandidates: ClassFileCandidates.RelativeClassFileCandidates,
     sourceFilePath: VirtualFile
   ): Result {
     val module = runReadAction { projectFileIndex.getModuleForFile(sourceFilePath) }
@@ -438,7 +441,7 @@ internal class ClassFilesFinderService(private val project: Project) {
         .mapNotNull { determineFullClassFilePathInCompilerOutputOfSourceFile(it, sourceFile) }
       if (compilerOutputClassFilePaths.isNotEmpty()) {
         return Result.withClassFileToPrepare(
-          ClassFilePreparationTask(
+          ClassFilesPreparatorService.ClassFilePreparationTask(
             compilerOutputClassFileCandidates = fromAbsolutePaths(*compilerOutputClassFilePaths.toTypedArray()),
             sourceFile = sourceFile
           )
@@ -518,7 +521,7 @@ internal class ClassFilesFinderService(private val project: Project) {
 
   data class Result(
     val classFilesToOpen: MutableList<ClassFile> = mutableListOf(),
-    val classFilesToPrepare: MutableList<ClassFilePreparationTask> = mutableListOf(),
+    val classFilesToPrepare: MutableList<ClassFilesPreparatorService.ClassFilePreparationTask> = mutableListOf(),
     val errors: MutableList<String> = mutableListOf()
   ) {
 
@@ -544,7 +547,7 @@ internal class ClassFilesFinderService(private val project: Project) {
       fun withErrorNotProcessableFile(psiFile: PsiFile) =
         Result(errors = mutableListOf("File '${psiFile.name}' is not a processable source or class file."))
 
-      fun withClassFileToPrepare(classFileToPrepare: ClassFilePreparationTask) =
+      fun withClassFileToPrepare(classFileToPrepare: ClassFilesPreparatorService.ClassFilePreparationTask) =
         Result(classFilesToPrepare = mutableListOf(classFileToPrepare))
 
       fun withClassFileToOpen(classFile: ClassFile) =

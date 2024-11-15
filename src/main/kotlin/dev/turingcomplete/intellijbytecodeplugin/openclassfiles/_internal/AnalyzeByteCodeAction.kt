@@ -2,25 +2,15 @@ package dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal
 
 import com.intellij.injected.editor.EditorWindow
 import com.intellij.lang.injection.InjectedLanguageManager
-import com.intellij.openapi.actionSystem.ActionUpdateThread
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiUtilBase
-import dev.turingcomplete.intellijbytecodeplugin._ui.ByteCodePluginIcons
 import dev.turingcomplete.intellijbytecodeplugin.common.ByteCodeAnalyserOpenClassFileService
 
-internal class AnalyzeByteCodeAction : DumbAwareAction(TITLE, null, ByteCodePluginIcons.ACTION_ICON) {
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
-
-  companion object {
-    const val TITLE = "Analyze Byte Code"
-  }
+internal class AnalyzeByteCodeAction : AnAction() {
 
   // -- Properties -------------------------------------------------------------------------------------------------- //
   // -- Initialization ---------------------------------------------------------------------------------------------- //

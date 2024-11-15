@@ -1,17 +1,13 @@
 package dev.turingcomplete.intellijbytecodeplugin.common
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import dev.turingcomplete.intellijbytecodeplugin._ui.ByteCodeToolWindowFactory
 import dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal.ClassFilesFinderService
 import dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal.ClassFilesFinderService.Result
-import dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal.ClassFilesPreparatorService
+import org.objectweb.asm.ClassReader
 
 @Service(Service.Level.PROJECT)
 class ByteCodeAnalyserOpenClassFileService(val project: Project) {
@@ -44,31 +40,22 @@ class ByteCodeAnalyserOpenClassFileService(val project: Project) {
   }
 
   private fun handleResult(result: Result) {
-    val toolWindow = ToolWindowManager.getInstance(project).getToolWindow(ByteCodeToolWindowFactory.TOOL_WINDOW_ID)
-      ?: throw IllegalStateException("Could not find tool window '${ByteCodeToolWindowFactory.TOOL_WINDOW_ID}'")
 
     result.classFilesToOpen.forEach {
-      ByteCodeToolWindowFactory.openClassFile(it, toolWindow, project)
+      openClassFile(it, project)
     }
+  }
 
-    if (result.classFilesToPrepare.isNotEmpty()) {
-      val classFilesPreparatorService = project.getService(ClassFilesPreparatorService::class.java)
-      classFilesPreparatorService.prepareClassFiles(result.classFilesToPrepare, toolWindow.component) {
-        ByteCodeToolWindowFactory.openClassFile(it, toolWindow, project)
-      }
-    }
-
-    if (result.errors.isNotEmpty()) {
-      val errorMessage = if (result.errors.size == 1) {
-        result.errors[0]
-      }
-      else {
-        "The following errors occurred: ${result.errors.joinToString(prefix = "<ul>", postfix = "</ul>") { "<li>$it</li>" }}"
-      }
-      ApplicationManager.getApplication().invokeLater {
-        Messages.showErrorDialog(project, errorMessage, "Analyse Class Files")
-      }
-    }
+  fun getClassNameFromClassFile(file: VirtualFile): String {
+    val inputStream = file.inputStream
+    val classReader = ClassReader(inputStream)
+    return classReader.className
+  }
+  fun openClassFile(classFile: ClassFile, project: Project) {
+    val clazz = Class.forName("io.github.FlyJingFish.AndroidAopPlugin.action.ClassFileLocationKt")
+    val method = clazz.getDeclaredMethod("show",String::class.java, VirtualFile::class.java,Project::class.java)
+    method.isAccessible = true
+    method.invoke(null,getClassNameFromClassFile(classFile.file).replace("/","."),classFile.file,project)
   }
 
   // -- Inner Type -------------------------------------------------------------------------------------------------- //

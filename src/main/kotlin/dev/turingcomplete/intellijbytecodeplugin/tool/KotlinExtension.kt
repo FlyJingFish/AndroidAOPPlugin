@@ -1,4 +1,4 @@
-package dev.turingcomplete.intellijbytecodeplugin.common._internal
+package dev.turingcomplete.intellijbytecodeplugin.tool
 
 // -- Properties ---------------------------------------------------------------------------------------------------- //
 // -- Exported Methods ---------------------------------------------------------------------------------------------- //

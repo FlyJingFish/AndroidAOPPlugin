@@ -323,6 +323,21 @@ public class ClassFileLocationKt {
         return LocationResult.of(new LocatedClassFile(jvmClassName, virtualFile));
     }
 
+    public static void show(String jvmClassName,VirtualFile virtualFile,Project project){
+        LocationResult locationResult = LocationResult.of(new LocatedClassFile(jvmClassName, virtualFile));
+        LocatedClassFile locatedClassFile = locationResult.locatedClassFile;
+        if (locatedClassFile != null) {
+            updateToolWindowContents(project, locatedClassFile);
+        } else {
+            if (!project.isDisposed()) {
+                Messages.showWarningDialog(
+                        project,
+                        locationResult.errorMessage != null ? locationResult.errorMessage : "internal error",
+                        "AndroidAOP Code Viewer"
+                );
+            }
+        }
+    }
 
     private static PsiClass getFileClass(PsiClass c) {
         if (!PsiUtil.isLocalOrAnonymousClass(c)) {

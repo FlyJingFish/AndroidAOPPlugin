@@ -1,10 +1,6 @@
 package io.github.FlyJingFish.AndroidAopPlugin.action;
 
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.LangDataKeys;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -12,14 +8,14 @@ import com.intellij.openapi.roots.*;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.VirtualFileSystem;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiClassOwner;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import com.intellij.task.ProjectTask;
 import com.intellij.task.ProjectTaskManager;
 import com.intellij.util.containers.OrderedSet;
 import com.intellij.util.io.URLUtil;
-
 import org.objectweb.asm.ClassReader;
-
 
 import java.io.File;
 import java.io.IOException;
@@ -27,8 +23,14 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.github.FlyJingFish.AndroidAopPlugin.common.Constants.ACTION_ICON;
+
 
 public class ShowAopCodeViewerAction extends AnAction {
+
+    public ShowAopCodeViewerAction() {
+        super("AndroidAOP Code", "Shows the AndroidAOP Code from the current class",ACTION_ICON);
+    }
 
     Module module;
 

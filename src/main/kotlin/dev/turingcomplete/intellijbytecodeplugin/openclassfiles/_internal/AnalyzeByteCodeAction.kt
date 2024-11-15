@@ -10,28 +10,11 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiUtilBase
 import dev.turingcomplete.intellijbytecodeplugin.common.ByteCodeAnalyserOpenClassFileService
 
-internal class AnalyzeByteCodeAction : AnAction() {
+object AnalyzeByteCodeAction  {
 
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
 
-  override fun update(e: AnActionEvent) {
-    e.presentation.isEnabledAndVisible = CommonDataKeys.PROJECT.getData(e.dataContext)?.let { project ->
-      val files = CommonDataKeys.VIRTUAL_FILE_ARRAY.getData(e.dataContext)
-      if (files?.any { ClassFilesFinderService.fileCanBeAnalysed(it, project) } == true) {
-        true
-      }
-      else {
-        findPsiElement(project, e.dataContext).let { result ->
-          val containingFile = result.first?.containingFile
-          if (containingFile != null) ClassFilesFinderService.fileCanBeAnalysed(containingFile) else false
-        }
-      }
-    } ?: false
-  }
-
-  override fun actionPerformed(e: AnActionEvent) {
+  @JvmStatic
+  fun actionPerformed(e: AnActionEvent) {
     val project = CommonDataKeys.PROJECT.getData(e.dataContext) ?: return
 
     val result = findPsiElement(project, e.dataContext)
@@ -48,7 +31,6 @@ internal class AnalyzeByteCodeAction : AnAction() {
     }
   }
 
-  override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 

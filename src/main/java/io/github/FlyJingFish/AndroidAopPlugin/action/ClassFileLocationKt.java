@@ -6,6 +6,7 @@ import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.ide.util.JavaAnonymousClassesHelper;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.compiler.CompilerPaths;
 import com.intellij.openapi.diagnostic.Logger;
@@ -44,6 +45,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class ClassFileLocationKt {
     private static class LocatedClassFile {
@@ -91,7 +94,7 @@ public class ClassFileLocationKt {
         }
     }
 
-    public static void openClassFile(PsiElement psiElement, Project project) {
+    public static void openClassFile(AnActionEvent e, PsiElement psiElement, Project project) {
         ProgressManager.getInstance().run(new Task.Backgroundable(project, "Locating class file ...") {
             LocationResult locationResult = null;
 
@@ -121,11 +124,20 @@ public class ClassFileLocationKt {
                     updateToolWindowContents(project, locatedClassFile);
                 } else {
                     if (!project.isDisposed()) {
-                        Messages.showWarningDialog(
-                                project,
-                                locationResult.errorMessage != null ? locationResult.errorMessage : "internal error",
-                                "AndroidAOP Code Viewer"
-                        );
+                        try {
+                            Class clazz = Class.forName("dev.turingcomplete.intellijbytecodeplugin.openclassfiles._internal.AnalyzeByteCodeAction");
+                            Method method = clazz.getDeclaredMethod("actionPerformed",AnActionEvent.class);
+                            method.setAccessible(true);
+                            method.invoke(null,e);
+                        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException |
+                                 InvocationTargetException ex) {
+                            Messages.showWarningDialog(
+                                    project,
+                                    locationResult.errorMessage != null ? locationResult.errorMessage : "internal error",
+                                    "AndroidAOP Code Viewer"
+                            );
+                        }
+
                     }
                 }
             }

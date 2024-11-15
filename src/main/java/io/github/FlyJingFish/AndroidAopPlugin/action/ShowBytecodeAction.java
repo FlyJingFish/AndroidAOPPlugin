@@ -26,7 +26,7 @@ public class ShowBytecodeAction {
             return;
         }
 
-        ClassFileLocationKt.openClassFile(psiElement,  project);
+        ClassFileLocationKt.openClassFile(e,psiElement,  project);
     }
 
     private PsiElement getPsiElement(AnActionEvent e) {

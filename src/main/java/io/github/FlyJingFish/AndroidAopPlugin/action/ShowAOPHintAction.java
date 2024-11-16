@@ -32,7 +32,7 @@ public class ShowAOPHintAction extends AnAction {
         );
 
         if (result == Messages.OK) {
-            String url = "https://github.com/FlyJingFish/AndroidAOP/wiki/AOP-%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90%E6%8F%92%E4%BB%B6";
+            String url = "https://flyjingfish.github.io/AndroidAOP/zh/AOP_Helper/";
             BrowserUtil.browse(url);
         }
     }

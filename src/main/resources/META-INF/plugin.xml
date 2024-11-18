@@ -16,7 +16,7 @@
     <version>1.1.0</version>
     <vendor>FlyJingFish</vendor>
 <!--    <idea-version since-build="222.4554" until-build="242.*"/>-->
-    <idea-version since-build="222.4554"/>
+    <idea-version since-build="223.8836"/>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.java</depends>
     <depends>org.jetbrains.kotlin</depends>
@@ -28,7 +28,7 @@
     <change-notes><![CDATA[
         <b>Version 1.1.0</b>
         <ul>
-            <li>Support Kotlin' class file</li>
+            <li>Support more kotlin' class file</li>
         </ul>
         <b>Version 1.0.9</b>
         <ul>
@@ -89,9 +89,6 @@
             <add-to-group anchor="last" group-id="CodeMenu" />
         </action>
     </actions>
-    <extensionPoints>
-        <extensionPoint name="byteCodeTool" interface="io.github.FlyJingFish.AndroidAopPlugin.tool.ByteCodeTool"/>
-    </extensionPoints>
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable groupId="tools" instance="io.github.FlyJingFish.AndroidAopPlugin.config.PluginConfig" />
         <toolWindow anchor="right" factoryClass="io.github.FlyJingFish.AndroidAopPlugin.view.AOPCodeOutlineToolWindowFactory" icon="/images/pluginIcon.png"

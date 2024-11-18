@@ -12,14 +12,6 @@ import org.objectweb.asm.ClassReader
 
 @Service(Service.Level.PROJECT)
 class ByteCodeAnalyserOpenClassFileService(val project: Project) {
-  // -- Companion Object -------------------------------------------------------------------------------------------- //
-  // -- Properties -------------------------------------------------------------------------------------------------- //
-  // -- Initialization ---------------------------------------------------------------------------------------------- //
-  // -- Exposed Methods --------------------------------------------------------------------------------------------- //
-
-  fun openPsiFiles(psiFiles: List<PsiFile>) {
-    run { service -> service.findByPsiFiles(psiFiles) }
-  }
 
   fun openPsiElements(psiElementToPsiElementOriginPsiFile: Map<PsiElement, PsiFile?>) {
     run { service -> service.findByPsiElements(psiElementToPsiElementOriginPsiFile) }
@@ -29,9 +21,6 @@ class ByteCodeAnalyserOpenClassFileService(val project: Project) {
     run { service -> service.findByVirtualFiles(files) }
   }
 
-  internal fun openClassFiles(classFiles: List<ClassFile>) {
-    run { service -> service.findByClassFiles(classFiles) }
-  }
 
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
@@ -60,6 +49,7 @@ class ByteCodeAnalyserOpenClassFileService(val project: Project) {
     return classReader.className
   }
   fun openClassFile(classFile: ClassFile, project: Project) {
+//    ClassFileLocationKt.show(getClassNameFromClassFile(classFile.file).replace("/","."),classFile.file,project)
     val clazz = Class.forName("io.github.FlyJingFish.AndroidAopPlugin.action.ClassFileLocationKt")
     val method = clazz.getDeclaredMethod("show",String::class.java, VirtualFile::class.java,Project::class.java)
     method.isAccessible = true

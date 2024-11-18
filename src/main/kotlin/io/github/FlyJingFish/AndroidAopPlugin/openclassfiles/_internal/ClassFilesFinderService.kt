@@ -3,6 +3,7 @@ package io.github.FlyJingFish.AndroidAopPlugin.openclassfiles._internal
 import com.intellij.debugger.engine.JVMNameUtil
 import com.intellij.ide.highlighter.JavaClassFileType
 import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.components.ComponentManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.serviceOrNull
 import com.intellij.openapi.fileTypes.FileTypeRegistry
@@ -11,16 +12,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.CompilerModuleExtension
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.findFile
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiClassOwner
-import com.intellij.psi.PsiCompiledFile
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiJavaFile
-import com.intellij.psi.PsiJavaModule
-import com.intellij.psi.PsiManager
-import com.intellij.psi.PsiTypeParameter
+import com.intellij.psi.*
 import com.intellij.psi.impl.compiled.ClsClassImpl
 import com.intellij.psi.impl.light.LightMethod
 import com.intellij.psi.search.GlobalSearchScope
@@ -30,6 +22,7 @@ import io.github.FlyJingFish.AndroidAopPlugin.common.SourceFile
 import io.github.FlyJingFish.AndroidAopPlugin.common.SourceFile.CompilableSourceFile
 import io.github.FlyJingFish.AndroidAopPlugin.openclassfiles._internal.ClassFileCandidates.Companion.fromAbsolutePaths
 import io.github.FlyJingFish.AndroidAopPlugin.openclassfiles._internal.ClassFileCandidates.Companion.fromRelativePaths
+import io.github.FlyJingFish.AndroidAopPlugin.tool.findFile
 import org.jetbrains.kotlin.analysis.decompiler.psi.file.KtDecompiledFile
 import org.jetbrains.kotlin.fileClasses.javaFileFacadeFqName
 import org.jetbrains.kotlin.idea.base.psi.classIdIfNonLocal
@@ -44,6 +37,7 @@ import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.jvm.internal.Intrinsics
 
 @Service(Service.Level.PROJECT)
 internal class ClassFilesFinderService(private val project: Project) {
@@ -76,7 +70,7 @@ internal class ClassFilesFinderService(private val project: Project) {
         )
       }
 
-      if (DumbService.isDumb(project)) {
+      if (isDumb(project)) {
         return@mapNotNull Result.withErrorDumbMode()
       }
 
@@ -104,7 +98,7 @@ internal class ClassFilesFinderService(private val project: Project) {
 
       // In dumb mode, the `workingFile.psiFile` may not be a `PsiJavaFile`
       // or `PsiClassOwner`, which may lead to incorrect results.
-      if (DumbService.isDumb(project)) {
+      if (isDumb(project)) {
         return@map Result.withErrorDumbMode()
       }
 
@@ -151,7 +145,7 @@ internal class ClassFilesFinderService(private val project: Project) {
       if (classFile.sourceFile is CompilableSourceFile) {
         val compilerOutputClassFilePath = fromAbsolutePaths(classFile.file.toNioPath())
           Result.withClassFileToPrepare(
-              ClassFilesPreparatorService.ClassFilePreparationTask(
+              ClassFilePreparationTask(
                   compilerOutputClassFilePath,
                   classFile.sourceFile
               )
@@ -166,7 +160,7 @@ internal class ClassFilesFinderService(private val project: Project) {
   // -- Private Methods --------------------------------------------------------------------------------------------- //
 
   private fun findByPsiElements(psiElement: PsiElement, workingFile: WorkingFile): Result {
-    if (DumbService.isDumb(project)) {
+    if (isDumb(project)) {
       return if (workingFile.virtualFile.isClassFile()) {
         // Fallback to the original file
         // Advantage:
@@ -451,7 +445,7 @@ internal class ClassFilesFinderService(private val project: Project) {
         .mapNotNull { determineFullClassFilePathInCompilerOutputOfSourceFile(it, sourceFile) }
       if (compilerOutputClassFilePaths.isNotEmpty()) {
         return Result.withClassFileToPrepare(
-            ClassFilesPreparatorService.ClassFilePreparationTask(
+            ClassFilePreparationTask(
                 compilerOutputClassFileCandidates = fromAbsolutePaths(*compilerOutputClassFilePaths.toTypedArray()),
                 sourceFile = sourceFile
             )
@@ -459,7 +453,7 @@ internal class ClassFilesFinderService(private val project: Project) {
       }
     }
 
-    return if (DumbService.isDumb(project)) {
+    return if (isDumb(project)) {
         Result.withErrorDumbMode()
     }
     else {
@@ -485,7 +479,7 @@ internal class ClassFilesFinderService(private val project: Project) {
     val elementToUse = this.getParentOfType<KtEnumEntry>(false)?.parent ?: this
     val candidatesForElement = classNameProvider.getCandidatesForElement(elementToUse)
     if (candidatesForElement.isNotEmpty()) {
-      return@runReadAction candidatesForElement.map { ClassId.topLevel(FqName(it)) }
+      return@runReadAction candidatesForElement.map { topLevel(FqName(it)) }
     }
 
     // This is a simple fall back logic which will find a parent
@@ -500,7 +494,14 @@ internal class ClassFilesFinderService(private val project: Project) {
 
     return@runReadAction parentKtClassOrObject?.classIdIfNonLocal?.let { listOf(it) } ?: emptyList()
   }
-
+  fun topLevel(topLevelFqName: FqName): ClassId {
+    Intrinsics.checkNotNullParameter(topLevelFqName, "topLevelFqName")
+    val var10002 = topLevelFqName.parent()
+    Intrinsics.checkNotNullExpressionValue(var10002, "parent(...)")
+    val var10003 = topLevelFqName.shortName()
+    Intrinsics.checkNotNullExpressionValue(var10003, "shortName(...)")
+    return ClassId(var10002, var10003)
+  }
   private fun determineFullClassFilePathInCompilerOutputOfSourceFile(relativeClassFilePath: Path, sourceFile: CompilableSourceFile): Path? {
     val compiler = CompilerModuleExtension.getInstance(sourceFile.module) ?: return null
     val isTest = runReadAction { projectFileIndex.isInTestSourceContent(sourceFile.file) }
@@ -531,7 +532,7 @@ internal class ClassFilesFinderService(private val project: Project) {
 
   data class Result(
       val classFilesToOpen: MutableList<ClassFile> = mutableListOf(),
-      val classFilesToPrepare: MutableList<ClassFilesPreparatorService.ClassFilePreparationTask> = mutableListOf(),
+      val classFilesToPrepare: MutableList<ClassFilePreparationTask> = mutableListOf(),
       val errors: MutableList<String> = mutableListOf()
   ) {
 
@@ -557,7 +558,7 @@ internal class ClassFilesFinderService(private val project: Project) {
       fun withErrorNotProcessableFile(psiFile: PsiFile) =
         Result(errors = mutableListOf("File '${psiFile.name}' is not a processable source or class file."))
 
-      fun withClassFileToPrepare(classFileToPrepare: ClassFilesPreparatorService.ClassFilePreparationTask) =
+      fun withClassFileToPrepare(classFileToPrepare: ClassFilePreparationTask) =
         Result(classFilesToPrepare = mutableListOf(classFileToPrepare))
 
       fun withClassFileToOpen(classFile: ClassFile) =
@@ -570,34 +571,26 @@ internal class ClassFilesFinderService(private val project: Project) {
   // -- Companion Object -------------------------------------------------------------------------------------------- //
 
   companion object {
-
-    fun fileCanBeAnalysed(file: VirtualFile, project: Project): Boolean {
-      if (file.name == "package-info.java") {
-        // Only exists in sources
-        return false
-      }
-
-      if (file.isClassFile()) {
-        return true
-      }
-
-      val psiFile = runReadAction { PsiManager.getInstance(project).findFile(file) }
-      return psiFile != null && fileCanBeAnalysed(psiFile)
-    }
-
-    fun fileCanBeAnalysed(psiFile: PsiFile): Boolean {
-      if (psiFile.name == "package-info.java") {
-        // Only exists in sources
-        return false
-      }
-
-      return psiFile is PsiClassOwner
-    }
-
     fun List<Result>.reduce() =
       this.reduceOrNull { a, b -> a.addResult(b) } ?: Result.empty()
 
     fun VirtualFile.isClassFile(): Boolean =
       FileTypeRegistry.getInstance().isFileOfType(this, JavaClassFileType.INSTANCE)
+  }
+
+  fun isDumb(project:Project) :Boolean{
+    val dumbService = getInstance(project)
+    return dumbService.isDumb
+  }
+
+  fun getInstance(project: Project): DumbService {
+    Intrinsics.checkNotNullParameter(project, "project")
+    val var5 = (project as ComponentManager).getService(DumbService::class.java)
+    if (var5 == null) {
+      throw IllegalStateException("not found")
+    } else {
+      Intrinsics.checkNotNull(var5)
+      return var5
+    }
   }
 }

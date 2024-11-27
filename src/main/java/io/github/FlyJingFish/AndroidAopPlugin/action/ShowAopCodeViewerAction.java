@@ -15,6 +15,7 @@ import com.intellij.task.ProjectTask;
 import com.intellij.task.ProjectTaskManager;
 import com.intellij.util.containers.OrderedSet;
 import com.intellij.util.io.URLUtil;
+import org.jetbrains.kotlin.psi.KtFile;
 import org.objectweb.asm.ClassReader;
 
 import java.io.File;
@@ -108,6 +109,15 @@ public class ShowAopCodeViewerAction extends AnAction {
             VirtualFile file1 = virtualFileManager.refreshAndFindFileByPath(path);
             if (file1 != null) {
                 return file1;
+            }else if (file instanceof KtFile){
+                String classFile2 = vFile.getNameWithoutExtension() + "Kt.class";
+                Logger.getInstance(ShowAopCodeViewerAction.class).warn("classFile " + classFile2);
+                String path2 = Paths.get(possibleOutputDirectory, pkg, classFile2).toString();
+                Logger.getInstance(ShowAopCodeViewerAction.class).warn("path " + path2);
+                VirtualFile file2 = virtualFileManager.refreshAndFindFileByPath(path2);
+                if (file2 != null) {
+                    return file2;
+                }
             }
         }
 

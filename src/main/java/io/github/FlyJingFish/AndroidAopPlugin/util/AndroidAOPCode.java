@@ -307,12 +307,31 @@ public class AndroidAOPCode {
 
         for (MethodNode method : scanner.getMethods()) {
             boolean isSuspendMethod = method.desc.endsWith("Lkotlin/coroutines/Continuation;)Ljava/lang/Object;");
+            boolean isInit = "<init>".equals(method.name);
             if (codeStyle == FileTypeExtension.JAVA){
                 if (!isSuspendMethod){
+                    if (isInit){
+                        stringWriter.append("/**\n");
+                    }
                     getReplaceJavaMethod(method.access,method.name,method.desc,stringWriter,scanner);
+                    if (isInit){
+                        stringWriter.append("\n*/");
+                    }
+                    if (isInit){
+                        getReplaceJavaConstructor(method.access,method.name,method.desc,stringWriter,scanner);
+                    }
                 }
             }else {
+                if (isInit){
+                    stringWriter.append("/**\n");
+                }
                 getReplaceKotlinMethod(method.access,method.name,method.desc,method.signature,stringWriter,scanner);
+                if (isInit){
+                    stringWriter.append("\n*/");
+                }
+                if (isInit){
+                    getReplaceKotlinConstructor(method.access,method.name,method.desc,method.signature,stringWriter,scanner);
+                }
             }
         }
 
@@ -443,18 +462,26 @@ public class AndroidAOPCode {
                     }
                 }
             }
-            String returnStr = scanner.getKotlinReturnType(methodName,methodDescriptor);
-            if ("Unit".equals(returnStr)){
-                returnStr = "";
-            }
-            if ("".equals(returnStr)){
-                stringWriter.append(")");
-            }else {
-                boolean returnNull = scanner.returnNull(methodName,methodDescriptor);
+
+            if (isInit){
                 stringWriter.append("):")
-                        .append(returnStr)
-                        .append(returnNull ?"?":"");
+                        .append(getShowMethodClassName(scanner.getClassName()));
+            }else {
+                String returnStr = scanner.getKotlinReturnType(methodName,methodDescriptor);
+                if ("Unit".equals(returnStr)){
+                    returnStr = "";
+                }
+                if ("".equals(returnStr)){
+                    stringWriter.append(")");
+                }else {
+                    boolean returnNull = scanner.returnNull(methodName,methodDescriptor);
+                    stringWriter.append("):")
+                            .append(returnStr)
+                            .append(returnNull ?"?":"");
+                }
             }
+
+
 
 
 
@@ -490,6 +517,153 @@ public class AndroidAOPCode {
                         .append(args)
                         .append(")");
             }
+            if (isInit){
+                stringWriter.append("\n}");
+            }else {
+                stringWriter.append("\n}\n\n");
+            }
+        }
+    }
+
+    public void getReplaceKotlinConstructor(int methodAccess, String methodName, String methodDescriptor,String signature,
+                                       StringWriter stringWriter, MethodParamNamesScanner scanner) {
+        if (!"<clinit>".equals(methodName)){
+
+            boolean isSuspendMethod = methodDescriptor.endsWith("Lkotlin/coroutines/Continuation;)Ljava/lang/Object;");
+            boolean isInit = "<init>".equals(methodName);
+            String returnTypeClassName = Type.getReturnType(methodDescriptor).getClassName();
+            if (isSuspendMethod){
+                returnTypeClassName = getSuspendMethodType(signature);
+            }else if (isInit){
+                returnTypeClassName = scanner.getClassName();
+            }
+
+
+            Type[] types= Type.getArgumentTypes(methodDescriptor);
+            List<String> argNameList = scanner.getParamNames(
+                    methodName,
+                    methodDescriptor,
+                    types.length
+            );
+
+            boolean isStatic = (methodAccess & Opcodes.ACC_STATIC) != 0;
+
+            stringWriter.append("@JvmStatic\n");
+            if (useProxyMethod){
+                stringWriter.append("@ProxyMethod(proxyClass = ")
+                        .append(getShowMethodClassName(scanner.getClassName()))
+                        .append("::class,type = ")
+                        .append(isStatic?"ProxyType.STATIC_METHOD":(isInit?"ProxyType.INIT":"ProxyType.METHOD"))
+                        .append(")\n");
+            }
+            stringWriter.append("@AndroidAopReplaceMethod(\"");
+            if (isSuspendMethod){
+                stringWriter.append("suspend").append(" ");
+            }else if (!isInit){
+                stringWriter.append(returnTypeClassName).append(" ");
+            }
+            stringWriter.append(methodName.replace("$","\\$")).append("(");
+
+            for (int i = 0; i < types.length; i++) {
+                Type type = types[i];
+                if (i == types.length - 1 && isSuspendMethod){
+                    break;
+                }
+                stringWriter.append(type.getClassName().replace("$","\\$"));
+                if ((isSuspendMethod && i < types.length - 2) || (!isSuspendMethod && i != types.length -1)){
+                    stringWriter.append(",");
+                }
+            }
+            stringWriter.append(")");
+
+            stringWriter.append("\")");
+
+            String[] returnAnnos = null;
+            if (applicationConfig.getCopyAnnotation() == CopyAnnotation.Copy){
+                returnAnnos = scanner.getKotlinReturnAnnotation(methodName,methodDescriptor);
+            }
+            if (returnAnnos != null){
+                stringWriter.append("\n");
+                for (String annotation : returnAnnos) {
+                    if (!annotation.contains("org.jetbrains.annotations.Nullable") && !annotation.contains("androidx.annotation.Nullable")) {
+                        stringWriter.append(annotation).append(" ");
+                    }
+                }
+            }
+
+            if (isSuspendMethod){
+                stringWriter.append("\nsuspend fun ");
+            }else {
+                stringWriter.append("\nfun ");
+            }
+            if (isInit){
+                stringWriter.append("get").append(JavaToKotlinTypeConverter.getShowMethodKotlinClassName(scanner.getClassName())).append(scanner.getInitCount()+"");
+            }else {
+                stringWriter.append(methodName);
+            }
+            stringWriter.append("(");
+            boolean[] paramsNull = scanner.paramsNull(methodName,methodDescriptor);
+            List<String> paramsList = scanner.getKotlinParamsTypes(methodName,methodDescriptor);
+            String[][] annos = null;
+            if (applicationConfig.getCopyAnnotation() == CopyAnnotation.Copy){
+                annos = scanner.getKotlinParamsAnnotation(methodName,methodDescriptor);
+            }
+            StringBuilder clazzes = new StringBuilder();
+            for (int i = 0; i < paramsList.size(); i++) {
+                String typeName = paramsList.get(i);
+                if (isSuspendMethod && i == types.length - 1){
+                    break;
+                }
+                if (annos != null){
+                    String[] annotations = annos[i];
+                    for (String annotation : annotations) {
+                        if (!annotation.contains("org.jetbrains.annotations.Nullable") && !annotation.contains("androidx.annotation.Nullable")) {
+                            stringWriter.append(annotation).append(" ");
+                        }
+                    }
+                }
+                stringWriter.append(argNameList.get(i)).append(": ");
+
+                stringWriter.append(typeName);
+                if (i< paramsNull.length && paramsNull[i]){
+                    stringWriter.append("?");
+                }
+                stringWriter.append(",");
+
+                clazzes.append(typeName).append("::class.java,");
+            }
+            stringWriter.append("constructorClazz: Class<?>");
+            stringWriter.append("):")
+                    .append(getShowMethodClassName(scanner.getClassName()));
+
+
+            stringWriter.append("{\n");
+
+            StringBuffer args = new StringBuffer();
+            for (int i = 0; i < argNameList.size(); i++) {
+                if (i == types.length - 1 && isSuspendMethod){
+                    break;
+                }
+                args.append(argNameList.get(i));
+                if ((isSuspendMethod && i < types.length - 2) || (!isSuspendMethod && i != types.length -1)){
+                    args.append(",");
+                }
+            }
+
+            if (!"void".equals(returnTypeClassName) || isInit){
+                stringWriter.append("   return ");
+
+            }else {
+                stringWriter.append("   ");
+            }
+            clazzes.setLength(clazzes.length()-1);
+            stringWriter
+                    .append("constructorClazz.getConstructor(")
+                    .append(clazzes)
+                    .append(").newInstance(")
+                    .append(args)
+                    .append(") as ")
+                    .append(getShowMethodClassName(scanner.getClassName()));
 
             stringWriter.append("\n}\n\n");
         }
@@ -624,6 +798,117 @@ public class AndroidAOPCode {
                         .append(args)
                         .append(")");
             }
+
+            stringWriter.append(";\n}\n\n");
+        }
+    }
+
+    public void getReplaceJavaConstructor(int methodAccess, String methodName, String methodDescriptor,
+                                     StringWriter stringWriter, MethodParamNamesScanner scanner) {
+        if (!"<clinit>".equals(methodName)){
+            boolean isInit = "<init>".equals(methodName);
+            Type returnType = Type.getReturnType(methodDescriptor);
+            Type[] types= Type.getArgumentTypes(methodDescriptor);
+            List<String> argNameList = scanner.getParamNames(
+                    methodName,
+                    methodDescriptor,
+                    types.length
+            );
+
+            boolean isStatic = (methodAccess & Opcodes.ACC_STATIC) != 0;
+            boolean isSuspendMethod = methodDescriptor.endsWith("Lkotlin/coroutines/Continuation;)Ljava/lang/Object;");
+            if (useProxyMethod){
+                stringWriter.append("@ProxyMethod(proxyClass = ")
+                        .append(getShowMethodClassName(scanner.getClassName()))
+                        .append(".class,type = ")
+                        .append(isStatic?"ProxyType.STATIC_METHOD":(isInit?"ProxyType.INIT":"ProxyType.METHOD"))
+                        .append(")\n");
+            }
+            stringWriter.append("@AndroidAopReplaceMethod(\"");
+            if (isSuspendMethod){
+                stringWriter.append("suspend").append(" ");
+            }else if (!isInit){
+                stringWriter.append(returnType.getClassName()).append(" ");
+            }
+            stringWriter.append(methodName).append("(");
+
+            for (int i = 0; i < types.length; i++) {
+                Type type = types[i];
+                stringWriter.append(type.getClassName());
+                if (i != types.length -1){
+                    stringWriter.append(",");
+                }
+            }
+            stringWriter.append(")");
+
+            stringWriter.append("\")");
+
+            String[] returnAnnos = null;
+            if (applicationConfig.getCopyAnnotation() == CopyAnnotation.Copy){
+                returnAnnos = scanner.getJavaReturnAnnotation(methodName,methodDescriptor);
+            }
+            if (returnAnnos != null && returnAnnos.length > 0){
+                stringWriter.append("\n");
+                for (String returnAnno : returnAnnos) {
+                    stringWriter.append(returnAnno).append(" ");
+                }
+            }else if (scanner.returnNull(methodName,methodDescriptor)){
+                stringWriter.append("\n@Nullable");
+            }
+
+            stringWriter.append("\npublic static ");
+            stringWriter.append(getShowMethodClassName(scanner.getClassName()));
+            stringWriter.append(" ");
+            stringWriter.append("get").append(getShowMethodClassName(scanner.getClassName())).append(scanner.getInitCount()+"");
+            stringWriter.append("(");
+
+            boolean[] paramsNull = scanner.paramsNull(methodName,methodDescriptor);
+            List<String> paramsList = scanner.getJavaParamsTypes(methodName,methodDescriptor);
+            String[][] annos = null;
+            if (applicationConfig.getCopyAnnotation() == CopyAnnotation.Copy){
+                annos = scanner.getJavaParamsAnnotation(methodName,methodDescriptor);
+            }
+            StringBuilder clazzes = new StringBuilder();
+            for (int i = 0; i < paramsList.size(); i++) {
+                String type = paramsList.get(i);
+
+                if (annos != null){
+                    String[] annotations = annos[i];
+                    for (String annotation : annotations) {
+                        stringWriter.append(annotation).append(" ");
+                    }
+                }else if (i< paramsNull.length && paramsNull[i]){
+                    stringWriter.append("@Nullable ");
+                }
+                stringWriter.append(type);
+                stringWriter.append(" ").append(argNameList.get(i));
+                stringWriter.append(",");
+                clazzes.append(type).append(".class,");
+            }
+            stringWriter.append("Class<?> constructorClazz");
+
+            stringWriter.append(")");
+            stringWriter.append("{\n");
+
+            StringBuffer args = new StringBuffer();
+            for (int i = 0; i < argNameList.size(); i++) {
+                args.append(argNameList.get(i));
+                if (i != argNameList.size() - 1){
+                    args.append(",");
+                }
+            }
+
+            clazzes.setLength(clazzes.length()-1);
+            stringWriter.append("   return ");
+            stringWriter
+                    .append("(")
+                    .append(getShowMethodClassName(scanner.getClassName()))
+                    .append(")")
+                    .append("constructorClazz.getConstructor(")
+                    .append(clazzes)
+                    .append(").newInstance(")
+                    .append(args)
+                    .append(")");
 
             stringWriter.append(";\n}\n\n");
         }

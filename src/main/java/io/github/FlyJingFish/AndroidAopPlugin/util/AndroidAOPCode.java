@@ -656,7 +656,9 @@ public class AndroidAOPCode {
             }else {
                 stringWriter.append("   ");
             }
-            clazzes.setLength(clazzes.length()-1);
+            if (!clazzes.isEmpty()){
+                clazzes.setLength(clazzes.length()-1);
+            }
             stringWriter
                     .append("constructorClazz.getConstructor(")
                     .append(clazzes)
@@ -898,7 +900,9 @@ public class AndroidAOPCode {
                 }
             }
 
-            clazzes.setLength(clazzes.length()-1);
+            if (!clazzes.isEmpty()){
+                clazzes.setLength(clazzes.length()-1);
+            }
             stringWriter.append("   return ");
             stringWriter
                     .append("(")

@@ -13,7 +13,7 @@
         </ul>
         ]]>
     </description>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
     <vendor>FlyJingFish</vendor>
 <!--    <idea-version since-build="222.4554" until-build="242.*"/>-->
     <idea-version since-build="223.8836"/>
@@ -26,6 +26,10 @@
         <supportsKotlinK2Mode/>
     </extensions>
     <change-notes><![CDATA[
+        <b>Version 1.1.2</b>
+        <ul>
+            <li>Improve the function</li>
+        </ul>
         <b>Version 1.1.1</b>
         <ul>
             <li>Support for top-level function files</li>

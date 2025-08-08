@@ -37,16 +37,14 @@ public class ShowAopCodeViewerAction extends AnAction {
 
     @Override
     public void update(final AnActionEvent e) {
-        final VirtualFile virtualFile = e.getData(PlatformDataKeys.VIRTUAL_FILE);
-        final Project project = e.getData(PlatformDataKeys.PROJECT);
+        final Project project = e.getData(CommonDataKeys.PROJECT);
         final Presentation presentation = e.getPresentation();
-        if (project == null || virtualFile == null) {
+        if (project == null) {
             presentation.setEnabled(false);
-            Logger.getInstance(ShowAopCodeViewerAction.class).error("project == null || virtualFile == null");
+            Logger.getInstance(ShowAopCodeViewerAction.class).error("project == null");
             return;
         }
-        final PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
-        presentation.setEnabled(psiFile instanceof PsiClassOwner);
+        presentation.setEnabled(true);
     }
 
     @Override
